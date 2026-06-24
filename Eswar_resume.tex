@@ -1,0 +1,162 @@
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{} 
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Tight margins optimized for single-page real estate
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.0in}
+\addtolength{\topmargin}{-0.6in}
+\addtolength{\textheight}{1.2in}
+
+\urlstyle{same}
+\textfloatsep 5pt
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+
+% Clean, ATS-optimized unnumbered section dividers
+\titleformat{\section}{
+  \vspace{-6pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\HNLines\vspace{-4pt}]
+
+\newcommand{\HNLines}{\hrule height 0.5pt}
+
+% Force machine readability and search compatibility
+\pdfgentounicode=1
+
+% Custom list spacing handlers
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-6pt}
+}
+
+% Mathematically bounded 3-argument project layout engine (Fixes margin overflow)
+\newcommand{\resumeProjectHeading}[3]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #3 \\
+      \textit{\small#2} & \\
+    \end{tabular*}\vspace{-6pt}
+}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[itemsep=1pt, parseitemsep=1pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-4pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADER (Elite Pure Typographic Standard)----------
+\begin{center}
+    {\Huge \scshape Datti EswaraVaraPrasad} \\ \vspace{6pt}
+    \small 
+    \href{mailto:prasanth.email@iitjammu.ac.in}{prasanth.email@iitjammu.ac.in} ~\textbar~ 
+    +91 00000 00000 ~\textbar~ 
+    \href{https://linkedin.com/in/yourprofile}{\textbf{LinkedIn}} ~\textbar~ 
+    \href{https://github.com/yourusername}{\textbf{GitHub}} ~\textbar~
+    \textbf{LeetCode}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section*{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Indian Institute of Technology (IIT) Jammu}{Jammu, India}
+      {Bachelor of Technology in Computer Science and Engineering}{July 2024 -- May 2028}
+      \begin{itemize}[leftmargin=0.15in, label={$\bullet$}, itemsep=1pt, parseitemsep=1pt]
+        \item \small{\textbf{Cumulative GPA:} 7.30 / 10.00}
+        \item \small{\textbf{JEE National Exams:} Ranked in the \textbf{Top 0.6\%} (99.4+ Percentile) out of \textbf{1.5M+ applicants} nationwide; successfully cleared the competitive JEE Advanced pipeline for core CSE.}
+        \item \small{\textbf{AlgoUniversity:} Ranked in the \textbf{Top 8\%} nationwide during the algorithmic screening process to qualify for Round 2.}
+      \end{itemize}
+  \resumeSubHeadingListEnd
+
+
+%-----------TECHNICAL SKILLS-----------
+\section*{Technical Skills \& Coursework}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{: C++, C, JavaScript (ES6+)} \\
+     \textbf{Backend \& Frameworks}{: Node.js, Express.js, REST APIs, WebSockets (Socket.io)} \\
+     \textbf{Databases \& Caching}{: MongoDB, Redis} \\
+     \textbf{Tools \& Platforms}{: Git, GitHub} \\
+     \textbf{Relevant Coursework}{: Data Structures, Design and Analysis of Algorithms, Computer Architecture, Principles of Programming Languages, Object-Oriented Programming}
+    }}
+ \end{itemize}
+
+
+%-----------PROJECTS-----------
+\section*{Projects}
+    \resumeSubHeadingListStart
+
+      \resumeProjectHeading
+          {High-Throughput Developer Metrics API with Redis Caching}
+          {Node.js, Express, Redis, MongoDB, REST APIs, Git}
+          {\href{https://github.com/yourusername}{\textbf{GitHub}}}
+          \resumeItemListStart
+            \resumeItem{Engineered an asynchronous REST API utilizing Node.js and Express to securely aggregate, normalize, and parse live competitive programming performance data from external web endpoints.}
+            \resumeItem{Implemented an in-memory Redis caching architecture with calculated Time-To-Live (TTL) policies, entirely bypassing external service rate-limiting bottlenecks and reducing redundant endpoint load.}
+            \resumeItem{Optimized backend data delivery pipeline and dropped response latency to \textbf{sub-15ms} by introducing structural payload pruning and concurrent execution blocks via \texttt{Promise.all}.}
+          \resumeItemListEnd
+          
+      \resumeProjectHeading
+          {Concurrent Multi-User Coding Engine with Conflict Resolution}
+          {Node.js, Socket.io, WebSockets, JavaScript}
+          {\href{https://github.com/yourusername}{\textbf{GitHub}}}
+          \resumeItemListStart
+            \resumeItem{Architected a collaborative real-time code editor environment using WebSockets (Socket.io) to maintain persistent, high-frequency, bi-directional data streams across multiple simultaneous clients.}
+            \resumeItem{Designed a lightweight state synchronization logic layer to systematically handle operational data drift and seamlessly resolve document text mutations originating from concurrent multi-user typing updates.}
+            \resumeItem{Streamlined event-driven message broadcasting and payload delivery mechanics to preserve global state consistency across open sessions while sustaining operational latency safely \textbf{under 100ms}.}
+          \resumeItemListEnd
+
+    \resumeSubHeadingListEnd
+
+
+%-----------CODING PROFILES-----------
+\section*{Coding Profiles}
+  \resumeItemListStart
+    \resumeItem{\textbf{Platform Consistency:} Developed strong algorithmic foundations by successfully solving \textbf{600+ distinct coding challenges} across LeetCode, Codeforces, and CodeChef.}
+    \resumeItem{\textbf{LeetCode (Max Rating: 1620+):} Active participant in live, timed Weekly Contests; consistently demonstrating efficient problem-solving agility within the \textbf{top $\sim$10\%} of global participants.}
+    \resumeItem{\textbf{Codeforces (Max Rating: 1150+):} Engaging in highly competitive, algorithmic speed rounds to optimize complex structural solution logic under strict time constraints.}
+  \resumeItemListEnd
+
+
+%-----------LEADERSHIP & EXPERIENCE-----------
+\section*{Leadership & Extracurriculars}
+  \resumeItemListStart
+    \resumeItem{\textbf{Head of Media \& Public Relations} $|$ \emph{Anhad (Cultural Fest) \& Pragyan (Technical Fest)} \\ Managed digital PR strategy and institutional outreach for major campus festivals; led a cross-functional volunteer team to handle event coverage and promotional logistics.}
+    \resumeItem{\textbf{Media Head} $|$ \emph{IIT Jammu Tinkering Lab \& EBSB Council} \\ Spearheaded promotional strategy for the institute's primary innovation hub and the Ek Bharat Shreshtha Bharat (EBSB) council; streamlined communication channels and event documentation for campus-wide technical workshops.}
+  \resumeItemListEnd
+
+\end{document}
