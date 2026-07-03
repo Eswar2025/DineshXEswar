@@ -1,0 +1,132 @@
+/* ==========================================================================
+   Wispr Flow — Design Tokens & Fonts
+   Color palette, typography scale, spacing, and @font-face declarations
+   ========================================================================== */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: "Figtree";
+  src: url("../assets/fonts/Figtree-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("../assets/fonts/Figtree-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("../assets/fonts/Figtree-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("../assets/fonts/Figtree-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("../assets/fonts/EBGaramond-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("../assets/fonts/EBGaramond-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Monaspace Neon";
+  src: url("../assets/fonts/MonaspaceNeon-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../assets/fonts/IBMPlexMono-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Tokens ---------- */
+:root {
+  /* Brand palette (from original CSS variables) */
+  --lumen: #ffffeb;        /* primary cream background */
+  --lumen-dark: #e4e4d0;
+  --dawn: #f0d7ff;         /* lavender / secondary */
+  --fathom: #034f46;       /* deep green */
+  --glow: #ffa946;         /* orange accent */
+  --pulse: #7f1c34;        /* wine red */
+  --vast: #1a1a1a;         /* near-black text / dark sections */
+  --white: #fff;
+
+  /* Neutrals */
+  --black: #000;
+  --neutral-darkest: #111;
+  --neutral-darker: #222;
+  --neutral-dark: #444;
+  --neutral: #666;
+  --neutral-light: #aaa;
+  --neutral-lighter: #ccc;
+  --neutral-lightest: #eee;
+
+  /* Semantic */
+  --bg-primary: var(--lumen);
+  --bg-alternate: var(--white);
+  --bg-secondary: var(--dawn);
+  --bg-tertiary: var(--vast);
+  --text-primary: var(--vast);
+  --text-alternate: var(--white);
+  --text-secondary: var(--lumen);
+  --border-primary: rgba(26, 26, 26, 0.3);
+  --border-secondary: var(--vast);
+  --alpha-light-50: rgba(255, 255, 235, 0.5);
+
+  /* Typography */
+  --font-body: "Figtree", Arial, sans-serif;
+  --font-serif: "EB Garamond", Georgia, serif;
+  --font-mono: "Monaspace Neon", "IBM Plex Mono", ui-monospace, monospace;
+
+  --h1: 7.5rem;
+  --h1-small: 6rem;
+  --h2: 4rem;
+  --h3: 3rem;
+  --h4: 2rem;
+  --h5: 1.25rem;
+  --h6: 1rem;
+  --body-large: 1.25rem;
+  --body-medium: 1.125rem;
+  --body-regular: 1rem;
+  --body-small: 0.875rem;
+
+  /* Spacing */
+  --section-pad-large: 8rem;
+  --section-pad-medium: 6rem;
+  --spacer-large: 3rem;
+  --spacer-medium: 1.5rem;
+  --section-radius: 2.5rem;
+
+  /* Layout */
+  --container-max: 80rem;   /* 1280px */
+  --container-pad: 1.5rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.3s var(--ease-smooth);
+}
+
+/* Fluid type down-scaling for large displays handled in base.css media queries */
