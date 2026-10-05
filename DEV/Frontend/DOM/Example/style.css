@@ -5,11 +5,21 @@ body {
   background-color: #f4f4f4;
   /* smooth colour change when JS updates the background */
   transition: background-color 0.4s ease;
+  color: #333;
 }
 
+/* JS sets the h1 text colour AND the page background to the same colour,
+   so the text vanished. The white "card" + dark outline keeps it readable
+   on every colour (even yellow on yellow). */
 h1 {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 12px;
+  background-color: #ffffff;
   font-size: 2.2rem;
   color: #333;
+  -webkit-text-stroke: 1.5px #333;
+  paint-order: stroke fill;
   transition: color 0.4s ease;
 }
 
