@@ -1,0 +1,46 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding-top: 60px;
+  background-color: #f4f4f4;
+  /* smooth colour change when JS updates the background */
+  transition: background-color 0.4s ease;
+}
+
+h1 {
+  font-size: 2.2rem;
+  color: #333;
+  transition: color 0.4s ease;
+}
+
+#buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.color-btn {
+  padding: 12px 22px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+/* Each button is painted its own colour using the data-color attribute */
+.color-btn[data-color="violet"] { background-color: #8f00ff; }
+.color-btn[data-color="indigo"] { background-color: #4b0082; }
+.color-btn[data-color="blue"]   { background-color: #0000ff; }
+.color-btn[data-color="green"]  { background-color: #008000; }
+.color-btn[data-color="yellow"] { background-color: #ffd400; color: #333; }
+.color-btn[data-color="orange"] { background-color: #ff7f00; }
+.color-btn[data-color="red"]    { background-color: #e00000; }
+
+/* A class that JS adds/removes to highlight the active button */
+.active {
+  outline: 4px solid #333;
+  transform: scale(1.1);
+}

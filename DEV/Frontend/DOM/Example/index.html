@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOM Lesson - VIBGYOR Buttons</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- This <h1> is a DOM "element node". JS will find it by its id and change it. -->
+  <h1 id="message">You pressed ______ color button</h1>
+
+  <!-- Each button carries its colour in a data-color attribute.
+       JS reads it with button.dataset.color -->
+  <div id="buttons">
+    <button class="color-btn" data-color="violet">Violet</button>
+    <button class="color-btn" data-color="indigo">Indigo</button>
+    <button class="color-btn" data-color="blue">Blue</button>
+    <button class="color-btn" data-color="green">Green</button>
+    <button class="color-btn" data-color="yellow">Yellow</button>
+    <button class="color-btn" data-color="orange">Orange</button>
+    <button class="color-btn" data-color="red">Red</button>
+  </div>
+
+  <!-- Script goes at the END of body so the DOM above already exists when JS runs -->
+  <script src="script.js"></script>
+</body>
+</html>
