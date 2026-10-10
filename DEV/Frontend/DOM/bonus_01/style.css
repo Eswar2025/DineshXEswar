@@ -1,0 +1,63 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  background-color: #e0f2fe;
+}
+
+.box {
+  width: 400px;
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  resize: none;
+}
+
+.info {
+  text-align: right;
+  color: #475569;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #0284c7;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/*
+  TASK 2 (CSS):
+  The remaining-characters number gets one of these classes from JS:
+    "warning" -> orange text (#ea580c)
+    "danger"  -> red text (#dc2626) and bold
+  Write both styles below.
+*/

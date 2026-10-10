@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tweet Box</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="box">
+    <h2>Write a post</h2>
+
+    <!--
+      TASK 1 (HTML):
+      - The textarea must have id="postText" and the attribute placeholder="What's on your mind?".
+      - The remaining-characters number must be inside an element with id="remaining".
+      - The Post button must have id="postBtn" and must start disabled (attribute disabled).
+      - The Clear button must have id="clearBtn".
+    -->
+    <textarea rows="4" cols="40"></textarea>
+
+    <p class="info">
+      Characters left: <span class="remaining">50</span>
+    </p>
+
+    <div class="actions">
+      <button id="clearbtn">Clear</button>
+      <button id="postBtn">Post</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
