@@ -17,14 +17,14 @@
       - The Post button must have id="postBtn" and must start disabled (attribute disabled).
       - The Clear button must have id="clearBtn".
     -->
-    <textarea rows="4" cols="40"></textarea>
+    <textarea id="postText" placeholder="What's on your mind?" rows="4" cols="40"></textarea>
 
     <p class="info">
-      Characters left: <span class="remaining">50</span>
+      Characters left: <span class="remaining" id="remaining">50</span>
     </p>
 
     <div class="actions">
-      <button id="clearbtn">Clear</button>
+      <button id="clearBtn">Clear</button>
       <button id="postBtn">Post</button>
     </div>
   </div>
