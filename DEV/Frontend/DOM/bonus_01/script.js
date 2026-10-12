@@ -12,3 +12,49 @@
   4. Clicking Clear empties the textarea, and everything goes back to the starting state:
      remaining = 50, no classes, Post button disabled.
 */
+
+const textEle = document.getElementById('postText');
+let remaininglengthEle = document.getElementById('remaining');
+let remaininglength ;
+const clearEle = document.getElementById('clearBtn') ;
+const postBtnEle = document.getElementById('postBtn') ;
+
+postBtnEle.disabled = true ;
+
+textEle.addEventListener("input", function(){
+   remaininglengthEle.innerText = 50 - textEle.value.length ;
+   remaininglength = 50 - textEle.value.length ;
+
+   let spaceremlengthEle = 50 - textEle.value.replace(/\s/g, "").length ;
+
+   if((spaceremlengthEle == 50) || (remaininglength < 0)){
+      postBtnEle.disabled = true ;
+   }
+   else{
+      postBtnEle.disabled = false ;
+   }
+
+
+   if(remaininglength <= 0){
+      remaininglengthEle.classList.remove("warning") ;
+      remaininglengthEle.classList.add("danger") ;
+   }
+   else if(remaininglength <= 10){
+      remaininglengthEle.classList.add("warning");
+      remaininglengthEle.classList.remove("danger") ;
+   }
+   else{
+      remaininglengthEle.classList.remove("warning");
+   }
+
+})
+
+clearEle.addEventListener("click", function(){
+   remaininglengthEle.classList.remove("warning");
+   remaininglengthEle.classList.remove("danger") ;
+   postBtnEle.disabled = true ;
+   textEle.value = '';
+   remaininglengthEle.innerText = 50 ;
+})
+
+

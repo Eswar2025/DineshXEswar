@@ -54,6 +54,14 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.warning {
+  color: #ea580c ;
+}
+
+.danger {
+  color: #dc2626 ;
+  font-family: bold ;
+}
 /*
   TASK 2 (CSS):
   The remaining-characters number gets one of these classes from JS:
