@@ -60,7 +60,7 @@ button:disabled {
 
 .danger {
   color: #dc2626 ;
-  font-family: bold ;
+  font-weight: bold ;
 }
 /*
   TASK 2 (CSS):

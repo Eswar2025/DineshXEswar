@@ -45,6 +45,7 @@ textEle.addEventListener("input", function(){
    }
    else{
       remaininglengthEle.classList.remove("warning");
+      remaininglengthEle.classList.remove("danger");
    }
 
 })
