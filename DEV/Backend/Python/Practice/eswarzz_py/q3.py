@@ -1,7 +1,7 @@
 # 3. Return the sum of the digits of a non-negative integer.
 #    1234 -> 10
 
-n = 5235234234
+n = 52352342346496496
 
 def digit_sum(n):
     x = 0
@@ -19,5 +19,6 @@ def dig_dig(n) :
 def dineshFn(n) : 
     return digit_sum(n) if digit_sum(n) < 10 else digit_sum(digit_sum(n))
 
+print(f"sum of the digits is {digit_sum(n)}")
 print(f"sum of the digits is {dig_dig(n)}")
 print(f"sum of the digits is {dineshFn(n)}")
