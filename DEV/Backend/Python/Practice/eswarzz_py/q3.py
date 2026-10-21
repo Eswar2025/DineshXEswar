@@ -17,7 +17,7 @@ def dig_dig(n) :
     return x 
 
 def dineshFn(n) : 
-    return dig_dig(n) if dig_dig(n) < 10 else dig_dig(dig_dig(n))
+    return digit_sum(n) if digit_sum(n) < 10 else digit_sum(digit_sum(n))
 
 print(f"sum of the digits is {dig_dig(n)}")
 print(f"sum of the digits is {dineshFn(n)}")
