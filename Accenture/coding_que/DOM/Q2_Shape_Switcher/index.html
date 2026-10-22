@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape Switcher</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Shape Switcher</h1>
+
+    <!--
+      PROBLEM (HTML):
+      Each button stores its shape name in the data-shape attribute.
+      That name must be exactly the same as the CSS class of the shape
+      (triangle, circle, square).
+      One button has a wrong value, so clicking it shows nothing. Find it and fix it.
+    -->
+    <div class="buttons">
+      <button class="shape-btn" data-shape="triangle">Triangle</button>
+      <button class="shape-btn" data-shape="circel">Circle</button>
+      <button class="shape-btn" data-shape="square">Square</button>
+    </div>
+
+    <div class="canvas">
+      <div id="shape" class="shape"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
