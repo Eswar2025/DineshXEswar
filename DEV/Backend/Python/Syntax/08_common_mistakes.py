@@ -85,3 +85,10 @@ wrong()
 assert total == 0
 
 print("08 OK")
+
+
+print("Enter your name")
+name = input()
+n = len(name)
+for i in range(n):
+    print(name[i:6])

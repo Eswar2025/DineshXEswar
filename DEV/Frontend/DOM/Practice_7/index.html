@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tabs</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="tabs-box">
+    <!--
+      TASK 1 (HTML):
+      Every tab button has a data-target attribute with the id of the panel it opens:
+        Tab 1 -> panel1,  Tab 2 -> panel2,  Tab 3 -> panel3
+      Also, the page must start with Tab 1 and Panel 1 active
+      (they carry the class "active").
+    -->
+    <div class="tab-bar">
+      <button class="tab" data-target="panel1">HTML</button>
+      <button class="tab" data-target="panel2">CSS</button>
+      <button class="tab">JavaScript</button>
+    </div>
+
+    <h3 id="status">Currently viewing: HTML</h3>
+
+    <div class="panel" id="panel1">HTML gives the page its structure.</div>
+    <div class="panel" id="panel2">CSS gives the page its looks.</div>
+    <div class="panel" id="pannel3">JavaScript makes the page interactive.</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

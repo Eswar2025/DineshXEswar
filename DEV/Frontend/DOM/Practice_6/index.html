@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup Form</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!--
+    TASK 1 (HTML):
+    - The <form> must have the attribute novalidate
+      (so our own error messages are used, not the browser's).
+    - The submit button must really submit the form.
+    - Every label must be linked to its input.
+  -->
+  <form id="signupForm">
+    <h1>Create account</h1>
+
+    <div class="group">
+      <label for="username">Username</label>
+      <input type="text" id="username" />
+      <span class="error" id="usernameError"></span>
+    </div>
+
+    <div class="group">
+      <label for="email">Email</label>
+      <input type="text" id="email" />
+      <span class="error" id="emailError"></span>
+    </div>
+
+    <div class="group">
+      <label for="pass">Password</label>
+      <input type="password" id="password" />
+      <span class="error" id="passwordError"></span>
+    </div>
+
+    <button type="button" id="submitBtn">Sign Up</button>
+
+    <p id="successMsg"></p>
+  </form>
+
+  <script src="script.js"></script>
+</body>
+</html>

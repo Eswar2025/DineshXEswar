@@ -1,7 +1,7 @@
 # 3. Return the sum of the digits of a non-negative integer.
 #    1234 -> 10
 
-n = 52352342346496496
+n = 999999999999999999999
 
 def digit_sum(n):
     x = 0

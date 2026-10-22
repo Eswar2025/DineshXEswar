@@ -1,0 +1,52 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding-top: 60px;
+  display: flex;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+}
+
+.tabs-box {
+  width: 480px;
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tab {
+  padding: 10px 18px;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.panel {
+  display: none;
+  padding: 16px 0;
+}
+
+/*
+  TASK 2 (CSS):
+  1. A tab with the class "active" must have blue text (#4f46e5)
+     and a 3px solid blue bottom border.
+  2. A panel with the class "active" must be visible (display: block).
+  The code below is meant to do the second one, but panels never appear.
+  Fix it and write the first one.
+*/
+.panel .active {
+  display: block;
+}

@@ -48,13 +48,14 @@ input {
 
 .swap-btn {
   width: 64px;
-  height: 48px;
+  height: 64px;
   font-size: 1.4rem;
   color: white;
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   border: 2px solid #60a5fa;
-  border-radius: 6px;
-  curser: pointer;
+  border-radius: 50%;
+  cursor: pointer;
+  /* border-radius: 50%; */
 }
 
 .swap-btn:hover {

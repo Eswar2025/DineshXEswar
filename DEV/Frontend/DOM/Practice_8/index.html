@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grocery Filter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shop">
+    <h1>Grocery Filter</h1>
+
+    <input type="text" id="searchBox" placeholder="Search items..." />
+
+    <!--
+      TASK 1 (HTML):
+      Every list item has a data-category attribute (fruit, veg or dairy)
+      and every filter button has a data-category too
+      ("all" for the All button).
+      Some of them are missing or wrong. Fix them.
+    -->
+    <div class="filters">
+      <button class="filter-btn active" data-category="all">All</button>
+      <button class="filter-btn" data-category="fruit">Fruit</button>
+      <button class="filter-btn" data-category="veg">Veg</button>
+      <button class="filter-btn" data-category="dairy">Dairy</button>
+    </div>
+
+    <p id="countText">Showing 6 items</p>
+
+    <ul id="itemList">
+      <li data-category="fruit">Apple</li>
+      <li data-category="fruits">Banana</li>
+      <li>Carrot</li>
+      <li data-category="veg">Spinach</li>
+      <li data-category="dairy">Milk</li>
+      <li data-category="dairy">Cheese</li>
+    </ul>
+
+    <p id="noResults" class="hidden">No items found</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

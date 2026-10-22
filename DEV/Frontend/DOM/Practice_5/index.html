@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>To-Do List</h1>
+
+    <!--
+      TASK 1 (HTML):
+      - The input must have id="taskInput", a placeholder "Add a task"
+        and the attribute maxlength="40".
+      - The add button must have id="addBtn".
+    -->
+    <div class="add-row">
+      <input type="text" id="task-input" />
+      <button id="addbtn">Add</button>
+    </div>
+
+    <ul id="taskList">
+      <li><span class="task-text">Read DOM notes</span><button class="delete-btn">X</button></li>
+      <li><span class="task-text">Solve one DSA question</span><button class="delete-btn">X</button></li>
+    </ul>
+
+    <p id="remaining">2 tasks left</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

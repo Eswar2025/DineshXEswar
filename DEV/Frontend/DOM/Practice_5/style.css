@@ -1,0 +1,75 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding-top: 60px;
+  display: flex;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+}
+
+.app {
+  width: 420px;
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.add-row input {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.add-row button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.task-text {
+  cursor: pointer;
+}
+
+.delete-btn {
+  border: none;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+}
+
+/*
+  TASK 2 (CSS):
+  A finished task has the class "done" on its <li>.
+  A "done" task must have:
+    - a line through the text
+    - grey text colour (#9ca3af)
+  Write the style below.
+*/

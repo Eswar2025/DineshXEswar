@@ -5,10 +5,11 @@
 a = 10            # int
 b = 3.5           # float
 name = "Eswar"    # str
-flag = True       # bool (capital T)
+flag = True       # bool (capital T) False
 nothing = None    # like null
 
-print(type(a), type(b), type(name), type(flag), type(nothing))
+# cout << type(a) << " is a data type\n";
+# print(type(a), " is a data type\n",  type(b), type(name), type(flag), type(nothing))
 
 # ---------- arithmetic ----------
 assert 7 / 2 == 3.5        # / is ALWAYS float division
@@ -18,7 +19,8 @@ assert 7 % 3 == 1
 assert 2 ** 10 == 1024     # power
 assert abs(-5) == 5
 assert divmod(17, 5) == (3, 2)   # quotient and remainder together
-
+# print(5/4) # 1.25
+# print(7/3)
 # ---------- swapping and multiple assignment ----------
 x, y = 1, 2
 x, y = y, x                # swap without temp
@@ -31,12 +33,12 @@ assert str(99) == "99"
 assert int(7.9) == 7       # truncates
 
 # ---------- print ----------
-print("Hello", "World")                 # Hello World   (space between)
+print("HelloWorld")                 # Hello World   (space between)
 print("a", "b", sep="-")                # a-b
-print("no newline", end="")             # stays on same line
+print("\tno newline", end="")             # stays on same line
 print()                                 # newline
 print(f"{name} is {a} years, pi~{3.14159:.2f}")   # f-string, 2 decimals -> 3.14
-
+print(f"My name is {name}")
 # ---------- reading input (OA style) ----------
 # input() ALWAYS returns a string.
 #   n = int(input())                          one integer

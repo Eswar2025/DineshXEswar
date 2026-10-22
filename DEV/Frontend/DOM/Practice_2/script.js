@@ -1,13 +1,18 @@
-const AEle = document.getElementById("inputA");
-const BEle = document.getElementById("inputB");
+const Aele = document.querySelector("#inputA");
+const Bele = document.querySelector("#inputB");
 
-const swapEle = document.querySelector(".swap-btn");
+// // function swapFn(){
+// //   const temp = Bele.value;
+// //   Bele.value = Aele.value;
+// //   Aele.value = temp;
+// // }
 
-swapEle.addEventListener("click", function SwapFn(event) {
-  const temp = AEle.value;
+// const SwapBtn = document.querySelector('.swap-btn');
 
-  AEle.value = BEle.value;
-  BEle.value = temp;
-});
-
-// if(AEle.value == "")
+document
+  .querySelector(".swap-btn")
+  .addEventListener("click", function (dinesh) {
+    const temp = Bele.value;
+    Bele.value = Aele.value;
+    Aele.value = temp;
+  });

@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  color: #111827;
+  transition: background-color 0.3s;
+}
+
+.card {
+  padding: 32px 48px;
+  max-width: 420px;
+  text-align: center;
+  border-radius: 16px;
+  background-color: #f3f4f6;
+  /* transistion: background-color 0.3s; */
+}
+
+.theme-btn {
+  margin-top: 16px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+
+/*
+  TASK 2 (CSS):
+  When the <body> has the class "dark":
+    - the page background must be #111827
+    - the text colour must be #f9fafb
+    - the .card background must be #1f2937
+  The code below is meant to do this, but the dark theme never shows up.
+  Fix it.
+*/
+.dark {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+body.dark.card {
+  background-color: #1f2937;
+  color: rgb(204, 29, 29);
+}
