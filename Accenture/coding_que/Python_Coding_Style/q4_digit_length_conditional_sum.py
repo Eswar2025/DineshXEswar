@@ -56,27 +56,29 @@ Example 3:
 from typing import List
 
 
+def digitLen(n):
+    len = 0
+    while n > 0:
+        n = n // 10
+        len = len + 1
+    return len
+
+def numberSum(n) :
+    sum = 0
+    while n > 0:
+        sum += n%10
+        n = n//10
+    return sum
+    
 class Solution:
     def calculateDigitRuleSum(self, n: int, a: List[int]) -> int:
-        """
-        Calculates the sum of elements after applying digit length conditional rules.
-
-        Args:
-            n (int): Number of elements in the array.
-            a (List[int]): Array of non-negative integers.
-
-        Returns:
-            int: The total accumulated sum.
-        """
-        # ======================================================================
-        # >>> WRITE YOUR CODE BELOW THIS LINE <<<
-        # ======================================================================
-        
-        pass  # Replace with your code
-        
-        # ======================================================================
-        # >>> WRITE YOUR CODE ABOVE THIS LINE <<<
-        # ======================================================================
+        totalSum = 0
+        for i in range(n) :
+            if digitLen(a[i]) % 2 == 0 :
+                totalSum = totalSum + digitLen(a[i])**2
+            else: 
+                totalSum = totalSum + numberSum(a[i])
+        return totalSum
 
 
 # ==============================================================================

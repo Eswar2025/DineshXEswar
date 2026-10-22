@@ -46,30 +46,15 @@ from typing import Tuple
 
 class Solution:
     def runningSumDivisibleBy5(self, n: int) -> Tuple[int, int]:
-        """
-        Calculates the running sum from 1 to n and counts how many times 
-        the running sum is divisible by 5.
-
-        Args:
-            n (int): A positive integer.
-
-        Returns:
-            Tuple[int, int]: (total_running_sum, count_divisible_by_5)
-        """
-        # ======================================================================
-        # >>> WRITE YOUR CODE BELOW THIS LINE <<<
-        # ======================================================================
-        
-        pass  # Replace with your code
-        
-        # ======================================================================
-        # >>> WRITE YOUR CODE ABOVE THIS LINE <<<
-        # ======================================================================
+        count = 0
+        runningSum = 0
+        for i in range(1, n + 1) :
+            runningSum = runningSum + i
+            if runningSum % 5 == 0:
+                count = count + 1
+        return runningSum, count
 
 
-# ==============================================================================
-# TEST RUNNER & TEST SCENARIOS (Accenture Assessment Test Harness)
-# ==============================================================================
 def run_tests():
     solution = Solution()
     
