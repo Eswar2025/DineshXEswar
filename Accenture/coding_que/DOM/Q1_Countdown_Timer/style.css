@@ -33,6 +33,7 @@ body {
     The timer number must have the text colour #A100FF.
     Add the missing property in this rule.
   */
+  color: #A100FF;
 }
 
 #startBtn {
