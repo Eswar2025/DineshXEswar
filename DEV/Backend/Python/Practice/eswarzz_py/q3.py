@@ -16,9 +16,6 @@ def dig_dig(n) :
        x=digit_sum(x)
     return x 
 
-def dineshFn(n) : 
-    return digit_sum(n) if digit_sum(n) < 10 else digit_sum(digit_sum(n))
 
 print(f"sum of the digits is {digit_sum(n)}")
 print(f"sum of the digits is {dig_dig(n)}")
-print(f"sum of the digits is {dineshFn(n)}")
