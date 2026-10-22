@@ -3,6 +3,14 @@
 n = 29
 
 def is_prime(n):
-    x= False
+    x= True
+    if x == 2 :
+        return ;
     for i in range(2,n ** 0.5 +1) :
-        if i
+        if n%i == 0 :
+            x = True
+            break
+    return x
+
+print(f"the statement that no. is prime is {is_prime(n)}")
+            
