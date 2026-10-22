@@ -1,0 +1,31 @@
+# Compiled binaries / build output
+*.exe
+*.o
+*.obj
+*.out
+*.pdb
+*.ilk
+
+# Editor / IDE (shared settings stay out of the repo)
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+
+# Logs
+*.log
