@@ -62,25 +62,36 @@ from typing import List
 
 class Solution:
     def maxMountainElevationSum(self, n: int, arr: List[int]) -> int:
-        """
-        Finds the maximum possible sum of elevations in any valid mountain route.
+        if n < 3:
+            return 0
 
-        Args:
-            n (int): Number of checkpoints.
-            arr (List[int]): Elevation array.
+        max_sum = 0
+        i = 1
 
-        Returns:
-            int: Maximum sum of a valid mountain route, or 0 if none exists.
-        """
-        # ======================================================================
-        # >>> WRITE YOUR CODE BELOW THIS LINE <<<
-        # ======================================================================
-        
-        pass  # Replace with your code
-        
-        # ======================================================================
-        # >>> WRITE YOUR CODE ABOVE THIS LINE <<<
-        # ======================================================================
+# Mundu, aa peak elements ni find chesi, and then traverse thorugh left and right pointers to get the extreme maxSum ..
+        while i < n - 1:
+            if arr[i - 1] < arr[i] and arr[i] > arr[i + 1]:
+                left = i
+                left_sum = 0
+                while left > 0 and arr[left - 1] < arr[left]:
+                    left -= 1
+                    left_sum += arr[left]
+
+                right = i
+                right_sum = 0
+                while right < n - 1 and arr[right] > arr[right + 1]:
+                    right += 1
+                    right_sum += arr[right]
+
+                current_sum = left_sum + arr[i] + right_sum
+                if current_sum > max_sum:
+                    max_sum = current_sum
+
+                i = right
+            else:
+                i += 1
+
+        return max_sum
 
 
 # ==============================================================================
