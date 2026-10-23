@@ -16,3 +16,7 @@
 
 -- write your query here
 
+select NAME, UNIT_PRICE from product 
+where UNIT_PRICE > (select avg(UNIT_PRICE) from product)
+order by UNIT_PRICE desc 
+, NAME asc ;

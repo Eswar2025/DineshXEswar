@@ -18,3 +18,8 @@
 
 -- write your query here
 
+select c.NAME AS category_name, COALESCE(SUM(o.QUANTITY), 0) AS units_sold from category c
+left join product_category p on p.CATEGORY_ID = c.CATEGORY_ID
+left join order_item o on o.PRODUCT_ID = p.PRODUCT_ID
+group by c.CATEGORY_ID 
+order by units_sold desc, category_name asc ;

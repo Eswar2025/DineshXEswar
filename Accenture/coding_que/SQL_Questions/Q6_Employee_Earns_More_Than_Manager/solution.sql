@@ -20,3 +20,10 @@
 
 -- write your query here
 
+select (e1.FIRST_NAME || ' ' || e1.LAST_NAME) as employee_name,
+ (e2.FIRST_NAME || ' ' || e2.LAST_NAME) as manager_name, 
+(e1.salary - e2.salary) as salary_difference
+from employee e1
+left join employee e2 on e1.MANAGER_ID = e2.EMP_ID
+where e1.salary > e2.salary
+order by salary_difference desc, employee_name asc ;
