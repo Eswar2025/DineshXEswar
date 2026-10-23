@@ -1,0 +1,58 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f8;
+}
+
+.card {
+  padding: 40px 60px;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+#yearInput {
+  padding: 10px 14px;
+  font-size: 1.1rem;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+}
+
+#checkBtn {
+  margin-left: 8px;
+  padding: 11px 28px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #333333;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+#result {
+  margin-top: 24px;
+  min-height: 1.5em;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+/*
+  TASK 2 (CSS):
+  The JavaScript adds one of two classes to the #result paragraph.
+  Write the two rules below:
+    .leap      -> text colour #16a34a (green)
+    .not-leap  -> text colour #dc2626 (red)
+*/
+
+.error {
+  color: #64748b;
+}
