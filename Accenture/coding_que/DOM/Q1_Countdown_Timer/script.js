@@ -50,13 +50,5 @@ function showPopup() {
 
 startBtn.addEventListener("click", function () {
   // write your code here
-  timerEl.innerText = "10";
-  let i;
-  // timerEl.innerText = "Heyy"
-  for (i = 10; i > 1; i--) {
-    setTimeout(() => {
-    timerEl.innerText = i;
-    // Do nothing
-    }, 1000);
-  }
+  
 });

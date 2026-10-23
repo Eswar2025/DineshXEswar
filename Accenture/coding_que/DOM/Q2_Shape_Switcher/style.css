@@ -61,7 +61,7 @@ body {
   width: 120px;
   height: 120px;
   background-color: #16a34a;
-  border-radius: 50;
+  border-radius: 50%;
 }
 
 .triangle {
