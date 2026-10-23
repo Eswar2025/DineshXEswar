@@ -13,3 +13,6 @@
 
 -- write your query here
 
+select c.USERNAME  from customer c
+left join customer_order co on c.CUSTOMER_ID = co.CUSTOMER_ID
+where co.CUSTOMER_ID is null

@@ -20,16 +20,10 @@
 
 -- write your query here
 
-SELECT e.FIRST_NAME || ' ' || e.LAST_NAME AS employee_name,
-       m.FIRST_NAME || ' ' || m.LAST_NAME AS manager_name,
-       e.SALARY - m.SALARY AS salary_difference
-FROM employee e
-JOIN employee m ON m.EMP_ID = e.MANAGER_ID
-WHERE e.SALARY > m.SALARY
-ORDER BY salary_difference DESC, employee_name ASC;
-
-SELECT Name as employee_name, mName as manager_name, salaryDiff
-FROM employee e1
-JOIN employee e2 ON e1.emp_id = e2.manager_id
-WHERE e1.salary > e2.salary
-ORDER BY salary_difference DESC, employee_name ASC;
+select (e1.FIRST_NAME || ' ' || e1.LAST_NAME) as employee_name,
+ (e2.FIRST_NAME || ' ' || e2.LAST_NAME) as manager_name, 
+(e1.salary - e2.salary) as salary_difference
+from employee e1
+left join employee e2 on e1.MANAGER_ID = e2.EMP_ID
+where e1.salary > e2.salary
+order by salary_difference desc, employee_name asc ;
