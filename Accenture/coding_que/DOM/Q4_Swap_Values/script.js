@@ -2,6 +2,7 @@ const firstInput = document.getElementById("firstInput");
 const secondInput = document.getElementById("secondInput");
 const swapBtn = document.getElementById("swapBtn");
 const swapCount = document.getElementById("swapCount");
+let count = 0
 
 /*
   TASK 3 (JavaScript):
@@ -21,4 +22,10 @@ const swapCount = document.getElementById("swapCount");
 
 swapBtn.addEventListener("click", function () {
   // write your code here
+  // const temp = secondInput.value
+  // secondInput.value = firstInput.value
+  // firstInput.value = temp
+  swap(firstInput.value,secondInput.value)
+  count=count+1
+  swapCount=count
 });
