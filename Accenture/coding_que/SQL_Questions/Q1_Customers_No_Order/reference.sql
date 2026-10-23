@@ -1,0 +1,4 @@
+SELECT c.USERNAME AS username
+FROM customer c
+LEFT JOIN customer_order o ON o.CUSTOMER_ID = c.CUSTOMER_ID
+WHERE o.ORDER_ID IS NULL;
