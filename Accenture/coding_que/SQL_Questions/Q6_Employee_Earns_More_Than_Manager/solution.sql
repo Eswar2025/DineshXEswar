@@ -20,3 +20,16 @@
 
 -- write your query here
 
+SELECT e.FIRST_NAME || ' ' || e.LAST_NAME AS employee_name,
+       m.FIRST_NAME || ' ' || m.LAST_NAME AS manager_name,
+       e.SALARY - m.SALARY AS salary_difference
+FROM employee e
+JOIN employee m ON m.EMP_ID = e.MANAGER_ID
+WHERE e.SALARY > m.SALARY
+ORDER BY salary_difference DESC, employee_name ASC;
+
+SELECT Name as employee_name, mName as manager_name, salaryDiff
+FROM employee e1
+JOIN employee e2 ON e1.emp_id = e2.manager_id
+WHERE e1.salary > e2.salary
+ORDER BY salary_difference DESC, employee_name ASC;

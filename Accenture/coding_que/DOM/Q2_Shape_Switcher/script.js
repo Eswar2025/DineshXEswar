@@ -11,11 +11,12 @@ const buttons = document.querySelectorAll(".shape-btn");
   Complete the two unfinished lines.
 */
 function showShape(name) {
-  shape.className = "shape " + ;
+  shape.className = "shape " + name;
 }
 
 buttons.forEach(function (btn) {
   btn.addEventListener("click", function () {
-    showShape();
+    showShape(btn.innerText.toLowerCase());
+    console.log(btn.innerText.toLowerCase())
   });
 });
