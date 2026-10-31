@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Eswar’s practical starting guide for Split Expenses: the first session, a sensible implementation order, how to use hints, and how to review work with Dinesh.">
+<title>How to proceed · Split expenses</title>
+<style>
+
+
+:root{
+  --bg:#0a0a0a;--surface:#1a1a1a;--surface-2:#1f1f1f;
+  --line:#1f1f1f;--line-strong:#3a3a3a;
+  --text:#fffaf0;--body:#e5e5e5;--muted:#9a9a9a;--faint:#6a6a6a;
+  --primary:#fffaf0;--on-primary:#0a0a0a;
+  --r:12px;--r-sm:8px;--r-pill:999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+  --font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#fffaf0;--surface:#faf5e8;--surface-2:#ebe6d6;
+  --line:#ebe6d6;--line-strong:#9a9a9a;
+  --text:#0a0a0a;--body:#1a1a1a;--muted:#6a6a6a;--faint:#9a9a9a;
+  --primary:#0a0a0a;--on-primary:#fffaf0;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--body);font:15px/1.7 var(--font);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+a{color:var(--text);text-underline-offset:4px}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+h1,h2,h3{color:var(--text);margin:0;font-weight:600}
+p{margin:0 0 var(--s3)}
+ul,ol{margin:0 0 var(--s3);padding-left:var(--s5)}
+li{margin-bottom:var(--s1)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+pre{margin:var(--s3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);overflow:auto;font:13px/1.6 var(--mono);color:var(--body)}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.label{font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin:0 0 var(--s2)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary);color:var(--on-primary);padding:8px 16px;border-radius:var(--r-pill);z-index:100}
+.skip:focus{left:16px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:50;height:56px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1280px;margin:0 auto;height:100%;padding:0 var(--s5);display:flex;align-items:center;gap:var(--s4)}
+.brand{font-weight:600;text-decoration:none;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:400;margin-left:var(--s2)}
+.search{flex:1;max-width:420px;margin-left:auto}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-pill);color:var(--text);font:inherit;font-size:14px;padding:6px 16px}
+.search input::placeholder{color:var(--muted)}
+.search{min-width:0}
+a.btn{text-decoration:none;display:inline-block}a.btn:hover{color:var(--text)}
+@media(max-width:640px){.brand span,.top .xlink{display:none}.top-inner{padding:0 var(--s4);gap:var(--s2)}.search input{padding:6px 12px}}
+.btn{border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:var(--r-pill);padding:6px 16px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+/* layout */
+.layout{max-width:1280px;margin:0 auto;padding:0 var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s7)}
+.toc{display:none}
+@media(min-width:1100px){
+  .layout{grid-template-columns:200px minmax(0,1fr)}
+  .toc{display:block;position:sticky;top:80px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;padding:var(--s6) 0}
+}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;font-size:13px;line-height:1.4}
+.toc a:hover{color:var(--text)}
+.toc a.active{color:var(--text);border-left-color:var(--primary)}
+.toc a.done::after{content:" \2713";color:var(--faint)}
+main{padding-bottom:var(--s8);min-width:0}
+
+/* hero */
+.hero{padding:var(--s8) 0 var(--s6)}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:var(--s4)}
+.lead{font-size:17px;line-height:1.6;color:var(--muted);max-width:68ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;margin-top:var(--s6)}
+.stats>div{background:var(--bg);padding:var(--s5)}
+.stats b{display:block;font-size:28px;line-height:1.1;font-weight:600;color:var(--text)}
+.stats span{font-size:13px;color:var(--muted)}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* roadmap */
+.map-head{margin-top:var(--s7)}
+.map-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.roadmap{position:relative;padding:var(--s5) 0}
+.roadmap svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--faint);stroke-width:1.5}
+.edges .spine{stroke:var(--muted);stroke-width:2}
+.edges .branch{stroke-dasharray:4 4}
+.edges .arrow{fill:var(--muted);stroke:none}
+.rows{position:relative;z-index:1;margin:0;padding:0;list-style:none}
+.row{display:grid;grid-template-columns:1fr minmax(200px,240px) 1fr;gap:var(--s7);align-items:center;padding:var(--s5) 0;margin:0}
+.branches{display:flex;flex-direction:column;gap:var(--s2)}
+.branches.left{align-items:flex-end}
+.branches.right{align-items:flex-start}
+.node{display:block;text-decoration:none;border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:6px 12px;font-size:13px;line-height:1.4;color:var(--muted);background:var(--bg)}
+.node:hover{border-color:var(--primary);color:var(--text)}
+.node.stage{text-align:center;border-radius:var(--r);padding:12px 16px;background:var(--surface);color:var(--text);font-weight:600;font-size:15px}
+.node.stage small{display:block;font-size:11px;letter-spacing:.08em;font-weight:500;color:var(--muted);text-transform:uppercase}
+.node.stage.active{border-color:var(--primary)}
+.node.stage.done{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.node.stage.done small{color:inherit;opacity:.7}
+@media(max-width:760px){
+  .row{grid-template-columns:1fr;justify-items:center;padding:var(--s4) 0}
+  .branches{display:none}
+}
+
+/* stages */
+.stage{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--line)}
+.stage.empty{display:none}
+.stage-head{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:start;margin-bottom:var(--s5)}
+.stage-num{font-size:48px;line-height:1;font-weight:600;color:var(--faint)}
+.stage-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.stage-head h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:var(--s2)}
+.stage-head .lead{margin:0}
+@media(max-width:640px){.stage-head{grid-template-columns:auto 1fr}.stage-head .btn{grid-column:1/-1;justify-self:start}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:var(--s4)}
+.topic{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);min-width:0}
+.topic:hover{border-color:var(--line-strong)}
+.topic:target{border-color:var(--primary)}
+.topic.wide{grid-column:1/-1}
+.topic h3{font-size:17px;line-height:1.35;margin-bottom:var(--s2)}
+.topic>:last-child{margin-bottom:0}
+.deeper{margin:var(--s5) 0 0;color:var(--muted);font-size:14px}
+.deeper .label{display:inline;margin-right:var(--s2)}
+.pager{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s5);font-size:14px}
+.pager a{color:var(--muted);text-decoration:none}
+.pager a:hover{color:var(--text)}
+.callout{border-left:3px solid var(--primary);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:var(--s3) var(--s4);margin:var(--s3) 0}
+.callout p:last-child{margin:0}
+.tw{overflow-x:auto;margin:var(--s3) 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);border-bottom-color:var(--line-strong)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s4)}
+.cols pre{margin:0}
+
+/* demos */
+.demo{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s5);margin-top:var(--s3)}
+.controls{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.controls label{display:flex;flex-direction:column;gap:var(--s1);font-size:13px;color:var(--muted)}
+.controls label.inline{flex-direction:row;align-items:center;gap:var(--s2)}
+.controls output{color:var(--text);font-family:var(--mono);margin-left:var(--s2)}
+.controls input[type=range]{width:150px;accent-color:var(--primary)}
+.controls input[type=checkbox]{accent-color:var(--primary)}
+.controls select{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);font:inherit;font-size:13px;padding:4px 8px}
+.stagebox{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4);overflow:auto}
+.demo pre{margin:var(--s3) 0 0;background:var(--bg)}
+.bm-margin{display:inline-block;padding:var(--m,16px);outline:1px dashed var(--faint)}
+.bm-box{border:var(--b,4px) solid var(--text);padding:var(--p,24px);background:var(--surface-2)}
+.bm-content{background:var(--primary);color:var(--on-primary);padding:8px 16px;font-size:13px;font-weight:500}
+.fx{display:flex;height:200px;border:1px dashed var(--faint);border-radius:var(--r-sm)}
+.fx div{background:var(--primary);color:var(--on-primary);border-radius:6px;font-weight:600;display:grid;place-items:center}
+.fx div:nth-child(1){min-width:48px;min-height:40px}
+.fx div:nth-child(2){min-width:64px;min-height:72px;opacity:.8}
+.fx div:nth-child(3){min-width:48px;min-height:32px;opacity:.6}
+.tf{display:grid;place-items:center;height:240px}
+.tf>div{grid-area:1/1;width:80px;height:80px;border-radius:var(--r-sm)}
+.tf-ghost{border:1px dashed var(--faint)}
+.tf-box{background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:600;font-size:13px}
+.bub{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s3) var(--s4);cursor:pointer;color:var(--muted);font-size:13px}
+.bub .bub{margin-top:var(--s2)}
+.bub:hover{border-color:var(--primary)}
+.log{min-height:96px;white-space:pre-wrap}
+
+/* checklist */
+.check{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--primary)}
+.foot{margin-top:var(--s8);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);margin:var(--s5) 0}
+.toolbar label{display:flex;align-items:center;gap:var(--s2)}
+#continue{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+select,input[type=text],input[type=number],textarea{background:var(--surface);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s2) var(--s3);font:inherit;max-width:100%}
+textarea{width:100%;min-height:120px;resize:vertical;display:block;margin-top:var(--s2)}
+.js-only{display:none!important}.js .js-only{display:flex!important}.js .js-block{display:block!important}
+.status{font-size:13px;color:var(--muted);min-height:24px;margin-top:var(--s2)}
+.progress-track{height:8px;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden;margin-top:var(--s4)}
+.progress-fill{height:100%;width:0;background:var(--primary)}
+.stage-head{grid-template-columns:auto 1fr}.stage-head .stage-progress{font-size:13px;color:var(--muted)}
+.check input{width:18px;height:18px;flex:0 0 18px;margin-top:4px}.check span{min-width:0}
+.check:has(input:checked) span{color:var(--muted);text-decoration:line-through}
+.topic details{margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3)}
+summary{cursor:pointer;color:var(--text);font-weight:500}details[open]>summary{margin-bottom:var(--s3)}
+.hint-label{font-size:13px;color:var(--muted);display:block;margin-bottom:var(--s2)}
+.reflect{background:var(--surface);padding:var(--s4);border-radius:var(--r-sm);margin-top:var(--s4)}
+.reflect strong{color:var(--text)}.reflect p{margin:var(--s2) 0 0}
+.deeper{overflow-wrap:anywhere}.topic h4{font-size:15px;color:var(--text);margin:var(--s4) 0 var(--s2)}
+.roadmap .row{gap:var(--s5);position:relative}.roadmap .row::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--muted);z-index:-1}
+.roadmap .row:not(:last-child)::after{content:"";position:absolute;left:calc(50% - 4px);bottom:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:8px solid var(--muted)}
+.roadmap .branches{position:relative}.roadmap .branches::before{content:"";position:absolute;top:50%;width:24px;border-top:1px dashed var(--faint)}
+.roadmap .branches.left::before{right:-24px}.roadmap .branches.right::before{left:-24px}
+.roadmap .node{overflow-wrap:anywhere}.roadmap .node.stage{margin:0}.roadmap .node.stage.active{border-color:var(--primary)}
+.roadmap .node.stage.done small{color:inherit}.demo .controls input{width:150px}.demo .controls select{font-size:15px;padding:var(--s2) var(--s3)}
+.demo caption{text-align:left;color:var(--muted);font-size:13px;padding-bottom:var(--s2)}
+.screen-flow{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;color:var(--muted)}
+.screen-flow span{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s2) var(--s3);color:var(--text)}
+.badge{font-size:12px;border:1px solid var(--line-strong);padding:4px 8px;border-radius:var(--r-pill);color:var(--muted);display:inline-block;margin-bottom:var(--s3)}
+.notes-box{margin-top:var(--s5)}.notes-box label{color:var(--text);font-weight:500}
+.map-toggle{border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s4) var(--s5);margin-top:var(--s5)}
+.profile-note{font-size:13px;color:var(--muted)}.foot a{white-space:normal}.btn:disabled{cursor:default;color:var(--muted)}
+#empty-search{padding:var(--s5);border:1px solid var(--line-strong);border-radius:var(--r)}
+@media(max-width:760px){.roadmap .branches::before{display:none}}
+@media(max-width:640px){.layout{padding:0 var(--s4)}.hero{padding-top:var(--s6)}.stats>div{padding:var(--s4)}.topic{padding:var(--s4)}.toolbar{gap:var(--s2)}.stage-head{gap:var(--s3)}.brand span{display:none}.top-inner{gap:var(--s2)}.top .btn{padding:var(--s2)}.search input{font-size:13px}.screen-flow{font-size:13px}}
+@media print{.top,.toc,.toolbar,.notes-box,.map-toggle,.pager,.demo,.js-only{display:none!important}.layout{display:block}.stage,.topic{break-inside:avoid}body{background:#fffaf0;color:#0a0a0a}h1,h2,h3,a{color:#0a0a0a}}
+
+.action-links{display:flex;gap:var(--s3);flex-wrap:wrap;margin:var(--s5) 0}
+.action-links a{white-space:normal;max-width:100%}
+.reading-map{margin-top:var(--s5)}
+.guidance-step{margin-top:var(--s4)}
+.guidance-step strong{color:var(--text)}
+.steps{padding-left:var(--s5)}.steps li{padding-left:var(--s2);margin-bottom:var(--s3)}
+@media(max-width:640px){.top .brand{font-size:13px}.top .search{max-width:150px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="top-inner">
+<a class="brand" href="#top">How to proceed<span>Split expenses</span></a>
+<div class="search js-only"><input id="q" type="search" placeholder="Search guidance ( / )" aria-label="Search guidance" autocomplete="off"></div>
+<button class="btn js-only" type="button" id="theme">Light mode</button>
+</div></header>
+<div class="layout" id="top">
+<nav class="toc" id="toc" aria-label="Guidance sections"></nav>
+<main id="main">
+<section class="hero" aria-labelledby="title">
+<p class="label">For Eswar · Also useful for Dinesh</p>
+<h1 id="title">Open the workbook.<br>Build one small thing.</h1>
+<p class="lead">Eswar, this page explains how to approach the project from the beginning. Use it to decide what to do next, what to learn along the way, and how to know when your work is ready.</p>
+<div class="action-links"><a class="btn" href="#start">Read the starting plan</a><a class="btn" href="Project_Guide.html">Open the project workbook</a><a class="btn" href="#first-session">Jump to your first session</a></div>
+<p class="callout"><strong>Your next action:</strong> read the project brief, work out the ₹900 dinner on paper, and sketch the group page. You can do all three before choosing a framework.</p>
+<noscript><p class="callout">All instructions and links work without JavaScript. Enable it for search, the reading roadmap, and the theme toggle.</p></noscript>
+<details class="map-toggle reading-map js-only js-block"><summary>See the guidance roadmap</summary><p>These are reading sections. Your actual build tasks and saved checklists live in the project workbook.</p><div class="roadmap"><ol class="rows" id="rows"></ol></div></details>
+</section>
+<p class="status" id="search-status" role="status" aria-live="polite"></p>
+<p id="empty-search" hidden>No matching guidance. Try “first session”, “backend”, “stuck”, or clear the search.</p>
+
+<section class="stage" id="start" data-title="Understand what you are building">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Begin with the problem</p><h2>Understand what you are building</h2><p class="lead">Your app keeps the story of shared spending and calculates what is still owed.</p></div></div>
+<div class="grid">
+<article class="topic" id="two-pages" data-node data-label="Use the two pages"><h3>Keep these two pages nearby</h3>
+<p><strong>This guidance page:</strong> the approach to follow when starting, implementing a task, or getting stuck.</p>
+<p><strong><a href="Project_Guide.html">Project workbook:</a></strong> the detailed requirements, build stages, checkboxes, expandable hints, examples, and notes. Choose <strong>Eswar</strong> in “Learning as” before marking your work.</p>
+<p><strong><code>app/</code>:</strong> the folder where you write your application. It currently contains only a Git placeholder. Create your own files and framework structure there.</p>
+<p>Progress is stored in the browser, not committed to Git. Use the workbook’s export/import buttons to move it between computers. Export contains both local profiles and their notes; importing replaces both, so keep your own backup first.</p>
+</article>
+<article class="topic" id="story" data-node data-label="Explain the dinner"><h3>Explain the dinner before the code</h3>
+<p>Dinesh pays ₹900 for dinner shared equally by Dinesh, Eswar, and Priya. Each person’s share is ₹300. Dinesh has already paid his own share and ₹600 for the others.</p>
+<p>Balances are <strong>Dinesh +₹600, Eswar −₹300, Priya −₹300</strong>. Positive means “should receive”; negative means “owes”. Add them together: zero.</p>
+<p>When Eswar repays Dinesh ₹300, record a settlement. Balances become +₹300, ₹0, −₹300. The dinner still cost ₹900; the settlement is a separate record.</p>
+<div class="reflect"><strong>Before you move on</strong><p>Explain those numbers in your own words. If you cannot explain the calculation yet, repeat it with ₹600 and draw arrows for the repayments.</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="Project_Guide.html#brief">read the project question</a> and <a href="Project_Guide.html#balance-rules">the balance rules</a>.</p>
+</section>
+
+<section class="stage" id="tools" data-title="Choose tools and learn as needed">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">A small, understandable setup</p><h2>Choose tools and learn as needed</h2><p class="lead">Pick a stack you want to practice and keep the first setup small.</p></div></div>
+<div class="grid">
+<article class="topic" id="stack" data-node data-label="Choose your stack"><h3>Make a few explicit decisions</h3>
+<p>You can choose any frontend, server, database, and libraries. React, Node/Express, and PostgreSQL are one possible combination that fits this repo’s learning direction. A full-stack framework or a different database can satisfy the same requirements.</p>
+<p>Write down your choices in the workbook’s notes with one reason each. Decide whether you and Dinesh are building one shared app or comparing separate implementations before creating competing structures.</p>
+<p>Get a minimal page running, then a server response, then a database connection. Write down the exact commands that work for your setup. Keep configuration secrets out of Git.</p>
+</article>
+<article class="topic" id="prerequisites" data-node data-label="Learn just enough"><h3>Learn the next missing concept</h3>
+<div class="tw"><table><thead><tr><th>When you reach</th><th>Be able to explain</th></tr></thead><tbody>
+<tr><td>Sample screens</td><td>Forms, events, arrays/objects, rendering a list</td></tr>
+<tr><td>API calls</td><td>Request, response, JSON, async work, loading/error states</td></tr>
+<tr><td>Persistence</td><td>IDs, relationships, constraints, queries, transactions</td></tr>
+<tr><td>Login and access</td><td>Verified identity, sessions, membership, permissions</td></tr>
+</tbody></table></div>
+<p>Open the matching handbook section, try a tiny example, then return to the project. You can start the UI before you have learned every backend topic.</p>
+<div class="reflect"><strong>Before you move on</strong><p>Point to what runs in the browser, what runs on the server, and where records are stored.</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="../../Frontend/Frontend_Handbook.html">frontend handbook</a>, <a href="../../Backend/Backend_Handbook.html">backend handbook</a>, and <a href="Project_Guide.html#choices">the stack decision exercise</a>.</p>
+</section>
+
+<section class="stage" id="first-session" data-title="Complete your first session">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Concrete actions for today</p><h2>Complete your first session</h2><p class="lead">Aim for a clear plan and one visible screen. Save the full backend flow for the next milestones.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="session-plan" data-node data-label="Your starting sequence"><h3>Follow this sequence</h3>
+<ol class="steps">
+<li><strong>Open the workbook and choose Eswar.</strong> Read “Define the first version”. Write one sentence: “A group member can record a shared expense and see everyone’s balance.”</li>
+<li><strong>Work out the ₹900 example.</strong> Write paid amount, share, and resulting balance for each person. Check the total is zero.</li>
+<li><strong>Sketch three views.</strong> A group list, a group detail page, and an add-expense form. Paper is enough. Label payer and participants separately.</li>
+<li><strong>Write your stack choices.</strong> Create the smallest working project inside <code>app/</code>. Add the commands you used to your application’s run instructions.</li>
+<li><strong>Render one group with sample data.</strong> Show “Weekend trip”, the three names, the dinner expense, and the expected balances. Hard-coded sample records are fine for this milestone.</li>
+<li><strong>Try the screen and record your next step.</strong> Check it at phone width, explain it to Dinesh, and mark only the workbook checks you actually verified. Note the next unfinished task.</li>
+</ol>
+<p>You can stop at a sensible boundary and continue later. The first session does not need custom splits, authentication, deployment, or a finished app.</p>
+<div class="reflect"><strong>What you should have afterward</strong><p>A project sentence, a correct calculation, screen sketches, recorded tool choices, and a sample group page you can run and explain. If setup takes longer, record the exact blocker and keep your sketches and calculations.</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="Project_Guide.html#screens">build the interface with sample data</a>. Use its completion checks as your evidence.</p>
+</section>
+
+<section class="stage" id="build-order" data-title="Follow the implementation order">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">One working milestone at a time</p><h2>Follow the implementation order</h2><p class="lead">The workbook has the details. This table tells you what each stage should produce.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="milestones" data-node data-label="Build milestones"><h3>Use a visible result as the finish line</h3>
+<div class="tw"><table><thead><tr><th>Build stage</th><th>Produce this before moving on</th></tr></thead><tbody>
+<tr><td><a href="Project_Guide.html#brief">Define the first version</a></td><td>A user story, scope boundary, tool choices, and a minimal running setup.</td></tr>
+<tr><td><a href="Project_Guide.html#rules">Money rules</a></td><td>Correct paper examples, integer paise, deterministic rounding, and written invariants.</td></tr>
+<tr><td><a href="Project_Guide.html#screens">Sample interface</a></td><td>Group and expense screens with sample records and clear empty/error states.</td></tr>
+<tr><td><a href="Project_Guide.html#data">Persistent data</a></td><td>A relationship diagram, database setup, seed data, and atomic expense/share writes.</td></tr>
+<tr><td><a href="Project_Guide.html#api">First backend flow</a></td><td>Directly callable group/expense operations and correct derived balances.</td></tr>
+<tr><td><a href="Project_Guide.html#connect">Connect the app</a></td><td>Create an expense through the UI; its records and balances survive a refresh.</td></tr>
+<tr><td><a href="Project_Guide.html#access">Identity and permissions</a></td><td>Separate users and server-enforced group access before publishing private data.</td></tr>
+<tr><td><a href="Project_Guide.html#custom">Custom shares</a></td><td>Explicit shares that sum exactly to the total, validated on the server.</td></tr>
+<tr><td><a href="Project_Guide.html#changes">Safe edits and deletion</a></td><td>Correct replacement balances, rollback on failure, and rejected stale edits.</td></tr>
+<tr><td><a href="Project_Guide.html#settlements">Settlements</a></td><td>Separate repayment history, valid partial/full repayments, and safe concurrency.</td></tr>
+<tr><td><a href="Project_Guide.html#verify">Verification</a></td><td>Repeatable money tests, backend access/consistency checks, and a complete browser flow.</td></tr>
+<tr><td><a href="Project_Guide.html#ship">Deployment and explanation</a></td><td>A reproducible setup, deployed main flow, and a short demo of your decisions.</td></tr>
+</tbody></table></div>
+<p>After the connected equal-split flow, you have your first working milestone. Demo it before adding more features. Check behavior as you build each stage; the verification stage gathers those checks into a complete review.</p>
+</article>
+<article class="topic wide" id="minimum-path" data-node data-label="Smallest end-to-end path"><h3>Keep the first real flow narrow</h3>
+<p>Your first backend-backed journey is: create one group → add the three members → save one equal-split dinner → read balances. Use local seeded identities while learning; add proper authentication and permissions before public use.</p>
+<p>Finish and verify that journey before adding charts, live notifications, receipts, payment integrations, or extra split modes. A small complete path is a useful base for every later feature.</p>
+</article>
+</div><p class="deeper">Go deeper: <a href="Project_Guide.html#integration">the connected first-version checkpoint</a>.</p>
+</section>
+
+<section class="stage" id="feature-cycle" data-title="Work through one feature">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Repeat this for each task</p><h2>Work through one feature</h2><p class="lead">Turn “add an expense” into a sequence you can implement and check.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="expense-walkthrough" data-node data-label="One request from end to end"><h3>Trace “save dinner” through the system</h3>
+<ol class="steps">
+<li><strong>Read the requirement.</strong> What inputs are required? What should happen on success and on invalid input? Write the expected result before implementation.</li>
+<li><strong>Write a sample contract.</strong> Your request needs the group, description, amount in paise, payer, date, split mode, and selected participants. The signed-in actor comes from the verified identity once authentication is added.</li>
+<li><strong>Build the calculation separately.</strong> Allocate the shares and derive balances using ordinary data. Run the ₹900 and ₹100 examples without a browser or database.</li>
+<li><strong>Implement the server operation.</strong> Check identity/access when available, validate all inputs and group membership, calculate shares, and save the expense plus shares atomically.</li>
+<li><strong>Call the backend directly.</strong> Use an API client, a small script, or your framework’s test tools. Confirm one valid request and one invalid request before wiring the form.</li>
+<li><strong>Connect the form.</strong> Show saving state, prevent repeat clicks, keep input on failure, and refresh both history and balances after success.</li>
+<li><strong>Prove it works.</strong> Refresh the page, inspect stored records, and check the exact balances. Run the task’s failure cases. Then mark the corresponding workbook checks.</li>
+</ol>
+<div class="reflect"><strong>Completion means observable behavior</strong><p>“I wrote the handler” is a step. “The expense saves once, survives refresh, and produces +600/−300/−300” is evidence that the feature works.</p></div>
+</article>
+<article class="topic" id="hints" data-node data-label="Use hints gradually"><h3>Try, then reveal a hint</h3>
+<p>Attempt a small version first. If you cannot identify the next step, open Hint 1. Try again before opening Hint 2. Use the deeper hint when you need a more concrete breakdown.</p>
+<p>When you use a snippet or pseudocode, explain each step and try a different input. Record the lesson in the workbook notes so you can teach it to each other.</p>
+</article>
+<article class="topic" id="check-before-done" data-node data-label="Check before marking done"><h3>Use a short review every time</h3>
+<ul><li>Does the normal case work?</li><li>What happens with invalid input?</li><li>What remains after refresh or restart?</li><li>Can a direct request bypass the UI rules?</li><li>Can you explain the result and why the code produces it?</li></ul>
+<p>Check off a task after performing its stated check. Keep a failing case unchecked and write down what you observed.</p>
+</article>
+</div><p class="deeper">Go deeper: <a href="Project_Guide.html#contracts">API design exercises</a> and <a href="Project_Guide.html#acceptance">exact acceptance examples</a>.</p>
+</section>
+
+<section class="stage" id="stuck" data-title="Find the boundary when you get stuck">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Debug one thing at a time</p><h2>Find the boundary when you get stuck</h2><p class="lead">Locate where the actual behavior first differs from what you expected.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="debugging" data-node data-label="Debugging guide"><h3>Follow the evidence</h3>
+<div class="tw"><table><thead><tr><th>Symptom</th><th>First thing to inspect</th></tr></thead><tbody>
+<tr><td>The page does not render</td><td>Browser console, development server output, and the smallest broken component.</td></tr>
+<tr><td>Clicking save does nothing</td><td>Does the submit handler run? Does a request appear in the network panel?</td></tr>
+<tr><td>The request fails</td><td>Request URL, method, payload, response status/body, and server log for that operation.</td></tr>
+<tr><td>Saving succeeds but data disappears</td><td>Database records, connection configuration, and whether reads use the same database.</td></tr>
+<tr><td>Balances are wrong</td><td>Paid paise, stored shares, signs, selected participants, and whether an old expense was counted twice.</td></tr>
+<tr><td>One paisa is missing</td><td>The remainder allocation and whether stored shares sum exactly to the expense.</td></tr>
+<tr><td>One account sees another group</td><td>The server’s membership check and query scope on that specific request.</td></tr>
+<tr><td>An edit sometimes loses another edit</td><td>Whether the version condition is part of the actual atomic database write.</td></tr>
+</tbody></table></div>
+<p>Reduce the problem to one group and one record. Compare expected and actual data at each boundary: form → request → handler → calculation → database → response → rendered result.</p>
+</article>
+<article class="topic wide" id="ask-for-help" data-node data-label="Ask a useful question"><h3>Bring a small, specific question</h3>
+<p>When asking Dinesh or an assistant, include the current task, expected behavior, actual behavior, relevant code, and one reproducible input. Leave out passwords, tokens, connection strings, and private session data.</p>
+<pre><code>I am implementing the equal-split calculation.
+Input: 10,000 paise, three participants in a fixed order.
+Expected: 3,334 / 3,333 / 3,333.
+Actual: 3,333 / 3,333 / 3,333.
+Here is my allocation function and the check that fails.
+Give me a hint about the missing step first.</code></pre>
+<p>After resolving it, write the cause and the fix in your notes. Add a repeatable test when the bug affects calculation, access, or persistent data.</p>
+</article>
+</div><p class="deeper">Go deeper: <a href="Project_Guide.html#invariants">the always-true rules</a> and <a href="Project_Guide.html#verify">verification tasks</a>.</p>
+</section>
+
+<section class="stage" id="together" data-title="Review together and choose the next step">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Learn by explaining</p><h2>Review together and choose the next step</h2><p class="lead">End a session knowing what works, what you learned, and what you will do next.</p></div></div>
+<div class="grid">
+<article class="topic" id="peer-session" data-node data-label="A practical peer session"><h3>Use your Google Meet well</h3>
+<ol class="steps"><li>Choose one small task and predict its result together.</li><li>One person types and explains; the other checks assumptions and asks questions.</li><li>Run the normal case and one failure case. Swap roles for the next task.</li><li>Explain the request flow or calculation without reading the code line by line.</li><li>Record one decision, one remaining doubt, and the next action.</li></ol>
+<p>If you are building separate versions, compare the same inputs and expected behavior. If you share one app, agree on file ownership for the current task and coordinate before editing the same files.</p>
+</article>
+<article class="topic" id="session-finish" data-node data-label="Close a session clearly"><h3>Leave the project ready to resume</h3>
+<ul><li>Mark the verified workbook checks under your own profile.</li><li>Save decisions and open questions in the stage notes.</li><li>Export progress when you need a backup or want to share your notes.</li><li>Review <code>git status</code> and the changed code before a commit. Pull before starting repo work; coordinate overlapping edits.</li><li>Write an exact next action, such as “connect the expense form to the route and preserve input on failure”.</li></ul>
+<p>For the final project demo, create a group, add the dinner, edit it, record a repayment, and explain each balance. Use the workbook’s deployment stage for the final setup and hosting checks.</p>
+<div class="reflect"><strong>The habit to keep</strong><p>Read one task, predict its behavior, implement a small piece, verify it, and explain it. Then continue to the next unfinished check.</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="Project_Guide.html">return to your workbook</a> and use its “Continue” button to resume.</p>
+</section>
+<footer class="foot"><p>For Eswar and Dinesh. This page explains the approach; the workbook holds the project tasks and saved progress.</p><p><a href="Project_Guide.html">Open project workbook</a> · <a href="#first-session">First-session plan</a> · <a href="#top">Back to top</a></p></footer>
+</main></div>
+<script>
+(() => {
+  'use strict';
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const stages = $$('section.stage');
+  const themeKey = 'split-expenses-theme';
+  try { const theme = localStorage.getItem(themeKey); if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme; } catch (_) {}
+  function link(id, text, className) {
+    const a = document.createElement('a'); a.href = '#' + id; a.textContent = text; if (className) a.className = className; return a;
+  }
+  const tocLinks = new Map();
+  const mapNodes = new Map();
+  stages.forEach((stage, i) => {
+    $('.stage-num', stage).textContent = String(i + 1).padStart(2, '0');
+    const title = stage.dataset.title;
+    const toc = link(stage.id, title); $('#toc').append(toc); tocLinks.set(stage.id, toc);
+    const row = document.createElement('li'); row.className = 'row';
+    const left = document.createElement('div'); left.className = 'branches left';
+    const right = document.createElement('div'); right.className = 'branches right';
+    const center = link(stage.id, '', 'node stage'); const small = document.createElement('small'); small.textContent = 'Section ' + (i + 1); center.append(small, document.createTextNode(title));
+    $$('[data-node]', stage).forEach((topic, j) => (j % 2 ? right : left).append(link(topic.id, topic.dataset.label, 'node')));
+    row.append(left, center, right); $('#rows').append(row); mapNodes.set(stage.id, center);
+    const pager = document.createElement('nav'); pager.className = 'pager'; pager.setAttribute('aria-label', title + ' navigation');
+    pager.append(i ? link(stages[i - 1].id, '← Previous section') : link('top', 'Back to start ↑'));
+    pager.append(i < stages.length - 1 ? link(stages[i + 1].id, 'Next section →') : Object.assign(document.createElement('a'), {href: 'Project_Guide.html', textContent: 'Open workbook →'}));
+    stage.append(pager);
+  });
+  function updateTheme() {
+    const light = document.documentElement.dataset.theme === 'light';
+    $('#theme').textContent = light ? 'Dark mode' : 'Light mode';
+    $('#theme').setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+  }
+  $('#theme').addEventListener('click', () => {
+    document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; updateTheme();
+    try { localStorage.setItem(themeKey, document.documentElement.dataset.theme); } catch (_) {}
+  });
+  function filter() {
+    const query = $('#q').value.trim().toLowerCase(); let matches = 0;
+    for (const stage of stages) {
+      let visible = 0;
+      for (const topic of $$('.topic', stage)) {
+        const match = !query || (stage.dataset.title + ' ' + (topic.dataset.label || '') + ' ' + topic.textContent).toLowerCase().includes(query);
+        topic.hidden = !match; if (match) visible++;
+      }
+      stage.hidden = visible === 0; matches += visible;
+    }
+    $('#empty-search').hidden = matches !== 0;
+    $('#search-status').textContent = query ? matches + ' matching cards. Clear search to restore all guidance.' : '';
+  }
+  $('#q').addEventListener('input', filter);
+  document.addEventListener('keydown', e => {
+    const editing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) || document.activeElement.isContentEditable;
+    if (e.key === '/' && !editing && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); $('#q').focus(); }
+    if (e.key === 'Escape' && document.activeElement === $('#q')) { $('#q').value = ''; filter(); $('#q').blur(); }
+  });
+  document.addEventListener('click', e => { if (e.target.closest('a[href^="#"]') && $('#q').value) { $('#q').value = ''; filter(); } });
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (!visible.length) return;
+      for (const stage of stages) {
+        const active = stage.id === visible[0].target.id;
+        tocLinks.get(stage.id).classList.toggle('active', active); mapNodes.get(stage.id).classList.toggle('active', active);
+        if (active) tocLinks.get(stage.id).setAttribute('aria-current', 'location'); else tocLinks.get(stage.id).removeAttribute('aria-current');
+      }
+    }, {rootMargin: '-72px 0px -55% 0px'});
+    stages.forEach(stage => observer.observe(stage));
+  }
+  document.body.classList.add('js'); updateTheme();
+})();
+</script>
+</body>
+</html>

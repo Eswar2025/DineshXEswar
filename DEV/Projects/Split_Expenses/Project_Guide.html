@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A hands-on Split Expenses project workbook for Dinesh and Eswar. Requirements, milestones, checklists, progressive hints, and balance examples. Choose your own stack and write the code yourself.">
+<title>Split expenses · Project workbook</title>
+<style>
+
+:root{
+  --bg:#0a0a0a;--surface:#1a1a1a;--surface-2:#1f1f1f;
+  --line:#1f1f1f;--line-strong:#3a3a3a;
+  --text:#fffaf0;--body:#e5e5e5;--muted:#9a9a9a;--faint:#6a6a6a;
+  --primary:#fffaf0;--on-primary:#0a0a0a;
+  --r:12px;--r-sm:8px;--r-pill:999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+  --font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#fffaf0;--surface:#faf5e8;--surface-2:#ebe6d6;
+  --line:#ebe6d6;--line-strong:#9a9a9a;
+  --text:#0a0a0a;--body:#1a1a1a;--muted:#6a6a6a;--faint:#9a9a9a;
+  --primary:#0a0a0a;--on-primary:#fffaf0;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--body);font:15px/1.7 var(--font);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+a{color:var(--text);text-underline-offset:4px}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+h1,h2,h3{color:var(--text);margin:0;font-weight:600}
+p{margin:0 0 var(--s3)}
+ul,ol{margin:0 0 var(--s3);padding-left:var(--s5)}
+li{margin-bottom:var(--s1)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+pre{margin:var(--s3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);overflow:auto;font:13px/1.6 var(--mono);color:var(--body)}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.label{font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin:0 0 var(--s2)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary);color:var(--on-primary);padding:8px 16px;border-radius:var(--r-pill);z-index:100}
+.skip:focus{left:16px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:50;height:56px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1280px;margin:0 auto;height:100%;padding:0 var(--s5);display:flex;align-items:center;gap:var(--s4)}
+.brand{font-weight:600;text-decoration:none;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:400;margin-left:var(--s2)}
+.search{flex:1;max-width:420px;margin-left:auto}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-pill);color:var(--text);font:inherit;font-size:14px;padding:6px 16px}
+.search input::placeholder{color:var(--muted)}
+.search{min-width:0}
+a.btn{text-decoration:none;display:inline-block}a.btn:hover{color:var(--text)}
+@media(max-width:640px){.brand span,.top .xlink{display:none}.top-inner{padding:0 var(--s4);gap:var(--s2)}.search input{padding:6px 12px}}
+.btn{border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:var(--r-pill);padding:6px 16px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+/* layout */
+.layout{max-width:1280px;margin:0 auto;padding:0 var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s7)}
+.toc{display:none}
+@media(min-width:1100px){
+  .layout{grid-template-columns:200px minmax(0,1fr)}
+  .toc{display:block;position:sticky;top:80px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;padding:var(--s6) 0}
+}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;font-size:13px;line-height:1.4}
+.toc a:hover{color:var(--text)}
+.toc a.active{color:var(--text);border-left-color:var(--primary)}
+.toc a.done::after{content:" \2713";color:var(--faint)}
+main{padding-bottom:var(--s8);min-width:0}
+
+/* hero */
+.hero{padding:var(--s8) 0 var(--s6)}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:var(--s4)}
+.lead{font-size:17px;line-height:1.6;color:var(--muted);max-width:68ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;margin-top:var(--s6)}
+.stats>div{background:var(--bg);padding:var(--s5)}
+.stats b{display:block;font-size:28px;line-height:1.1;font-weight:600;color:var(--text)}
+.stats span{font-size:13px;color:var(--muted)}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* roadmap */
+.map-head{margin-top:var(--s7)}
+.map-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.roadmap{position:relative;padding:var(--s5) 0}
+.roadmap svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--faint);stroke-width:1.5}
+.edges .spine{stroke:var(--muted);stroke-width:2}
+.edges .branch{stroke-dasharray:4 4}
+.edges .arrow{fill:var(--muted);stroke:none}
+.rows{position:relative;z-index:1;margin:0;padding:0;list-style:none}
+.row{display:grid;grid-template-columns:1fr minmax(200px,240px) 1fr;gap:var(--s7);align-items:center;padding:var(--s5) 0;margin:0}
+.branches{display:flex;flex-direction:column;gap:var(--s2)}
+.branches.left{align-items:flex-end}
+.branches.right{align-items:flex-start}
+.node{display:block;text-decoration:none;border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:6px 12px;font-size:13px;line-height:1.4;color:var(--muted);background:var(--bg)}
+.node:hover{border-color:var(--primary);color:var(--text)}
+.node.stage{text-align:center;border-radius:var(--r);padding:12px 16px;background:var(--surface);color:var(--text);font-weight:600;font-size:15px}
+.node.stage small{display:block;font-size:11px;letter-spacing:.08em;font-weight:500;color:var(--muted);text-transform:uppercase}
+.node.stage.active{border-color:var(--primary)}
+.node.stage.done{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.node.stage.done small{color:inherit;opacity:.7}
+@media(max-width:760px){
+  .row{grid-template-columns:1fr;justify-items:center;padding:var(--s4) 0}
+  .branches{display:none}
+}
+
+/* stages */
+.stage{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--line)}
+.stage.empty{display:none}
+.stage-head{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:start;margin-bottom:var(--s5)}
+.stage-num{font-size:48px;line-height:1;font-weight:600;color:var(--faint)}
+.stage-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.stage-head h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:var(--s2)}
+.stage-head .lead{margin:0}
+@media(max-width:640px){.stage-head{grid-template-columns:auto 1fr}.stage-head .btn{grid-column:1/-1;justify-self:start}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:var(--s4)}
+.topic{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);min-width:0}
+.topic:hover{border-color:var(--line-strong)}
+.topic:target{border-color:var(--primary)}
+.topic.wide{grid-column:1/-1}
+.topic h3{font-size:17px;line-height:1.35;margin-bottom:var(--s2)}
+.topic>:last-child{margin-bottom:0}
+.deeper{margin:var(--s5) 0 0;color:var(--muted);font-size:14px}
+.deeper .label{display:inline;margin-right:var(--s2)}
+.pager{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s5);font-size:14px}
+.pager a{color:var(--muted);text-decoration:none}
+.pager a:hover{color:var(--text)}
+.callout{border-left:3px solid var(--primary);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:var(--s3) var(--s4);margin:var(--s3) 0}
+.callout p:last-child{margin:0}
+.tw{overflow-x:auto;margin:var(--s3) 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);border-bottom-color:var(--line-strong)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s4)}
+.cols pre{margin:0}
+
+/* demos */
+.demo{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s5);margin-top:var(--s3)}
+.controls{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.controls label{display:flex;flex-direction:column;gap:var(--s1);font-size:13px;color:var(--muted)}
+.controls label.inline{flex-direction:row;align-items:center;gap:var(--s2)}
+.controls output{color:var(--text);font-family:var(--mono);margin-left:var(--s2)}
+.controls input[type=range]{width:150px;accent-color:var(--primary)}
+.controls input[type=checkbox]{accent-color:var(--primary)}
+.controls select{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);font:inherit;font-size:13px;padding:4px 8px}
+.stagebox{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4);overflow:auto}
+.demo pre{margin:var(--s3) 0 0;background:var(--bg)}
+.bm-margin{display:inline-block;padding:var(--m,16px);outline:1px dashed var(--faint)}
+.bm-box{border:var(--b,4px) solid var(--text);padding:var(--p,24px);background:var(--surface-2)}
+.bm-content{background:var(--primary);color:var(--on-primary);padding:8px 16px;font-size:13px;font-weight:500}
+.fx{display:flex;height:200px;border:1px dashed var(--faint);border-radius:var(--r-sm)}
+.fx div{background:var(--primary);color:var(--on-primary);border-radius:6px;font-weight:600;display:grid;place-items:center}
+.fx div:nth-child(1){min-width:48px;min-height:40px}
+.fx div:nth-child(2){min-width:64px;min-height:72px;opacity:.8}
+.fx div:nth-child(3){min-width:48px;min-height:32px;opacity:.6}
+.tf{display:grid;place-items:center;height:240px}
+.tf>div{grid-area:1/1;width:80px;height:80px;border-radius:var(--r-sm)}
+.tf-ghost{border:1px dashed var(--faint)}
+.tf-box{background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:600;font-size:13px}
+.bub{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s3) var(--s4);cursor:pointer;color:var(--muted);font-size:13px}
+.bub .bub{margin-top:var(--s2)}
+.bub:hover{border-color:var(--primary)}
+.log{min-height:96px;white-space:pre-wrap}
+
+/* checklist */
+.check{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--primary)}
+.foot{margin-top:var(--s8);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);margin:var(--s5) 0}
+.toolbar label{display:flex;align-items:center;gap:var(--s2)}
+#continue{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+select,input[type=text],input[type=number],textarea{background:var(--surface);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s2) var(--s3);font:inherit;max-width:100%}
+textarea{width:100%;min-height:120px;resize:vertical;display:block;margin-top:var(--s2)}
+.js-only{display:none!important}.js .js-only{display:flex!important}.js .js-block{display:block!important}
+.status{font-size:13px;color:var(--muted);min-height:24px;margin-top:var(--s2)}
+.progress-track{height:8px;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden;margin-top:var(--s4)}
+.progress-fill{height:100%;width:0;background:var(--primary)}
+.stage-head{grid-template-columns:auto 1fr}.stage-head .stage-progress{font-size:13px;color:var(--muted)}
+.check input{width:18px;height:18px;flex:0 0 18px;margin-top:4px}.check span{min-width:0}
+.check:has(input:checked) span{color:var(--muted);text-decoration:line-through}
+.topic details{margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3)}
+summary{cursor:pointer;color:var(--text);font-weight:500}details[open]>summary{margin-bottom:var(--s3)}
+.hint-label{font-size:13px;color:var(--muted);display:block;margin-bottom:var(--s2)}
+.reflect{background:var(--surface);padding:var(--s4);border-radius:var(--r-sm);margin-top:var(--s4)}
+.reflect strong{color:var(--text)}.reflect p{margin:var(--s2) 0 0}
+.deeper{overflow-wrap:anywhere}.topic h4{font-size:15px;color:var(--text);margin:var(--s4) 0 var(--s2)}
+.roadmap .row{gap:var(--s5);position:relative}.roadmap .row::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--muted);z-index:-1}
+.roadmap .row:not(:last-child)::after{content:"";position:absolute;left:calc(50% - 4px);bottom:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:8px solid var(--muted)}
+.roadmap .branches{position:relative}.roadmap .branches::before{content:"";position:absolute;top:50%;width:24px;border-top:1px dashed var(--faint)}
+.roadmap .branches.left::before{right:-24px}.roadmap .branches.right::before{left:-24px}
+.roadmap .node{overflow-wrap:anywhere}.roadmap .node.stage{margin:0}.roadmap .node.stage.active{border-color:var(--primary)}
+.roadmap .node.stage.done small{color:inherit}.demo .controls input{width:150px}.demo .controls select{font-size:15px;padding:var(--s2) var(--s3)}
+.demo caption{text-align:left;color:var(--muted);font-size:13px;padding-bottom:var(--s2)}
+.screen-flow{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;color:var(--muted)}
+.screen-flow span{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s2) var(--s3);color:var(--text)}
+.badge{font-size:12px;border:1px solid var(--line-strong);padding:4px 8px;border-radius:var(--r-pill);color:var(--muted);display:inline-block;margin-bottom:var(--s3)}
+.notes-box{margin-top:var(--s5)}.notes-box label{color:var(--text);font-weight:500}
+.map-toggle{border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s4) var(--s5);margin-top:var(--s5)}
+.profile-note{font-size:13px;color:var(--muted)}.foot a{white-space:normal}.btn:disabled{cursor:default;color:var(--muted)}
+#empty-search{padding:var(--s5);border:1px solid var(--line-strong);border-radius:var(--r)}
+@media(max-width:760px){.roadmap .branches::before{display:none}}
+@media(max-width:640px){.layout{padding:0 var(--s4)}.hero{padding-top:var(--s6)}.stats>div{padding:var(--s4)}.topic{padding:var(--s4)}.toolbar{gap:var(--s2)}.stage-head{gap:var(--s3)}.brand span{display:none}.top-inner{gap:var(--s2)}.top .btn{padding:var(--s2)}.search input{font-size:13px}.screen-flow{font-size:13px}}
+@media print{.top,.toc,.toolbar,.notes-box,.map-toggle,.pager,.demo,.js-only{display:none!important}.layout{display:block}.stage,.topic{break-inside:avoid}body{background:#fffaf0;color:#0a0a0a}h1,h2,h3,a{color:#0a0a0a}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="top-inner">
+<a class="brand" href="#top">Split expenses<span>Project workbook</span></a>
+<div class="search js-only"><input id="q" type="search" placeholder="Search tasks ( / )" aria-label="Search workbook" autocomplete="off"></div>
+<button class="btn js-only" type="button" id="theme">Light mode</button>
+</div></header>
+<div class="layout" id="top">
+<nav class="toc" id="toc" aria-label="Project stages"></nav>
+<main id="main">
+<section class="hero" aria-labelledby="title">
+<p class="label">Dinesh and Eswar · Build it yourself</p>
+<h1 id="title">Split expenses.<br>Understand every balance.</h1>
+<p class="lead">Build an app that remembers who paid, who shared the expense, and who still owes money. Start with equal splits. Grow into custom shares, safe edits, and settlements. Choose your own technologies and write the application in <code>app/</code>.</p>
+<p class="callout"><strong>Eswar, start here:</strong> open <a href="Guidance.html">How to proceed</a> for the first-session plan, build order, and a practical way to work through each task.</p>
+<div class="stats">
+<div><b id="n-stages">—</b><span>Build stages</span></div>
+<div><b id="n-checks">—</b><span>Completion checks</span></div>
+<div><b id="n-done">—</b><span>Checks completed</span></div>
+<div><b>INR</b><span>One currency to start</span></div>
+</div>
+<div class="js-only js-block">
+<div class="progress-track" role="progressbar" aria-label="Workbook completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="toolbar">
+<label for="profile">Learning as <select id="profile"><option>Dinesh</option><option>Eswar</option></select></label>
+<a href="#brief" class="btn" id="continue">Start here</a>
+<button type="button" class="btn" id="export">Export progress</button>
+<button type="button" class="btn" id="import">Import progress</button>
+<input id="import-file" type="file" accept="application/json,.json" hidden>
+<button type="button" class="btn" id="reset">Reset my progress</button>
+</div>
+<p class="profile-note">Checkboxes and notes are separate for Dinesh and Eswar. Saved in this browser when storage is available; export a backup before moving or renaming the file. There is no automatic sync or code evaluation.</p>
+<p class="status" id="storage-status" role="status" aria-live="polite"></p>
+</div>
+<noscript><p class="callout">The whole workbook and hints are readable without JavaScript. Enable it for saved progress, search, notes, the roadmap, and the balance explorer.</p></noscript>
+<details class="map-toggle js-only js-block"><summary>Explore the full build roadmap</summary>
+<p>Follow the spine in order. Branches jump to the exercises inside each stage.</p>
+<div class="roadmap"><ol class="rows" id="rows"></ol></div>
+</details>
+</section>
+<p id="search-status" class="status" role="status" aria-live="polite"></p>
+<p id="empty-search" hidden>No matching tasks. Try “rounding”, “permissions”, “edit”, or clear the search.</p>
+
+<section class="stage" id="brief" data-title="Define the first version">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Scope and finish line</p><h2>Define the first version</h2><p class="lead">Three friends share a meal. One pays. Your app makes the result understandable to everyone.</p></div></div>
+<div class="grid">
+<article class="topic" id="scope" data-node data-label="First version"><h3>Your project question</h3>
+<p>Build a full-stack expense-sharing app. A user creates a group, adds existing users as members, records an expense with one payer, and selects which members shared it. The app stores the expense and shows each member’s net balance.</p>
+<p><strong>First working version:</strong> groups, members, equal splits, expense history, persistent data, and derived balances. Seeded users are fine locally while learning. Add real login in the access stage before publishing private groups.</p>
+<p><strong>Later stages:</strong> exact custom shares, edits and deletion, recorded settlements, and deployment. Stretch features come last. This app records repayments made elsewhere; it does not move money.</p>
+<label class="check"><input type="checkbox" data-check="scope-story"><span>Write a user story from creating a group to seeing the first balance.</span></label>
+<label class="check"><input type="checkbox" data-check="scope-boundary"><span>Write down the first-version boundary and keep payment gateways, currency conversion, and receipt scanning outside it.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>How is “Dinesh paid ₹900” different from “Dinesh owes ₹900”?</p></div>
+</article>
+<article class="topic" id="choices" data-node data-label="Choose your tools"><h3>Choose and justify your tools</h3>
+<p>You can use any frontend, backend, database, language, or library. Node/Express matches the repo’s backend learning direction, but it is a choice. A relational database makes group membership and shares natural to model; documents work too if you explain how you enforce the same rules.</p>
+<p>Write down your UI, server, database, authentication approach, test tool, and hosting plan. For each, give one sentence explaining the choice. Start in <code>app/</code> using your framework’s own structure.</p>
+<label class="check"><input type="checkbox" data-check="tools-decide"><span>Record your stack and sketch browser → server → database.</span></label>
+<label class="check"><input type="checkbox" data-check="tools-setup"><span>Run a minimal page and a server health response locally; keep secrets out of Git.</span></label>
+<details><summary>Hints for getting started</summary><p class="hint-label">1 · Direction</p><p>Use tools you can explain. A small working setup is enough to begin.</p><details><summary>2 · Break it down</summary><p>Create the UI, create one backend route, verify it directly, then call it from the UI. A full-stack framework can keep both in one app.</p><details><summary>3 · More help</summary><p>For separate client/server processes, document their ports and how browser requests reach the server. Choose a development proxy or an explicit allowed origin.</p></details></details></details>
+</article>
+</div><p class="deeper">Go deeper: <a href="../../Web_Development_Roadmap.md">the repo’s web development roadmap</a>. Pick the concepts you need for your chosen tools.</p>
+</section>
+
+<section class="stage" id="rules" data-title="Get the money rules right">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">The core model</p><h2>Get the money rules right</h2><p class="lead">Make the calculation work on paper before building screens or database tables.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="balance-rules" data-node data-label="Balances and signs"><h3>One sign convention, everywhere</h3>
+<p><strong>Positive:</strong> this member should receive money. <strong>Negative:</strong> this member owes money. <strong>Zero:</strong> settled. For every expense, add the full paid amount to its payer and subtract each participant’s assigned share from that participant.</p>
+<p>A payer can also be a participant, but does not have to be. A group member excluded from the expense receives no share. A group net balance tells you how much someone owes overall; it does not preserve a unique “who owes whom” relationship.</p>
+<div class="tw"><table><caption>Dinesh pays ₹900; Dinesh, Eswar, and Priya share equally.</caption><thead><tr><th>Member</th><th>Paid</th><th>Share</th><th>Net balance</th></tr></thead><tbody><tr><td>Dinesh</td><td>₹900</td><td>₹300</td><td>+₹600</td></tr><tr><td>Eswar</td><td>₹0</td><td>₹300</td><td>−₹300</td></tr><tr><td>Priya</td><td>₹0</td><td>₹300</td><td>−₹300</td></tr></tbody></table></div>
+<label class="check"><input type="checkbox" data-check="rules-nine"><span>Reproduce +600, −300, −300 by hand and verify that the sum is zero.</span></label>
+<label class="check"><input type="checkbox" data-check="rules-excluded"><span>Calculate the same ₹900 with only Eswar and Priya sharing: Dinesh +900, Eswar −450, Priya −450.</span></label>
+<label class="check"><input type="checkbox" data-check="rules-self"><span>Explain why paying ₹900 entirely for yourself gives a net balance of zero.</span></label>
+</article>
+<article class="topic" id="money" data-node data-label="Paise and rounding"><h3>Represent money exactly</h3>
+<p>For this project, use INR and integer paise throughout the calculation: ₹900 = 90,000 paise. Parse decimal input at the boundary, reject more than two decimal places, and format rupees for display. Choose an explicit maximum amount that stays within your language and database limits, including accumulated totals.</p>
+<p>When an equal split leaves extra paise, give one extra paisa to each of the first remaining participants in a stable member-ID order. Save the allocated shares. ₹100 split among Dinesh, Eswar, and Priya in that order becomes ₹33.34, ₹33.33, ₹33.33.</p>
+<label class="check"><input type="checkbox" data-check="money-paise"><span>Store and calculate whole paise; test ₹0.01, ₹10.10, invalid text, and out-of-range input.</span></label>
+<label class="check"><input type="checkbox" data-check="money-round"><span>Split ₹100 among three people with no lost paisa and repeat the result regardless of screen sorting.</span></label>
+<details><summary>Hint 1 · Where does the remainder go?</summary><p>Divide the amount by the number of participants using integer division. How many paise have you allocated?</p><details><summary>Hint 2 · Allocate exactly</summary><p>The remainder is less than the participant count. Add one paisa to that many participants in a stable order.</p><details><summary>Hint 3 · Example</summary><p>10,000 ÷ 3 gives a base of 3,333 and one extra paisa. The stored shares are 3,334, 3,333, 3,333.</p></details></details></details>
+</article>
+<article class="topic" id="invariants" data-node data-label="Always-true rules"><h3>Write your invariants</h3>
+<p>An invariant is something that must remain true after every successful change. For an expense, assigned shares must sum to its amount. Across a group, member balances must sum to zero. No expense may include a payer or participant from another group.</p>
+<p>Amounts must be positive integer paise within your limit. A participant appears once per expense. Require at least one participant, and reject duplicate participant IDs. Membership changes must preserve old history; adding a new member must not change old splits.</p>
+<label class="check"><input type="checkbox" data-check="rules-list"><span>Write these rules as assertions or test cases, including an invalid participant from a different group.</span></label>
+<label class="check"><input type="checkbox" data-check="rules-history"><span>Decide to retain historical members and shares instead of silently recalculating old expenses.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>Why can rounding each person’s share independently create or lose money?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger">MDN’s safe integer reference</a>. Check equivalent numeric limits if you use another language.</p>
+</section>
+
+<section class="stage" id="screens" data-title="Build the interface with sample data">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Frontend first</p><h2>Build the interface with sample data</h2><p class="lead">Give the user a clear path through the app before connecting persistence.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="screen-plan" data-node data-label="Pages and states"><h3>Sketch the main journey</h3>
+<div class="screen-flow"><span>Group list</span> → <span>Group detail</span> → <span>Add expense</span> → <span>Balances</span> → <span>Record settlement</span></div>
+<p>Group detail needs its name, members, expenses, and balance summary. An expense form needs description, date, amount, payer, and selected participants. Keep edit and settlement screens as sketches until their stages.</p>
+<label class="check"><input type="checkbox" data-check="ui-screens"><span>Build the group list, group detail, and expense form using a small sample dataset.</span></label>
+<label class="check"><input type="checkbox" data-check="ui-states"><span>Show empty, loading, error, and successful states. A new group should clearly invite its first expense.</span></label>
+<label class="check"><input type="checkbox" data-check="ui-mobile"><span>Use the app at a narrow phone width with labeled controls, keyboard navigation, and no page-wide horizontal scroll.</span></label>
+<details><summary>Hint 1 · What should the UI own?</summary><p>Selection, form input, and loading state belong in the UI. Stored balances will come from the server once connected.</p><details><summary>Hint 2 · Work with fixtures</summary><p>Create one empty group and one group with three members and a ₹900 expense. Render both before building forms.</p><details><summary>Hint 3 · Keep responsibilities small</summary><p>Separate the group list, expense list, expense form, and balance summary. Use your framework’s composition approach or plain functions.</p></details></details></details>
+</article>
+<article class="topic" id="form-behavior" data-node data-label="Forms"><h3>Make the expense form understandable</h3>
+<p>Show the selected participant count and a share preview. Display currency explicitly. Distinguish the person who paid from the people who shared the expense. Keep input intact after an error.</p>
+<label class="check"><input type="checkbox" data-check="ui-form"><span>Catch missing description, invalid amount, missing payer, and empty participant selection with useful field errors.</span></label>
+<label class="check"><input type="checkbox" data-check="ui-preview"><span>Preview shares, including the rounding paisa, and explain that the server will validate the final result.</span></label>
+</article>
+<article class="topic" id="sample-data" data-node data-label="Sample records"><h3>Make a tiny reusable dataset</h3>
+<p>Use Dinesh, Eswar, and Priya in a group called “Weekend trip”. Create one ₹900 dinner paid by Dinesh. Keep a second group with different members to check that data never leaks between groups.</p>
+<label class="check"><input type="checkbox" data-check="ui-fixtures"><span>Reuse these fixtures for screenshots, manual checks, and later backend tests.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>Which screen state would you show if loading succeeds but the group has no expenses?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="https://www.w3.org/WAI/tutorials/forms/">W3C’s accessible forms tutorial</a>.</p>
+</section>
+
+<section class="stage" id="data" data-title="Design persistent data">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Database design</p><h2>Design persistent data</h2><p class="lead">Keep enough information to explain and rebuild any balance.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="entities" data-node data-label="Entities and relationships"><h3>Draw the relationships yourself</h3>
+<div class="tw"><table><thead><tr><th>Concept</th><th>What it remembers</th><th>Question to answer</th></tr></thead><tbody>
+<tr><td>User</td><td>Identity and display name</td><td>How does a login map to this identity?</td></tr>
+<tr><td>Group</td><td>Name, currency, creator</td><td>Who can manage membership?</td></tr>
+<tr><td>Membership</td><td>User, group, active status, join date</td><td>How is duplicate membership prevented?</td></tr>
+<tr><td>Expense</td><td>Group, payer, amount, description, date, creator, version</td><td>What changes when it is edited or deleted?</td></tr>
+<tr><td>Expense share</td><td>Expense, participant, allocated paise</td><td>How are shares kept unique and exact?</td></tr>
+<tr><td>Settlement</td><td>Group, sender, receiver, paise, date, recorder</td><td>How do you preserve repayment history?</td></tr>
+</tbody></table></div>
+<p>Balances are derived from expenses, shares, and settlements. Begin by calculating them from stored records. If you later cache totals, explain how you keep them consistent and rebuild them.</p>
+<label class="check"><input type="checkbox" data-check="db-draw"><span>Draw the relationships and write your own schema or document structure, including IDs, constraints, and useful indexes.</span></label>
+<label class="check"><input type="checkbox" data-check="db-seed"><span>Create a repeatable migration/setup and seed the two sample groups.</span></label>
+<label class="check"><input type="checkbox" data-check="db-history"><span>Add a member after an expense and verify that historical shares stay unchanged.</span></label>
+<details><summary>Hint 1 · Why are shares separate?</summary><p>A group has members. An expense has selected participants. They are not always the same set.</p><details><summary>Hint 2 · Model the association</summary><p>Each expense needs one stored share per participant. Think about a unique pair of expense ID and member ID.</p><details><summary>Hint 3 · Choosing a database</summary><p>With SQL, foreign keys and unique constraints enforce parts of the model. With documents, decide what to embed and how atomic updates and validation enforce those same rules.</p></details></details></details>
+</article>
+<article class="topic wide" id="atomicity" data-node data-label="Atomic writes"><h3>Save a complete expense or nothing</h3>
+<p>Creating an expense and saving its shares is one logical operation. A failure halfway through must leave no partial expense. Use a transaction, or an equivalent atomic document operation that covers all the records you change. Check group membership inside a consistency boundary appropriate to your database.</p>
+<label class="check"><input type="checkbox" data-check="db-atomic"><span>Force a share write to fail and confirm that no expense or partial shares remain.</span></label>
+<label class="check"><input type="checkbox" data-check="db-constraints"><span>Reject duplicate shares and non-integer, zero, or negative expense amounts on the server, with database constraints where supported.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>Why is “insert the expense, then try to insert its shares” incomplete without rollback?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">PostgreSQL’s transaction introduction</a>. Apply the all-or-nothing idea using your chosen database.</p>
+</section>
+
+<section class="stage" id="api" data-title="Build the first backend flow">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Requests and business logic</p><h2>Build the first backend flow</h2><p class="lead">Make one complete path work: create a group, add an expense, read its balances.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="contracts" data-node data-label="API exercises"><h3>Write contracts before handlers</h3>
+<p>These are candidate REST routes. Adapt them to your framework or API style. For every operation, define the allowed caller, input, output, validation errors, and missing-resource behavior.</p>
+<div class="tw"><table><thead><tr><th>Operation</th><th>Candidate route</th><th>Your design exercise</th></tr></thead><tbody>
+<tr><td>Create/list groups</td><td><code>POST /groups</code><br><code>GET /groups</code></td><td>Return only groups visible to the current user.</td></tr>
+<tr><td>Read group</td><td><code>GET /groups/:id</code></td><td>Return members and group metadata.</td></tr>
+<tr><td>Add existing user</td><td><code>POST /groups/:id/members</code></td><td>Require an owner; reject duplicate membership.</td></tr>
+<tr><td>Create/list expenses</td><td><code>POST /groups/:id/expenses</code><br><code>GET /groups/:id/expenses</code></td><td>Validate IDs and split rules; define stable ordering.</td></tr>
+<tr><td>Read balances</td><td><code>GET /groups/:id/balances</code></td><td>Return integer paise and a clear sign convention.</td></tr>
+<tr><td>Edit/delete expense</td><td><code>PATCH /groups/:id/expenses/:expenseId</code><br><code>DELETE /groups/:id/expenses/:expenseId</code></td><td>Define atomic replacement, permissions, and stale-edit behavior.</td></tr>
+<tr><td>Create/list settlements</td><td><code>POST /groups/:id/settlements</code><br><code>GET /groups/:id/settlements</code></td><td>Record a transfer and keep it in the history.</td></tr>
+</tbody></table></div>
+<label class="check"><input type="checkbox" data-check="api-contract"><span>Write example requests and responses for group creation, equal expense creation, and balances.</span></label>
+<label class="check"><input type="checkbox" data-check="api-create"><span>Implement and call the first-version routes directly, without relying on the UI.</span></label>
+<label class="check"><input type="checkbox" data-check="api-validate"><span>Reject a wrong-group payer, repeated participant, empty selection, bad amount, and unknown group.</span></label>
+<details><summary>Hint 1 · Separate the responsibilities</summary><p>Your HTTP handler should not need to contain all the money calculations.</p><details><summary>Hint 2 · A useful separation</summary><p>Validate the request shape, check access and membership, calculate shares, persist atomically, and serialize the result.</p><details><summary>Hint 3 · Suggested input concepts</summary><p>An expense request needs a description, amount in paise, payer ID, date, and participant IDs. For equal splits the server allocates shares. Do not accept a client-supplied final balance.</p></details></details></details>
+</article>
+<article class="topic wide" id="derive" data-node data-label="Derive balances"><h3>Calculate from the records</h3>
+<p>Initialize every group member at zero, including members with no expenses. Add each expense’s paid amount to its payer and subtract its stored shares. When settlements exist, add outgoing settlement amounts and subtract incoming amounts. Keep this calculation independent of UI rendering.</p>
+<label class="check"><input type="checkbox" data-check="api-balances"><span>Return +60,000, −30,000, −30,000 paise for the dinner example, with the total exactly zero.</span></label>
+<label class="check"><input type="checkbox" data-check="api-isolation"><span>Verify that reading a second group never includes expenses or balances from the first group.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>Which checks belong on the server even if the form already performs them?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">MDN’s HTTP status reference</a>. Choose consistent success, validation, access, missing-record, and conflict responses.</p>
+</section>
+
+<section class="stage" id="connect" data-title="Connect the first working version">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">An end-to-end milestone</p><h2>Connect the first working version</h2><p class="lead">Replace sample state with actual requests and verify the complete journey.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="integration" data-node data-label="Real requests"><h3>Make server data authoritative</h3>
+<p>Load groups and expenses from your backend. Submit the expense, wait for a successful response, then refresh the relevant lists and balances or update them from the server result. Preserve the form on failure. Show request progress and prevent accidental repeat submissions while pending.</p>
+<label class="check"><input type="checkbox" data-check="connect-save"><span>Create “Weekend trip”, add members, save the ₹900 dinner, and display the expected balances through the UI.</span></label>
+<label class="check"><input type="checkbox" data-check="connect-refresh"><span>Refresh the browser and restart the backend; the stored group and expense still load.</span></label>
+<label class="check"><input type="checkbox" data-check="connect-failure"><span>Stop the server during submission. Show a helpful error and retain the entered data.</span></label>
+<label class="check"><input type="checkbox" data-check="connect-duplicate"><span>Double-click submit on a slow request and check that it creates one expense.</span></label>
+<details><summary>Hint 1 · What gets refreshed?</summary><p>An expense changes both the history and the balances. Updating just one leaves the page inconsistent.</p><details><summary>Hint 2 · Start with a simple strategy</summary><p>After saving, refetch the group’s expenses and balances. Introduce caching or optimistic UI only when you can explain its invalidation and rollback behavior.</p><details><summary>Hint 3 · A failed request can be ambiguous</summary><p>A timeout can happen after the server saved the expense. Disabling the button handles rapid clicks; a server-side request key is a later improvement for retry safety.</p></details></details></details>
+<div class="reflect"><strong>First-version checkpoint</strong><p>Demo the complete flow to each other. Explain one request from button click through validation, calculation, storage, and response.</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="../../Frontend/Frontend_Handbook.html">the frontend handbook</a> and <a href="../../Backend/Backend_Handbook.html">the backend handbook</a>. Review the request/response boundary with your own code.</p>
+</section>
+
+<section class="stage" id="access" data-title="Add identity and group permissions">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Before a public deployment</p><h2>Add identity and group permissions</h2><p class="lead">Knowing who is signed in and deciding what they may change are separate jobs.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="permission-rules" data-node data-label="Access matrix"><h3>Write and enforce your access matrix</h3>
+<p>Choose an established authentication approach supported by your stack. Map its verified identity to an app user on the server. If you handle passwords yourself, use a maintained password hashing implementation and study session handling before deployment.</p>
+<p>Use this project policy: members can read their groups and create expenses; only the expense creator or group owner can edit or delete an expense; only the owner can add existing users. Settlements can be recorded by the sender or owner. The payer is a record of who paid, not proof of who submitted the request.</p>
+<label class="check"><input type="checkbox" data-check="auth-login"><span>Sign in as Dinesh and Eswar in separate sessions. Verify that logout removes authenticated access.</span></label>
+<label class="check"><input type="checkbox" data-check="auth-membership"><span>Enforce membership on every group, expense, balance, and settlement request, including reads.</span></label>
+<label class="check"><input type="checkbox" data-check="auth-tamper"><span>Change a group ID, expense ID, and claimed creator ID in a direct request; confirm that access rules still hold.</span></label>
+<label class="check"><input type="checkbox" data-check="auth-session"><span>Configure session/token handling for your stack; address CSRF for cookie-authenticated mutations and restrict allowed browser origins where applicable.</span></label>
+<details><summary>Hint 1 · Do not trust the caller’s identity field</summary><p>Read the acting user from the verified session or token, not a user ID in the request body.</p><details><summary>Hint 2 · Check the resource relationship</summary><p>Load the expense in the requested group. Then check membership and whether this user is the creator or owner.</p><details><summary>Hint 3 · Test beyond hidden buttons</summary><p>A missing edit button is a UI convenience. Send the same edit request directly as an unauthorized user and inspect the response and stored records.</p></details></details></details>
+<div class="reflect"><strong>Explain to your friend</strong><p>Why does having a valid login not give someone access to every group?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html">OWASP’s authorization guidance</a>. Apply the permission checks to every request.</p>
+</section>
+
+<section class="stage" id="custom" data-title="Add exact custom shares">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">More flexible splitting</p><h2>Add exact custom shares</h2><p class="lead">First support amounts entered explicitly. Percentage and weighted splits can wait.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="custom-amounts" data-node data-label="Custom allocation"><h3>Every paisa must be assigned</h3>
+<p>Allow equal or custom-amount mode. In custom mode, enter a nonnegative share for each selected participant; require the shares to sum exactly to the positive expense total. Zero-share participants are allowed. Store the split mode and final allocated amounts.</p>
+<p>Example: Dinesh pays ₹900, with shares Dinesh ₹200, Eswar ₹300, Priya ₹400. Expected balances: Dinesh +₹700, Eswar −₹300, Priya −₹400.</p>
+<label class="check"><input type="checkbox" data-check="custom-valid"><span>Save the custom example and display the expected balances.</span></label>
+<label class="check"><input type="checkbox" data-check="custom-invalid"><span>Reject a ₹899.99 or ₹900.01 share total for a ₹900 expense on both frontend and backend.</span></label>
+<label class="check"><input type="checkbox" data-check="custom-modes"><span>Switch split modes without accidentally submitting hidden stale shares; show the remaining unassigned amount.</span></label>
+<label class="check"><input type="checkbox" data-check="custom-zero"><span>Handle a zero share correctly and reject duplicate, negative, and wrong-group participant shares.</span></label>
+<details><summary>Hint 1 · Custom amounts need no division</summary><p>You only need to parse each share exactly, validate the participants, and compare the integer sum with the expense total.</p><details><summary>Hint 2 · Keep the contract explicit</summary><p>Use a split-mode field to distinguish selected IDs for equal splitting from explicit participant/amount pairs for custom splitting.</p><details><summary>Hint 3 · Normalize after validation</summary><p>Both modes should produce the same internal result: a list of member IDs and allocated paise. The balance calculation should not need to know which UI mode created them.</p></details></details></details>
+<div class="reflect"><strong>Explain to your friend</strong><p>Why should the server validate a custom share total even when the form disables the save button?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="#invariants">revisit your invariants</a> and make both split modes satisfy the same checks.</p>
+</section>
+
+<section class="stage" id="changes" data-title="Edit and delete safely">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">The interesting backend challenge</p><h2>Edit and delete safely</h2><p class="lead">An edited expense replaces its old effect. It must never be counted twice.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="edit-rules" data-node data-label="Replacement and conflicts"><h3>Follow one expense through its changes</h3>
+<p>Begin with the ₹900 equal dinner. Change the amount to ₹1,200: expected balances become +₹800, −₹400, −₹400. Change the payer to Eswar while keeping ₹900: −₹300, +₹600, −₹300. Change participants to Dinesh and Eswar only, with Dinesh paying ₹900: +₹450, −₹450, ₹0.</p>
+<p>When deriving balances, atomically replace the expense and its shares, then recalculate from the current records. If you maintain cached balances, reverse the old contribution and apply the new one in the same transaction. Preserve settlements; an edit can legitimately reverse who owes whom.</p>
+<p>For concurrent edits, include a version in the update condition and increment it atomically. A stale version gets a conflict response and a reload prompt. Decide whether deletion is soft deletion or hard deletion; either way, exclude deleted expenses consistently.</p>
+<label class="check"><input type="checkbox" data-check="edit-amount"><span>Verify the amount, payer, and participant edits above as independent cases starting from the original dinner.</span></label>
+<label class="check"><input type="checkbox" data-check="edit-atomic"><span>Cause an edited-share write to fail; confirm that the original expense and all its shares remain intact.</span></label>
+<label class="check"><input type="checkbox" data-check="edit-delete"><span>Delete the only expense in a group with no settlements; all member balances return to zero.</span></label>
+<label class="check"><input type="checkbox" data-check="edit-conflict"><span>Open an expense in two tabs. Save one, then reject the stale update from the other without losing the first change.</span></label>
+<details><summary>Hint 1 · What is your source of truth?</summary><p>If the records are authoritative, changing those records should be enough to derive the new balances.</p><details><summary>Hint 2 · Keep reads and writes consistent</summary><p>Read the current version, validate the replacement, and write the expense plus shares within an atomic operation. Compare the version as part of the write, not just beforehand.</p><details><summary>Hint 3 · The old-plus-new trap</summary><p>For the change from ₹900 to ₹1,200, the new balance for Dinesh is +₹800. Adding +₹800 to the old +₹600 would incorrectly yield +₹1,400.</p></details></details></details>
+<div class="reflect"><strong>Explain to your friend</strong><p>Why is checking a version and then updating unconditionally still vulnerable to a race?</p></div>
+</article>
+</div><p class="deeper">Go deeper: <a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">transaction atomicity</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">conflict responses</a>. Look up conditional writes in your database.</p>
+</section>
+
+<section class="stage" id="settlements" data-title="Record settlements and suggest repayments">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Closing the loop</p><h2>Record settlements and suggest repayments</h2><p class="lead">A repayment changes what is owed; it does not create a new shared expense.</p></div></div>
+<div class="grid">
+<article class="topic" id="settle-rules" data-node data-label="Settlement records"><h3>Keep repayments in their own history</h3>
+<p>Starting from +₹600, −₹300, −₹300, Eswar pays Dinesh ₹300 outside the app. Record the settlement: add ₹300 to Eswar’s balance and subtract ₹300 from Dinesh’s. The result is +₹300, ₹0, −₹300. A partial ₹100 repayment instead gives +₹500, −₹200, −₹300.</p>
+<p>For this project, allow a debtor to pay a creditor up to the smaller of the current debt and credit. Reject self-payment, zero/negative amounts, and cross-group transfers. Validate the current balances and write the settlement in a transaction with suitable locking or serializable retry behavior so concurrent repayments cannot exceed the cap.</p>
+<label class="check"><input type="checkbox" data-check="settle-full"><span>Record Eswar → Dinesh ₹300, then Priya → Dinesh ₹300. All balances become zero.</span></label>
+<label class="check"><input type="checkbox" data-check="settle-partial"><span>Verify the partial ₹100 example independently and show both the expense and settlement history.</span></label>
+<label class="check"><input type="checkbox" data-check="settle-validation"><span>Reject self-payment, nonmembers, an overpayment, and an unauthorized recorder.</span></label>
+<label class="check"><input type="checkbox" data-check="settle-concurrent"><span>Submit competing repayments against the same balance and confirm the cap cannot be bypassed.</span></label>
+<details><summary>Hint 1 · Follow the direction</summary><p>The sender’s debt shrinks, so their signed balance increases. The receiver’s credit shrinks, so their balance decreases.</p><details><summary>Hint 2 · Keep the original story</summary><p>Do not edit the dinner amount to represent a repayment. Add a separate settlement and include it when deriving balances.</p><details><summary>Hint 3 · One consistency boundary</summary><p>A simple design serializes balance-changing writes per group. Whatever mechanism you choose, all relevant expense and settlement writes must follow the same locking or concurrency policy.</p></details></details></details>
+</article>
+<article class="topic" id="suggestions" data-node data-label="Suggested transfers"><h3>Suggest a valid repayment plan</h3>
+<p>Pair a negative balance with a positive balance. Suggest the smaller of the outstanding debt and credit, adjust temporary balances, and continue. This produces a valid plan; do not claim it always minimizes the number of transfers.</p>
+<p>Suggestions are derived advice. They become settlement records only after someone confirms a repayment happened. Because you use group net balances, a suggested recipient can differ from the original expense’s payer.</p>
+<label class="check"><input type="checkbox" data-check="suggest-valid"><span>Apply the suggested transfers in a test and verify that every final balance is exactly zero.</span></label>
+<label class="check"><input type="checkbox" data-check="suggest-record"><span>Keep “suggested” separate from “recorded”; show no suggestions for a settled group.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>Why can you still owe money after deleting an expense if a repayment was already recorded?</p></div>
+</article>
+<article class="topic wide" id="explorer" data-node data-label="Balance explorer"><h3>A small balance explorer</h3>
+<p>This workbook demo uses Dinesh, Eswar, and Priya, all sharing equally. Participant order is fixed for rounding. Use it to predict a result before checking your own app.</p>
+<div class="demo js-only js-block">
+<div class="controls">
+<label for="demo-amount">Expense (₹)<input id="demo-amount" type="text" inputmode="decimal" value="900" maxlength="12"></label>
+<label for="demo-payer">Paid by<select id="demo-payer"><option value="0">Dinesh</option><option value="1">Eswar</option><option value="2">Priya</option></select></label>
+<label for="demo-settlement">Eswar pays Dinesh (₹)<input id="demo-settlement" type="text" inputmode="decimal" value="0" maxlength="12"></label>
+</div>
+<div class="tw"><table><caption>Positive receives money; negative owes money.</caption><thead><tr><th>Member</th><th>Allocated share</th><th>Net balance</th></tr></thead><tbody id="demo-result"></tbody></table></div>
+<p id="demo-status" role="status" aria-live="polite"></p>
+<p class="profile-note">For readability this explorer caps an expense at ₹1,000,000. It records no real expenses or progress.</p>
+</div>
+</article>
+</div><p class="deeper">Go deeper: <a href="#balance-rules">trace the sign convention again</a> and <a href="#atomicity">review atomic writes</a> before handling simultaneous repayments.</p>
+</section>
+
+<section class="stage" id="verify" data-title="Verify the behavior">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">Evidence that it works</p><h2>Verify the behavior</h2><p class="lead">Test the rules most likely to break: exact amounts, edits, isolation, and concurrent writes.</p></div></div>
+<div class="grid">
+<article class="topic wide" id="acceptance" data-node data-label="Acceptance examples"><h3>Use independent, repeatable cases</h3>
+<p>For each row below, reset to an empty group and apply only the described records. Balances are in rupees in Dinesh / Eswar / Priya order. The ₹100 case allocates the extra paisa to Dinesh.</p>
+<div class="tw"><table><thead><tr><th>Case</th><th>Records</th><th>Expected net balances</th></tr></thead><tbody>
+<tr><td>Empty</td><td>No records</td><td>0 / 0 / 0</td></tr>
+<tr><td>Equal</td><td>Dinesh pays 900 for all three</td><td>+600 / −300 / −300</td></tr>
+<tr><td>Rounding</td><td>Dinesh pays 100 for all three</td><td>+66.66 / −33.33 / −33.33</td></tr>
+<tr><td>Payer excluded</td><td>Dinesh pays 900 for Eswar and Priya</td><td>+900 / −450 / −450</td></tr>
+<tr><td>Multiple payers</td><td>Dinesh pays 900, then Eswar pays 300; both shared by all</td><td>+500 / −100 / −400</td></tr>
+<tr><td>Custom</td><td>Dinesh pays 900; shares 200 / 300 / 400</td><td>+700 / −300 / −400</td></tr>
+<tr><td>Edited amount</td><td>900 dinner replaced with 1,200, paid by Dinesh</td><td>+800 / −400 / −400</td></tr>
+<tr><td>Partial repayment</td><td>900 dinner; Eswar pays Dinesh 100</td><td>+500 / −200 / −300</td></tr>
+<tr><td>Fully settled</td><td>900 dinner; Eswar and Priya each pay Dinesh 300</td><td>0 / 0 / 0</td></tr>
+<tr><td>Delete after repayment</td><td>900 dinner; Eswar pays Dinesh 300; delete dinner</td><td>−300 / +300 / 0</td></tr>
+</tbody></table></div>
+<label class="check"><input type="checkbox" data-check="test-money"><span>Automate the calculation cases above, with exact integer assertions and the zero-sum invariant.</span></label>
+<label class="check"><input type="checkbox" data-check="test-api"><span>Test persistence, rollback, cross-group access, invalid shares, stale updates, and competing settlements through the backend.</span></label>
+<label class="check"><input type="checkbox" data-check="test-browser"><span>Complete one browser flow: login → group → expense → edit → settlement → refresh.</span></label>
+<label class="check"><input type="checkbox" data-check="test-explain"><span>Have your friend run the project and explain one failure case without your help.</span></label>
+<details><summary>Hint 1 · Test the rule directly</summary><p>Use small calculation tests before browser tests. A failing arithmetic test should not need a running UI.</p><details><summary>Hint 2 · Test what a client can bypass</summary><p>Send malformed payloads directly to the server and query stored data after a failed write.</p><details><summary>Hint 3 · Assert properties too</summary><p>For valid generated expenses, assert share sum = amount and group balance sum = zero. Repeat an equal split with the same stable participant IDs and expect the same allocated shares.</p></details></details></details>
+</article>
+</div><p class="deeper">Go deeper: <a href="#invariants">turn the invariants into repeatable checks</a>. Use your chosen test tool’s official documentation for setup.</p>
+</section>
+
+<section class="stage" id="ship" data-title="Deploy and tell the story">
+<div class="stage-head"><span class="stage-num" aria-hidden="true"></span><div><p class="label">A finished project</p><h2>Deploy and tell the story</h2><p class="lead">Make it reproducible, demo it clearly, and explain the decisions you made.</p></div></div>
+<div class="grid">
+<article class="topic" id="deploy" data-node data-label="Deployment checklist"><h3>Make a fresh setup work</h3>
+<p>Write run instructions alongside your application: required tools, environment variable names, database setup/migrations, seed command, test command, and production build/start commands. Provide sample values without secrets.</p>
+<label class="check"><input type="checkbox" data-check="ship-docs"><span>Follow your own instructions from a fresh setup and run the application successfully.</span></label>
+<label class="check"><input type="checkbox" data-check="ship-config"><span>Deploy with HTTPS, persistent storage, server-only secrets, and production auth/cookie/origin settings for your stack.</span></label>
+<label class="check"><input type="checkbox" data-check="ship-smoke"><span>Run the main flow on the deployed app from a second account and verify unauthorized group access is rejected.</span></label>
+<label class="check"><input type="checkbox" data-check="ship-story"><span>Prepare a short demo explaining the data model, ₹900 example, rounding rule, safe edit, settlement, and one tradeoff.</span></label>
+<div class="reflect"><strong>Explain to your friend</strong><p>What would you need to change if a group grew from 3 members and 10 expenses to 200 members and 100,000 expenses?</p></div>
+</article>
+<article class="topic" id="stretch" data-node data-label="Optional extensions"><span class="badge">Optional · after the core works</span><h3>Choose one extension at a time</h3>
+<ul><li><strong>Percentages or weights:</strong> allocate remaining paise deterministically.</li><li><strong>Retry safety:</strong> make a repeated creation request return the original result using an idempotency key and a uniqueness constraint.</li><li><strong>History:</strong> record who changed an expense and what changed.</li><li><strong>Invitations:</strong> add acceptance and expiration instead of immediately adding existing users.</li><li><strong>Scale:</strong> add paginated history with stable sorting, and measure query plans before adding caches.</li><li><strong>Exports:</strong> download a group report with expense and settlement history.</li></ul>
+<p>Write a small requirement and acceptance checklist before starting an extension. Keep optional work outside the core progress count.</p>
+</article>
+</div><p class="deeper">Go deeper: <a href="../../Backend/Backend_Handbook.html">the backend handbook</a>. Use your chosen host’s official deployment instructions when you reach this stage.</p>
+</section>
+<footer class="foot"><p>Made for Dinesh and Eswar. The guide is an offline workbook; your app and stack are your own. External “Go deeper” links need an internet connection.</p><p><a href="Guidance.html">How to proceed</a> · <a href="../../Frontend/Frontend_Handbook.html">Frontend handbook</a> · <a href="../../Backend/Backend_Handbook.html">Backend handbook</a> · <a href="#top">Back to top</a></p></footer>
+</main></div>
+<script>
+(() => {
+  'use strict';
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const stages = $$('section.stage');
+  const checks = $$('[data-check]');
+  const key = 'dinesh-eswar-split-expenses-v1';
+  const themeKey = 'split-expenses-theme';
+  const blank = () => ({checks: {}, notes: {}});
+  let state = {version: 1, project: 'split-expenses', active: 'Dinesh', profiles: {Dinesh: blank(), Eswar: blank()}};
+  let storageOK = true;
+  const status = $('#storage-status');
+  function normalize(raw) {
+    if (!raw || raw.version !== 1 || raw.project !== 'split-expenses' || !raw.profiles) throw Error('This is not a Split Expenses progress backup (version 1).');
+    const clean = {version: 1, project: 'split-expenses', active: raw.active === 'Eswar' ? 'Eswar' : 'Dinesh', profiles: {Dinesh: blank(), Eswar: blank()}};
+    for (const name of ['Dinesh', 'Eswar']) {
+      const p = raw.profiles[name];
+      if (!p || typeof p.checks !== 'object' || p.checks === null || typeof p.notes !== 'object' || p.notes === null) throw Error('The backup is missing a valid profile.');
+      for (const c of checks) clean.profiles[name].checks[c.dataset.check] = p.checks[c.dataset.check] === true;
+      for (const s of stages) clean.profiles[name].notes[s.id] = typeof p.notes[s.id] === 'string' ? p.notes[s.id].slice(0, 12000) : '';
+    }
+    return clean;
+  }
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved) state = normalize(JSON.parse(saved));
+    const theme = localStorage.getItem(themeKey);
+    if (theme === 'light' || theme === 'dark') { document.documentElement.dataset.theme = theme; }
+  } catch (_) { storageOK = false; }
+  function message(text) { status.textContent = text; }
+  function save() {
+    try { localStorage.setItem(key, JSON.stringify(state)); storageOK = true; message('Saved for ' + state.active + ' in this browser.'); }
+    catch (_) { storageOK = false; message('Browser storage is unavailable or full. Your changes stay in this tab; export progress to keep them.'); }
+  }
+  function link(target, text, className) {
+    const a = document.createElement('a'); a.href = '#' + target; a.textContent = text; if (className) a.className = className; return a;
+  }
+  const mapNodes = new Map();
+  const tocLinks = new Map();
+  stages.forEach((stage, i) => {
+    $('.stage-num', stage).textContent = String(i + 1).padStart(2, '0');
+    const title = stage.dataset.title;
+    const tocLink = link(stage.id, title); $('#toc').append(tocLink); tocLinks.set(stage.id, tocLink);
+    const count = document.createElement('p'); count.className = 'stage-progress js-only js-block'; $('.stage-head>div', stage).append(count);
+    const row = document.createElement('li'); row.className = 'row';
+    const left = document.createElement('div'); left.className = 'branches left';
+    const right = document.createElement('div'); right.className = 'branches right';
+    const center = link(stage.id, '', 'node stage');
+    const small = document.createElement('small'); small.textContent = 'Stage ' + (i + 1); center.append(small, document.createTextNode(title));
+    $$('[data-node]', stage).forEach((topic, j) => (j % 2 ? right : left).append(link(topic.id, topic.dataset.label, 'node')));
+    row.append(left, center, right); $('#rows').append(row); mapNodes.set(stage.id, center);
+    const notes = document.createElement('div'); notes.className = 'notes-box js-only js-block';
+    const label = document.createElement('label'); label.htmlFor = 'notes-' + stage.id; label.textContent = 'Your decisions, doubts, and peer-review notes';
+    const input = document.createElement('textarea'); input.id = label.htmlFor; input.dataset.notes = stage.id; input.maxLength = 12000; input.placeholder = 'Record why you chose an approach, what failed, or what you want to discuss.';
+    input.addEventListener('input', () => { state.profiles[state.active].notes[stage.id] = input.value; save(); });
+    notes.append(label, input); stage.append(notes);
+    const pager = document.createElement('nav'); pager.className = 'pager'; pager.setAttribute('aria-label', title + ' navigation');
+    if (i) pager.append(link(stages[i - 1].id, '← Previous stage')); else pager.append(document.createElement('span'));
+    if (i < stages.length - 1) pager.append(link(stages[i + 1].id, 'Next stage →')); else pager.append(link('top', 'Back to progress ↑'));
+    stage.append(pager);
+  });
+  $('#n-stages').textContent = stages.length;
+  $('#n-checks').textContent = checks.length;
+  function updateProgress() {
+    const completed = checks.filter(c => c.checked).length;
+    $('#n-done').textContent = completed;
+    const percent = Math.round(100 * completed / checks.length);
+    $('#progress-fill').style.width = percent + '%';
+    $('.progress-track').setAttribute('aria-valuenow', percent);
+    $('.progress-track').setAttribute('aria-valuetext', completed + ' of ' + checks.length + ' checks completed for ' + state.active);
+    for (const stage of stages) {
+      const cs = $$('[data-check]', stage); const done = cs.filter(c => c.checked).length;
+      const finished = cs.length > 0 && done === cs.length;
+      $('.stage-progress', stage).textContent = done + ' / ' + cs.length + ' checks complete';
+      mapNodes.get(stage.id).classList.toggle('done', finished);
+      tocLinks.get(stage.id).classList.toggle('done', finished);
+    }
+    const next = checks.find(c => !c.checked);
+    $('#continue').href = '#' + (next ? next.closest('.topic').id : 'ship');
+    $('#continue').textContent = next ? 'Continue: ' + next.closest('.stage').dataset.title : 'All checks done · Review your project';
+  }
+  function renderProfile() {
+    $('#profile').value = state.active;
+    const p = state.profiles[state.active];
+    checks.forEach(c => { c.checked = p.checks[c.dataset.check] === true; });
+    $$('[data-notes]').forEach(n => { n.value = p.notes[n.dataset.notes] || ''; });
+    updateProgress();
+  }
+  checks.forEach(c => c.addEventListener('change', () => { state.profiles[state.active].checks[c.dataset.check] = c.checked; updateProgress(); save(); }));
+  $('#profile').addEventListener('change', e => { state.active = e.target.value; renderProfile(); save(); });
+  function updateTheme() {
+    const light = document.documentElement.dataset.theme === 'light';
+    $('#theme').textContent = light ? 'Dark mode' : 'Light mode';
+    $('#theme').setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+  }
+  $('#theme').addEventListener('click', () => {
+    document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; updateTheme();
+    try { localStorage.setItem(themeKey, document.documentElement.dataset.theme); } catch (_) { message('Theme changed for this tab. Browser storage is unavailable.'); }
+  });
+  $('#export').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'split-expenses-progress.json'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    message('Progress export requested. It includes both profiles and notes.');
+  });
+  $('#import').addEventListener('click', () => $('#import-file').click());
+  $('#import-file').addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      if (file.size > 1000000) throw Error('Backup is too large. Select an exported progress JSON file under 1 MB.');
+      const imported = normalize(JSON.parse(await file.text()));
+      if (!confirm('Replace both profiles and notes with this backup? Export your current progress first if needed.')) return;
+      state = imported; renderProfile(); save(); message(storageOK ? 'Both profiles imported and saved.' : 'Imported for this tab. Storage is unavailable; export to keep your changes.');
+    } catch (error) { message('Import failed: ' + error.message); }
+    finally { e.target.value = ''; }
+  });
+  $('#reset').addEventListener('click', () => {
+    if (!confirm('Clear all checks and notes for ' + state.active + '? The other profile will stay unchanged.')) return;
+    state.profiles[state.active] = blank(); renderProfile(); save();
+  });
+  function clearSearch() { $('#q').value = ''; filterTopics(); }
+  function filterTopics() {
+    const query = $('#q').value.trim().toLowerCase(); let matches = 0;
+    for (const stage of stages) {
+      let visible = 0;
+      for (const topic of $$('.topic', stage)) {
+        const match = !query || (stage.dataset.title + ' ' + (topic.dataset.label || '') + ' ' + topic.textContent).toLowerCase().includes(query);
+        topic.hidden = !match; if (match) visible++;
+      }
+      stage.hidden = visible === 0; matches += visible;
+    }
+    $('#empty-search').hidden = matches !== 0;
+    $('#search-status').textContent = query ? matches + ' matching cards. Clear search to restore the full workbook.' : '';
+  }
+  $('#q').addEventListener('input', filterTopics);
+  document.addEventListener('keydown', e => {
+    const editing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) || document.activeElement.isContentEditable;
+    if (e.key === '/' && !editing && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); $('#q').focus(); }
+    if (e.key === 'Escape' && document.activeElement === $('#q')) { clearSearch(); $('#q').blur(); }
+  });
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]'); if (!a) return;
+    if ($('#q').value) clearSearch();
+  });
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (!visible.length) return;
+      const id = visible[0].target.id;
+      for (const stage of stages) {
+        const current = stage.id === id; tocLinks.get(stage.id).classList.toggle('active', current); mapNodes.get(stage.id).classList.toggle('active', current);
+        if (current) tocLinks.get(stage.id).setAttribute('aria-current', 'location'); else tocLinks.get(stage.id).removeAttribute('aria-current');
+      }
+    }, {rootMargin: '-72px 0px -55% 0px'});
+    stages.forEach(s => observer.observe(s));
+  }
+  const names = ['Dinesh', 'Eswar', 'Priya'];
+  function parseMoney(text) {
+    if (!/^\d{1,7}(\.\d{1,2})?$/.test(text.trim())) return null;
+    const [whole, fraction = ''] = text.trim().split('.');
+    return Number(whole) * 100 + Number(fraction.padEnd(2, '0'));
+  }
+  function money(paise, signed = false) {
+    const sign = paise < 0 ? '−' : signed && paise > 0 ? '+' : '';
+    return sign + '₹' + (Math.abs(paise) / 100).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+  function renderDemo() {
+    const amount = parseMoney($('#demo-amount').value);
+    const repayment = parseMoney($('#demo-settlement').value);
+    const payer = Number($('#demo-payer').value);
+    const body = $('#demo-result'); body.replaceChildren();
+    if (amount === null || amount <= 0 || amount > 100000000 || repayment === null) {
+      $('#demo-status').textContent = 'Enter an expense from ₹0.01 to ₹1,000,000 and a nonnegative settlement, with up to two decimal places.'; return;
+    }
+    const base = Math.floor(amount / 3), remainder = amount % 3;
+    const shares = names.map((_, i) => base + (i < remainder ? 1 : 0));
+    const balances = shares.map((s, i) => (payer === i ? amount : 0) - s);
+    const cap = Math.max(0, Math.min(-balances[1], balances[0]));
+    if (repayment > cap) { $('#demo-status').textContent = 'For this expense, Eswar → Dinesh can be at most ' + money(cap) + '. Choose a valid debtor-to-creditor repayment.'; return; }
+    balances[1] += repayment; balances[0] -= repayment;
+    names.forEach((name, i) => {
+      const row = document.createElement('tr');
+      for (const text of [name, money(shares[i]), money(balances[i], true)]) { const td = document.createElement('td'); td.textContent = text; row.append(td); }
+      body.append(row);
+    });
+    $('#demo-status').textContent = 'Balance sum: ' + money(balances.reduce((a, b) => a + b, 0)) + '. Allocated ' + money(shares.reduce((a, b) => a + b, 0)) + ' exactly.';
+  }
+  for (const id of ['demo-amount', 'demo-payer', 'demo-settlement']) $('#' + id).addEventListener('input', renderDemo);
+  document.body.classList.add('js');
+  renderProfile(); updateTheme(); renderDemo();
+  message(storageOK ? 'Progress is local to this browser. Choose your profile to begin.' : 'Stored progress could not be loaded. Existing storage has not been changed. Export a backup before making changes if you need to recover it.');
+})();
+</script>
+</body>
+</html>
