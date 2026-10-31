@@ -23,6 +23,9 @@ venv/
 # Node
 node_modules/
 
+# Local project data
+/DEV/Projects/Split_Expenses/app/AI/data/
+
 # Environment / secrets
 .env
 .env.*
