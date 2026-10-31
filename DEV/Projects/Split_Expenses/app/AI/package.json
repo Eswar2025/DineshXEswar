@@ -1,0 +1,22 @@
+{
+  "name": "split-expenses-reference",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A commented, runnable reference implementation of the Split Expenses workbook.",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node scripts/seed.js",
+    "test": "node --test",
+    "check": "node --check src/app.js && node --check src/database.js && node --check src/security.js && node --check src/money.js && node --check src/server.js && node --check public/app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0"
+  }
+}

@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Keep a clear record of shared expenses, balances, and repayments with friends."
+    />
+    <title>Split · Shared expenses, clearly</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Split home"
+        ><span class="brand-mark" aria-hidden="true">s.</span
+        ><span
+          >split<span class="brand-dot"> / </span
+          ><span class="brand-caption">a little clarity</span></span
+        ></a
+      >
+      <div id="account" class="account" hidden>
+        <span id="account-name"></span
+        ><button id="logout" class="button subtle" type="button">
+          Sign out
+        </button>
+      </div>
+      <span id="guest-caption" class="eyebrow">Made for shared moments</span>
+    </header>
+    <div
+      id="notice"
+      class="notice"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
+    <main id="main">
+      <section
+        id="auth-screen"
+        class="auth-layout"
+        aria-labelledby="auth-title"
+      >
+        <div class="auth-story">
+          <p class="eyebrow">Less keeping score. More living.</p>
+          <h1 id="auth-title">Good company.<br />Clear balances.</h1>
+          <p class="lead">
+            From a shared dinner to a weekend away, keep the costs simple and
+            the memories yours.
+          </p>
+          <div class="sample-ledger" aria-label="An example shared dinner">
+            <div class="sample-heading">
+              <span class="icon-tile" aria-hidden="true">↗</span>
+              <div>
+                <strong>Friday dinner</strong
+                ><span>Three friends, one good evening</span>
+              </div>
+              <strong>₹900</strong>
+            </div>
+            <div class="sample-row">
+              <span>Dinesh paid</span><span>₹900.00</span>
+            </div>
+            <div class="sample-row">
+              <span>Each person's share</span><span>₹300.00</span>
+            </div>
+            <div class="sample-total">
+              <span>Everyone knows where they stand.</span
+              ><span aria-hidden="true">✓</span>
+            </div>
+          </div>
+          <p class="small muted">
+            One shared record. Exact shares. A clear way to settle up.
+          </p>
+        </div>
+        <div class="auth-card">
+          <div class="tabs" role="group" aria-label="Account action">
+            <button
+              id="login-tab"
+              class="tab selected"
+              type="button"
+              aria-pressed="true"
+            >
+              Sign in</button
+            ><button
+              id="register-tab"
+              class="tab"
+              type="button"
+              aria-pressed="false"
+            >
+              Create account
+            </button>
+          </div>
+          <h2 id="auth-form-title">Welcome back.</h2>
+          <p id="auth-description" class="muted">
+            Your groups and shared moments are waiting.
+          </p>
+          <form id="auth-form">
+            <label id="name-field" hidden
+              >Your name<input
+                id="auth-name"
+                name="name"
+                autocomplete="name"
+                maxlength="60"
+            /></label>
+            <label
+              >Email address<input
+                id="auth-email"
+                name="email"
+                type="email"
+                autocomplete="username"
+                maxlength="254"
+                required
+                placeholder="you@example.com"
+            /></label>
+            <label
+              >Password<input
+                id="auth-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                minlength="12"
+                maxlength="128"
+                required
+                aria-describedby="password-help"
+            /></label>
+            <p id="password-help" class="small muted">Use 12–128 characters.</p>
+            <p id="auth-error" class="form-error" role="alert" hidden></p>
+            <button id="auth-submit" class="button primary full" type="submit">
+              Sign in <span aria-hidden="true">↗</span>
+            </button>
+          </form>
+          <p class="small muted auth-footnote">
+            A space for the people you split things with.
+          </p>
+        </div>
+      </section>
+
+      <section
+        id="workspace"
+        class="workspace"
+        hidden
+        aria-label="Your shared expenses"
+      >
+        <aside class="sidebar" aria-label="Your groups">
+          <div class="sidebar-heading">
+            <h2>Your circles</h2>
+            <span id="group-count" class="pill">0</span>
+          </div>
+          <p class="small muted">People, plans, and shared costs.</p>
+          <nav
+            id="group-list"
+            class="group-list"
+            aria-label="Choose a group"
+          ></nav>
+          <form id="group-form" class="new-group-form">
+            <label for="group-name">Start a new group</label>
+            <div class="input-action">
+              <input
+                id="group-name"
+                name="name"
+                maxlength="80"
+                required
+                placeholder="e.g. Weekend trip"
+              /><button
+                class="button icon-button"
+                type="submit"
+                aria-label="Create group"
+              >
+                +
+              </button>
+            </div>
+            <p class="form-error" role="alert" hidden></p>
+          </form>
+          <div class="sidebar-footer">
+            <span class="mini-dot" aria-hidden="true"></span>Every paisa,
+            accounted for.
+          </div>
+        </aside>
+        <div class="workspace-main">
+          <div id="group-loading" class="empty-state" hidden role="status">
+            Opening your group…
+          </div>
+          <section id="no-group" class="welcome-empty" hidden>
+            <p class="eyebrow">A fresh start</p>
+            <h1>Bring your people<br />into the picture.</h1>
+            <p class="lead">
+              Create your first group, add your friends, and record something
+              you shared.
+            </p>
+            <button id="focus-new-group" class="button primary" type="button">
+              Create your first group <span aria-hidden="true">↗</span>
+            </button>
+          </section>
+          <section id="group-view" hidden aria-labelledby="group-title">
+            <header class="group-header">
+              <div>
+                <p class="eyebrow">Your shared space · INR</p>
+                <h1 id="group-title"></h1>
+                <p id="group-subtitle" class="muted"></p>
+              </div>
+              <div class="header-actions">
+                <button id="refresh-group" class="button subtle" type="button">
+                  Refresh</button
+                ><button id="add-expense" class="button primary" type="button">
+                  + Add expense
+                </button>
+              </div>
+            </header>
+            <div class="summary-grid">
+              <div>
+                <span class="eyebrow">Shared spending</span
+                ><strong id="total-spent"></strong
+                ><span class="small muted">Across all recorded expenses</span>
+              </div>
+              <div>
+                <span id="your-balance-label" class="eyebrow">Your balance</span
+                ><strong id="your-balance"></strong
+                ><span id="your-balance-hint" class="small muted"></span>
+              </div>
+              <div>
+                <span class="eyebrow">The story so far</span
+                ><strong id="expense-count"></strong
+                ><span class="small muted">Expenses in this group</span>
+              </div>
+            </div>
+            <div class="group-columns">
+              <div class="main-column">
+                <section class="panel" aria-labelledby="expenses-title">
+                  <div class="panel-heading">
+                    <div>
+                      <p class="eyebrow">The shared record</p>
+                      <h2 id="expenses-title">Expenses</h2>
+                    </div>
+                    <label class="sr-only" for="expense-search"
+                      >Filter expenses by description or payer</label
+                    ><input
+                      id="expense-search"
+                      class="compact-search"
+                      type="search"
+                      placeholder="Find an expense…"
+                    />
+                  </div>
+                  <div id="expense-list"></div>
+                </section>
+                <section
+                  class="panel"
+                  aria-labelledby="settlement-history-title"
+                >
+                  <div class="panel-heading">
+                    <div>
+                      <p class="eyebrow">Closing the loop</p>
+                      <h2 id="settlement-history-title">Repayments</h2>
+                    </div>
+                    <button
+                      id="record-settlement"
+                      class="button subtle"
+                      type="button"
+                    >
+                      Record payment
+                    </button>
+                  </div>
+                  <p class="small muted">
+                    Payments made outside Split and recorded here.
+                  </p>
+                  <div id="settlement-list"></div>
+                </section>
+              </div>
+              <aside class="detail-column" aria-label="Balances and members">
+                <section class="panel" aria-labelledby="balances-title">
+                  <div class="panel-heading">
+                    <div>
+                      <p class="eyebrow">Where everyone stands</p>
+                      <h2 id="balances-title">Balances</h2>
+                    </div>
+                  </div>
+                  <p class="small muted">Positive receives · Negative owes</p>
+                  <div id="balance-list"></div>
+                </section>
+                <section class="panel" aria-labelledby="suggestions-title">
+                  <div class="panel-heading">
+                    <div>
+                      <p class="eyebrow">A way to settle up</p>
+                      <h2 id="suggestions-title">Next payments</h2>
+                    </div>
+                  </div>
+                  <div id="suggestion-list"></div>
+                </section>
+                <section class="panel" aria-labelledby="members-title">
+                  <div class="panel-heading">
+                    <h2 id="members-title">Your people</h2>
+                    <span id="member-count" class="pill"></span>
+                  </div>
+                  <div id="member-list" class="member-list"></div>
+                  <form id="member-form" class="member-form" hidden>
+                    <label for="member-email"
+                      >Add a registered friend's email</label
+                    >
+                    <div class="input-action">
+                      <input
+                        id="member-email"
+                        type="email"
+                        maxlength="254"
+                        required
+                        placeholder="friend@example.com"
+                      /><button
+                        class="button icon-button"
+                        type="submit"
+                        aria-label="Add member"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p class="small muted">
+                      Ask them to create an account first.
+                    </p>
+                    <p class="form-error" role="alert" hidden></p>
+                  </form>
+                </section>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <span>split / a little clarity</span
+      ><span>Good records. Better company.</span>
+    </footer>
+
+    <dialog id="expense-dialog" aria-labelledby="expense-dialog-title">
+      <form id="expense-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Something shared</p>
+            <h2 id="expense-dialog-title">Add expense</h2>
+          </div>
+          <button
+            class="button icon-button"
+            type="button"
+            data-close="expense-dialog"
+            aria-label="Close expense form"
+          >
+            ×
+          </button>
+        </div>
+        <label
+          >What was it for?<input
+            id="expense-description"
+            maxlength="160"
+            required
+            placeholder="e.g. Friday dinner"
+        /></label>
+        <div class="form-row">
+          <label
+            >Amount (₹)<input
+              id="expense-amount"
+              inputmode="decimal"
+              required
+              placeholder="0.00"
+              aria-describedby="expense-amount-help" /></label
+          ><label>Date<input id="expense-date" type="date" required /></label>
+        </div>
+        <p id="expense-amount-help" class="small muted">
+          Up to ₹10,00,000 per expense. Use at most two decimal places.
+        </p>
+        <div class="form-row">
+          <label>Paid by<select id="expense-payer" required></select></label
+          ><label
+            >Split method<select id="expense-mode">
+              <option value="equal">Equally</option>
+              <option value="custom">Custom amounts</option>
+            </select></label
+          >
+        </div>
+        <fieldset class="participants">
+          <legend>Who shared this expense?</legend>
+          <div id="participant-list"></div>
+        </fieldset>
+        <div class="share-preview" aria-live="polite">
+          <p id="share-summary" class="small"></p>
+          <div id="share-preview-list"></div>
+        </div>
+        <p id="expense-error" class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button
+            id="reload-expense"
+            class="button subtle"
+            type="button"
+            hidden
+          >
+            Reload latest version</button
+          ><button class="button primary" type="submit">Save expense</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="settlement-dialog" aria-labelledby="settlement-dialog-title">
+      <form id="settlement-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">A little more settled</p>
+            <h2 id="settlement-dialog-title">Record a repayment</h2>
+          </div>
+          <button
+            class="button icon-button"
+            type="button"
+            data-close="settlement-dialog"
+            aria-label="Close repayment form"
+          >
+            ×
+          </button>
+        </div>
+        <p class="muted">
+          Record a payment that has already happened outside Split.
+        </p>
+        <div class="form-row">
+          <label>Paid by<select id="settlement-sender" required></select></label
+          ><label
+            >Paid to<select id="settlement-receiver" required></select
+          ></label>
+        </div>
+        <div class="form-row">
+          <label
+            >Amount (₹)<input
+              id="settlement-amount"
+              inputmode="decimal"
+              required
+              placeholder="0.00" /></label
+          ><label
+            >Date<input id="settlement-date" type="date" required
+          /></label>
+        </div>
+        <p id="settlement-cap" class="small muted"></p>
+        <p id="settlement-error" class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="button primary" type="submit">Record payment</button>
+        </div>
+      </form>
+    </dialog>
+    <noscript
+      ><p class="notice">
+        Enable JavaScript to sign in and use Split.
+      </p></noscript
+    >
+  </body>
+</html>
