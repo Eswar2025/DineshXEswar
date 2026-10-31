@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-handbook="project">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A story-based walkthrough of building an issue and project tracker, from product decisions and permissions to a complete request, tests and deployment.">
+<title>Build an Issue Tracker · Project Handbook</title>
+<script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("hb-codex-theme"))||"light"}catch(e){}</script>
+<style>
+:root{
+  --bg:#0a0a0a;--surface:#1a1a1a;--surface-2:#1f1f1f;
+  --line:#1f1f1f;--line-strong:#3a3a3a;
+  --text:#fffaf0;--body:#e5e5e5;--muted:#9a9a9a;--faint:#6a6a6a;
+  --primary:#fffaf0;--on-primary:#0a0a0a;
+  --r:12px;--r-sm:8px;--r-pill:999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+  --font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#fffaf0;--surface:#faf5e8;--surface-2:#ebe6d6;
+  --line:#ebe6d6;--line-strong:#9a9a9a;
+  --text:#0a0a0a;--body:#1a1a1a;--muted:#6a6a6a;--faint:#9a9a9a;
+  --primary:#0a0a0a;--on-primary:#fffaf0;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--body);font:15px/1.7 var(--font);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+a{color:var(--text);text-underline-offset:4px}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+h1,h2,h3{color:var(--text);margin:0;font-weight:600}
+p{margin:0 0 var(--s3)}
+ul,ol{margin:0 0 var(--s3);padding-left:var(--s5)}
+li{margin-bottom:var(--s1)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+pre{margin:var(--s3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);overflow:auto;font:13px/1.6 var(--mono);color:var(--body)}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.label{font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin:0 0 var(--s2)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary);color:var(--on-primary);padding:8px 16px;border-radius:var(--r-pill);z-index:100}
+.skip:focus{left:16px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:50;height:56px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1280px;margin:0 auto;height:100%;padding:0 var(--s5);display:flex;align-items:center;gap:var(--s4)}
+.brand{font-weight:600;text-decoration:none;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:400;margin-left:var(--s2)}
+.search{flex:1;max-width:420px;margin-left:auto}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-pill);color:var(--text);font:inherit;font-size:14px;padding:6px 16px}
+.search input::placeholder{color:var(--muted)}
+.search{min-width:0}
+a.btn{text-decoration:none;display:inline-block}a.btn:hover{color:var(--text)}
+@media(max-width:640px){.brand span,.top .xlink{display:none}.top-inner{padding:0 var(--s4);gap:var(--s2)}.search input{padding:6px 12px}}
+.btn{border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:var(--r-pill);padding:6px 16px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+/* layout */
+.layout{max-width:1280px;margin:0 auto;padding:0 var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s7)}
+.toc{display:none}
+@media(min-width:1100px){
+  .layout{grid-template-columns:200px minmax(0,1fr)}
+  .toc{display:block;position:sticky;top:80px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;padding:var(--s6) 0}
+}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;font-size:13px;line-height:1.4}
+.toc a:hover{color:var(--text)}
+.toc a.active{color:var(--text);border-left-color:var(--primary)}
+.toc a.done::after{content:" \2713";color:var(--faint)}
+main{padding-bottom:var(--s8);min-width:0}
+
+/* hero */
+.hero{padding:var(--s8) 0 var(--s6)}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:var(--s4)}
+.lead{font-size:17px;line-height:1.6;color:var(--muted);max-width:68ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;margin-top:var(--s6)}
+.stats>div{background:var(--bg);padding:var(--s5)}
+.stats b{display:block;font-size:28px;line-height:1.1;font-weight:600;color:var(--text)}
+.stats span{font-size:13px;color:var(--muted)}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* roadmap */
+.map-head{margin-top:var(--s7)}
+.map-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.roadmap{position:relative;padding:var(--s5) 0}
+.roadmap svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--faint);stroke-width:1.5}
+.edges .spine{stroke:var(--muted);stroke-width:2}
+.edges .branch{stroke-dasharray:4 4}
+.edges .arrow{fill:var(--muted);stroke:none}
+.rows{position:relative;z-index:1;margin:0;padding:0;list-style:none}
+.row{display:grid;grid-template-columns:1fr minmax(200px,240px) 1fr;gap:var(--s7);align-items:center;padding:var(--s5) 0;margin:0}
+.branches{display:flex;flex-direction:column;gap:var(--s2)}
+.branches.left{align-items:flex-end}
+.branches.right{align-items:flex-start}
+.node{display:block;text-decoration:none;border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:6px 12px;font-size:13px;line-height:1.4;color:var(--muted);background:var(--bg)}
+.node:hover{border-color:var(--primary);color:var(--text)}
+.node.stage{text-align:center;border-radius:var(--r);padding:12px 16px;background:var(--surface);color:var(--text);font-weight:600;font-size:15px}
+.node.stage small{display:block;font-size:11px;letter-spacing:.08em;font-weight:500;color:var(--muted);text-transform:uppercase}
+.node.stage.active{border-color:var(--primary)}
+.node.stage.done{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.node.stage.done small{color:inherit;opacity:.7}
+@media(max-width:760px){
+  .row{grid-template-columns:1fr;justify-items:center;padding:var(--s4) 0}
+  .branches{display:none}
+}
+
+/* stages */
+.stage{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--line)}
+.stage.empty{display:none}
+.stage-head{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:start;margin-bottom:var(--s5)}
+.stage-num{font-size:48px;line-height:1;font-weight:600;color:var(--faint)}
+.stage-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.stage-head h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:var(--s2)}
+.stage-head .lead{margin:0}
+@media(max-width:640px){.stage-head{grid-template-columns:auto 1fr}.stage-head .btn{grid-column:1/-1;justify-self:start}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:var(--s4)}
+.topic{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);min-width:0}
+.topic:hover{border-color:var(--line-strong)}
+.topic:target{border-color:var(--primary)}
+.topic.wide{grid-column:1/-1}
+.topic h3{font-size:17px;line-height:1.35;margin-bottom:var(--s2)}
+.topic>:last-child{margin-bottom:0}
+.deeper{margin:var(--s5) 0 0;color:var(--muted);font-size:14px}
+.deeper .label{display:inline;margin-right:var(--s2)}
+.pager{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s5);font-size:14px}
+.pager a{color:var(--muted);text-decoration:none}
+.pager a:hover{color:var(--text)}
+.callout{border-left:3px solid var(--primary);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:var(--s3) var(--s4);margin:var(--s3) 0}
+.callout p:last-child{margin:0}
+.tw{overflow-x:auto;margin:var(--s3) 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);border-bottom-color:var(--line-strong)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s4)}
+.cols pre{margin:0}
+
+/* demos */
+.demo{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s5);margin-top:var(--s3)}
+.controls{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.controls label{display:flex;flex-direction:column;gap:var(--s1);font-size:13px;color:var(--muted)}
+.controls label.inline{flex-direction:row;align-items:center;gap:var(--s2)}
+.controls output{color:var(--text);font-family:var(--mono);margin-left:var(--s2)}
+.controls input[type=range]{width:150px;accent-color:var(--primary)}
+.controls input[type=checkbox]{accent-color:var(--primary)}
+.controls select{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);font:inherit;font-size:13px;padding:4px 8px}
+.stagebox{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4);overflow:auto}
+.demo pre{margin:var(--s3) 0 0;background:var(--bg)}
+.bm-margin{display:inline-block;padding:var(--m,16px);outline:1px dashed var(--faint)}
+.bm-box{border:var(--b,4px) solid var(--text);padding:var(--p,24px);background:var(--surface-2)}
+.bm-content{background:var(--primary);color:var(--on-primary);padding:8px 16px;font-size:13px;font-weight:500}
+.fx{display:flex;height:200px;border:1px dashed var(--faint);border-radius:var(--r-sm)}
+.fx div{background:var(--primary);color:var(--on-primary);border-radius:6px;font-weight:600;display:grid;place-items:center}
+.fx div:nth-child(1){min-width:48px;min-height:40px}
+.fx div:nth-child(2){min-width:64px;min-height:72px;opacity:.8}
+.fx div:nth-child(3){min-width:48px;min-height:32px;opacity:.6}
+.tf{display:grid;place-items:center;height:240px}
+.tf>div{grid-area:1/1;width:80px;height:80px;border-radius:var(--r-sm)}
+.tf-ghost{border:1px dashed var(--faint)}
+.tf-box{background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:600;font-size:13px}
+.bub{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s3) var(--s4);cursor:pointer;color:var(--muted);font-size:13px}
+.bub .bub{margin-top:var(--s2)}
+.bub:hover{border-color:var(--primary)}
+.log{min-height:96px;white-space:pre-wrap}
+
+/* checklist */
+.check{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--primary)}
+.foot{margin-top:var(--s8);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+<style id="codex-design">
+/* Codex edition: a quiet workspace for a long learning journey. */
+:root, :root[data-theme="light"] {
+  --bg:#f6f7f9; --surface:#fff; --surface-2:#eef2f5;
+  --line:#e2e7eb; --line-strong:#cbd5dd; --text:#182b37; --body:#415461;
+  --muted:#617380; --faint:#728592; --primary:#087c72; --on-primary:#fff;
+  --accent-soft:#e7f4ef; --accent-line:#bbddd2; --accent-ink:#06685f;
+  --hero-bg:#eaf3ef; --hero-dot:#c4d8d0; --warm:#a86525; --warm-soft:#fff3df;
+  --code-bg:#172b35; --code-text:#e1ecee; --shadow:0 3px 14px #243b4b05;
+  --r:16px; --r-sm:9px; --font:"Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+:root[data-handbook="backend"] {
+  --primary:#4258a6; --accent-soft:#e9eef9; --accent-line:#c6d1e7;
+  --accent-ink:#334786; --hero-bg:#edf1f8; --hero-dot:#cbd6e7;
+}
+:root[data-theme="dark"] {
+  --bg:#101c24; --surface:#172731; --surface-2:#203440;
+  --line:#2a3e49; --line-strong:#3c5461; --text:#e9f1f3; --body:#bdcdd4;
+  --muted:#9cafb9; --faint:#91a5b0; --primary:#72ceba; --on-primary:#102b27;
+  --accent-soft:#1a3a37; --accent-line:#30594e; --accent-ink:#8bdfcb;
+  --hero-bg:#19332f; --hero-dot:#2d5148; --warm:#ebc185; --warm-soft:#3b3023;
+  --code-bg:#0c1820; --code-text:#dce9ec; --shadow:0 3px 14px #00000010;
+  color-scheme:dark;
+}
+:root[data-handbook="backend"][data-theme="dark"] {
+  --primary:#9eb7ff; --on-primary:#142445; --accent-soft:#20324b;
+  --accent-line:#405878; --accent-ink:#b7caff; --hero-bg:#1b2d40; --hero-dot:#354e68;
+}
+html { scroll-padding-top:100px; }
+body { font-size:15px; line-height:1.75; }
+button, a, input, select, textarea, summary { -webkit-tap-highlight-color:transparent; }
+button, .btn { touch-action:manipulation; }
+button, input, select, textarea { font-family:var(--font); }
+::selection { background:var(--accent-line); color:var(--text); }
+a { color:var(--accent-ink); }
+a:hover { color:var(--primary); }
+:focus-visible { outline:3px solid var(--primary); outline-offset:4px; }
+.top { height:76px; background:color-mix(in srgb,var(--surface) 94%,transparent); backdrop-filter:blur(18px); }
+.top-inner { max-width:1536px; padding:0 36px; gap:24px; }
+.brand { display:flex; align-items:center; gap:12px; color:var(--text); font-size:15px; letter-spacing:-.35px; }
+.brand::before { content:""; display:block; width:36px; height:40px; flex:none; border-radius:10px; background:var(--primary); mask:none; }
+.brand { position:relative; }
+.brand::after { content:"</>"; position:absolute; left:5px; top:7px; font:700 16px/26px var(--mono); color:var(--on-primary); }
+.brand span { display:block; margin:1px 0 0; font-size:10px; line-height:1.3; font-weight:500; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); }
+.brand-copy { display:block; }
+.header-divider { width:1px; height:25px; background:var(--line); }
+.header-context { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); white-space:nowrap; }
+.header-context i { height:6px; width:6px; border-radius:50%; background:var(--primary); }
+.search { position:relative; max-width:320px; margin-left:auto; }
+.search::before { content:""; position:absolute; width:12px; height:12px; border:1.5px solid var(--muted); border-radius:50%; left:15px; top:13px; pointer-events:none; }
+.search::after { content:""; position:absolute; width:6px; height:1.5px; background:var(--muted); left:26px; top:26px; transform:rotate(45deg); pointer-events:none; }
+.search input { height:42px; padding:8px 38px 8px 40px; border-radius:9px; background:var(--bg); border:1px solid var(--line); font-size:12px; }
+.search kbd { position:absolute; right:12px; top:10px; padding:0 5px; border:1px solid var(--line-strong); border-radius:4px; font:11px/20px var(--mono); color:var(--muted); pointer-events:none; }
+.btn { border-radius:8px; min-height:38px; padding:7px 13px; font-size:12px; font-weight:600; line-height:1.6; transition:background .16s,border-color .16s,box-shadow .16s; }
+.btn:hover { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.xlink { border:0; color:var(--muted); }
+.xlink::after { content:" ↗"; margin-left:5px; }
+#theme { background:var(--surface); border-color:var(--line); }
+.reading-progress { position:absolute; left:0; bottom:-1px; height:2px; width:100%; pointer-events:none; }
+.reading-progress span { display:block; height:100%; width:0; background:var(--primary); }
+.layout { max-width:1536px; padding:0 36px; grid-template-columns:228px minmax(0,1fr); gap:48px; }
+.toc { display:block; position:sticky; top:76px; align-self:start; max-height:calc(100dvh - 76px); overflow:auto; padding:30px 0 24px; scrollbar-width:thin; scrollbar-color:var(--line-strong) transparent; }
+.toc .label { font-size:10px; font-weight:700; letter-spacing:1.6px; padding:0!important; margin:26px 12px 12px; }
+.toc a { border-left:0; border-radius:7px; margin:3px 0; padding:8px 11px; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; line-height:1.6; }
+.toc a:hover { background:var(--surface-2); color:var(--text); }
+.toc a.active { background:var(--accent-soft); color:var(--accent-ink); font-weight:600; }
+.toc-number { font:10px/21px var(--mono); opacity:.8; width:20px; flex:none; }
+.toc a.done::after { content:"✓"; margin-left:auto; color:var(--primary); font-size:12px; }
+.toc a.active .toc-number { color:var(--primary); opacity:1; }
+.track-switcher { border:1px solid var(--line); border-radius:10px; padding:4px; background:var(--surface); display:flex; gap:3px; }
+.track-switcher a { margin:0; flex:1; justify-content:center; font-size:11px; padding:8px 4px; gap:6px; }
+.track-switcher a[aria-current="page"] { background:var(--accent-soft); color:var(--accent-ink); font-weight:700; }
+.track-switcher svg { width:14px; height:14px; }
+.toc .toc-overview { margin-bottom:15px; color:var(--text); }
+.toc-overview svg { width:15px; height:15px; color:var(--primary); }
+.sidebar-progress { margin:25px 2px 0; padding:16px; border:1px solid var(--accent-line); background:var(--accent-soft); border-radius:12px; }
+.sidebar-progress p { font-size:11px; color:var(--accent-ink); font-weight:600; margin:0 0 10px; display:flex; justify-content:space-between; gap:8px; }
+.sidebar-progress small { color:var(--muted); font-size:10px; display:block; margin-top:8px; }
+progress { appearance:none; width:100%; height:5px; display:block; border:0; border-radius:10px; overflow:hidden; background:var(--line); accent-color:var(--primary); }
+progress::-webkit-progress-bar { background:var(--line); border-radius:10px; }
+progress::-webkit-progress-value { background:var(--primary); border-radius:10px; }
+progress::-moz-progress-bar { background:var(--primary); border-radius:10px; }
+main { padding-bottom:70px; }
+.workspace-bar { display:flex; align-items:center; justify-content:space-between; padding:25px 0; gap:12px; border-bottom:1px solid var(--line); font-size:11px; color:var(--muted); }
+.workspace-bar span { display:flex; align-items:center; gap:9px; }
+.workspace-bar svg { width:14px; height:14px; }
+.workspace-bar .edition { border:1px solid var(--line); border-radius:5px; padding:2px 8px; font:9px/20px var(--mono); letter-spacing:.8px; white-space:nowrap; }
+.workspace-bar strong { color:var(--text); font-weight:500; }
+.hero { display:grid; grid-template-columns:minmax(0,1fr) 300px; column-gap:32px; align-items:center; padding:44px 0 0; }
+.hero .label { color:var(--accent-ink); font-size:10px; font-weight:700; letter-spacing:1.5px; margin-bottom:18px; }
+.hero .label::before { content:""; width:6px; height:6px; display:inline-block; background:var(--primary); margin-right:8px; vertical-align:2px; border-radius:50%; }
+.hero h1 { font-size:clamp(46px,4.5vw,68px); letter-spacing:-3px; line-height:1.06; font-weight:650; margin-bottom:20px; }
+.hero h1 span { display:block; color:var(--primary); }
+.hero .lead { font-size:14px; line-height:1.85; max-width:62ch; color:var(--muted); }
+.hero-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:25px; }
+.hero-actions .btn { padding:11px 17px; font-size:12px; }
+.btn-primary { background:var(--primary); color:var(--on-primary); border-color:var(--primary); box-shadow:0 3px 8px color-mix(in srgb,var(--primary) 15%,transparent); }
+.btn-primary:hover { background:var(--accent-ink); color:var(--on-primary); border-color:var(--accent-ink); }
+.hero-actions .btn-primary::after { content:" →"; margin-left:20px; }
+.hero-actions .btn-secondary { border-color:var(--line-strong); color:var(--body); background:var(--surface); }
+.hero-art { min-height:298px; position:relative; display:flex; flex-direction:column; padding:22px; border:1px solid var(--accent-line); border-radius:20px; background-color:var(--hero-bg); background-image:radial-gradient(var(--hero-dot) .8px,transparent .8px); background-size:14px 14px; overflow:hidden; }
+.art-label { font:9px/1.5 var(--mono); letter-spacing:1.5px; color:var(--accent-ink); display:flex; align-items:center; gap:7px; }
+.art-label::before { content:""; display:inline-block; width:6px; height:6px; border:1px solid var(--primary); border-radius:50%; }
+.art-window { margin-top:20px; padding:0 0 16px; border:1px solid var(--accent-line); border-radius:11px; background:var(--surface); box-shadow:0 10px 25px #102c2910; transform:rotate(-3deg); }
+.art-window-bar { display:flex; align-items:center; gap:4px; padding:10px; border-bottom:1px solid var(--line); }
+.art-window-bar i { width:5px; height:5px; background:var(--accent-line); border-radius:50%; }
+.art-window-bar span { margin-left:auto; color:var(--muted); font:8px/1 var(--mono); }
+.art-code { padding:15px 19px 4px; font:11px/1.85 var(--mono); color:var(--muted); white-space:pre; }
+.art-code em { color:var(--primary); font-style:normal; }
+.art-code b { color:var(--warm); font-weight:400; }
+.art-tags { display:flex; gap:6px; margin-top:23px; flex-wrap:wrap; }
+.art-tags span { font:9px/1.5 var(--mono); padding:5px 10px; border:1px solid var(--accent-line); color:var(--accent-ink); border-radius:6px; background:var(--surface); }
+.art-caption { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:18px; font-size:9px; color:var(--accent-ink); }
+.art-caption b { font-weight:500; }
+.art-server { display:flex; align-items:center; justify-content:space-between; margin-top:28px; gap:8px; }
+.art-server span { display:flex; flex-direction:column; align-items:center; gap:8px; border:1px solid var(--accent-line); border-radius:10px; padding:13px 10px; flex:1; background:var(--surface); font:9px/1.4 var(--mono); color:var(--accent-ink); }
+.art-server svg { width:24px; height:24px; }
+.art-server i { color:var(--primary); font-style:normal; }
+.art-response { background:var(--surface); padding:12px; margin-top:15px; border-radius:8px; border:1px solid var(--accent-line); font:10px/1.6 var(--mono); color:var(--muted); }
+.art-response span { color:var(--primary); }
+.stats { grid-column:1/-1; gap:12px; background:none; border:0; border-radius:0; overflow:visible; margin-top:34px; }
+.stats>div { background:var(--surface); padding:18px 20px 16px; border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); position:relative; }
+.stats b { font-size:27px; letter-spacing:-1px; margin-bottom:5px; font-weight:600; }
+.stats span { font-size:11px; }
+.stats>div::after { position:absolute; right:16px; top:17px; width:26px; height:26px; border-radius:7px; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent-ink); font:12px/1 var(--mono); }
+.stats>div:nth-child(1)::after { content:"↗"; }
+.stats>div:nth-child(2)::after { content:"≡"; }
+.stats>div:nth-child(3)::after { content:"▷"; background:var(--warm-soft); color:var(--warm); }
+.stats>div:nth-child(4)::after { content:"{}"; }
+.journey { display:flex; align-items:center; gap:24px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:17px 20px; margin-top:16px; }
+.journey-copy { flex:none; }
+.journey-copy strong { display:block; color:var(--text); font-size:12px; font-weight:600; }
+.journey-copy small { color:var(--muted); font-size:11px; }
+.journey progress { flex:1; }
+.journey-pct { font:11px/1.5 var(--mono); color:var(--primary); }
+.map-head { margin-top:40px; }
+.map-head .label { color:var(--accent-ink); font-size:10px; letter-spacing:1.4px; font-weight:600; }
+.map-head h2 { font-size:24px; letter-spacing:-.6px; font-weight:600; }
+.map-head .lead { font-size:12px; max-width:none; line-height:1.8; }
+.roadmap-panel { margin-top:18px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.roadmap-panel summary { list-style:none; display:flex; align-items:center; gap:14px; padding:19px 20px; cursor:pointer; color:var(--text); }
+.roadmap-panel summary::-webkit-details-marker { display:none; }
+.roadmap-panel summary::after { content:"+"; margin-left:auto; font-size:22px; color:var(--primary); font-weight:300; }
+.roadmap-panel[open] summary::after { content:"−"; }
+.roadmap-panel summary:hover { background:var(--accent-soft); border-radius:12px; }
+.roadmap-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:9px; background:var(--accent-soft); color:var(--primary); flex:none; }
+.roadmap-icon svg { width:19px; height:19px; }
+.roadmap-panel summary strong { display:block; font-size:12px; font-weight:600; }
+.roadmap-panel summary small { display:block; font-size:10px; color:var(--muted); margin-top:1px; }
+.roadmap { margin:0 24px; padding:8px 0 24px; }
+.row { grid-template-columns:1fr minmax(180px,210px) 1fr; gap:30px; padding:16px 0; }
+.node { background:var(--surface); font-size:11px; padding:7px 11px; border-color:var(--line); box-shadow:var(--shadow); }
+.node:hover { background:var(--accent-soft); border-color:var(--accent-line); }
+.node.stage { margin-top:0; font-size:13px; padding:13px 12px; border:1px solid var(--accent-line); background:var(--accent-soft); color:var(--accent-ink); }
+.node.stage small { color:var(--accent-ink); font:9px/1.7 var(--mono); }
+.node.stage.done { background:var(--primary); color:var(--on-primary); }
+.edges .spine { stroke:var(--primary); stroke-width:1.3; }
+.edges .branch { stroke:var(--line-strong); }
+.edges .arrow { fill:var(--primary); }
+.section-kicker { display:flex; align-items:center; gap:14px; color:var(--muted); font-size:10px; letter-spacing:1.6px; margin-top:42px; font-weight:600; }
+.section-kicker::after { content:""; flex:1; height:1px; background:var(--line); }
+section.stage { margin-top:34px; padding-top:34px; }
+.section-kicker + section.stage { margin-top:0; border-top:0; padding-top:26px; }
+.stage-head { grid-template-columns:54px 1fr auto; gap:18px; align-items:start; margin-bottom:25px; }
+.stage-num { display:grid; place-items:center; height:54px; border:1px solid var(--accent-line); border-radius:13px; background:var(--accent-soft); color:var(--primary); font:500 19px/1 var(--mono); }
+.stage-head h2 { font-size:26px; letter-spacing:-.7px; line-height:1.25; margin:0 0 10px; }
+.stage-head h2 small { display:block; font-size:11px; color:var(--primary); margin:6px 0 0; letter-spacing:0; font-weight:500; }
+.stage-head .lead { font-size:13px; line-height:1.8; }
+.stage-head .btn { background:var(--surface); margin-top:3px; font-size:11px; }
+.stage-head .btn[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent-line); }
+.stage-head .btn[aria-pressed="true"]::before { content:"✓ "; }
+.grid { gap:16px; grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr)); }
+.topic { background:var(--surface); border-color:var(--line); padding:25px; border-radius:13px; box-shadow:var(--shadow); scroll-margin-top:100px; }
+.topic:hover { border-color:var(--accent-line); }
+.topic:target { border-color:var(--primary); box-shadow:0 0 0 3px var(--accent-soft); }
+.topic h3 { font-size:17px; letter-spacing:-.3px; margin-bottom:12px; color:var(--text); font-weight:600; }
+.topic h4 { color:var(--text); font-size:13px; }
+.topic p, .topic li { font-size:14px; line-height:1.85; }
+.topic b { color:var(--text); font-weight:600; }
+.topic ul, .topic ol { padding-left:20px; }
+.topic li::marker { color:var(--primary); }
+code { background:var(--accent-soft); color:var(--accent-ink); border-color:transparent; border-radius:4px; font-size:.86em; padding:2px 5px; overflow-wrap:anywhere; }
+pre { color:var(--code-text); background:var(--code-bg); border:0; border-radius:0 0 9px 9px; font:12px/1.85 var(--mono); padding:17px 18px; tab-size:2; margin:0; }
+pre code { color:inherit; white-space:pre; overflow-wrap:normal; }
+.wrap code { white-space:pre-wrap; overflow-wrap:anywhere; }
+.jwt .p1 { color:#a7bdc6; }
+.jwt .p2 { color:#e9f2ef; }
+.jwt .p3 { color:#a7bdc6; }
+.code-block { margin:16px 0; border:1px solid var(--line); border-radius:10px; overflow:hidden; min-width:0; }
+.code-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 12px; background:var(--code-bg); border-bottom:1px solid #ffffff16; color:#a7bdc6; font:9px/1.5 var(--mono); letter-spacing:.3px; }
+.code-toolbar>span::before { content:"● ● ●"; color:#7f9aa5; font-size:7px; letter-spacing:2px; margin-right:12px; }
+.copy-code { background:transparent; border:1px solid #ffffff2b; color:#d4e1e6; border-radius:4px; font-size:9px; line-height:1.5; padding:3px 7px; cursor:pointer; min-width:49px; }
+.copy-code:hover { background:#ffffff18; }
+.callout { background:var(--accent-soft); border-color:var(--primary); padding:15px 18px; color:var(--body); border-radius:0 9px 9px 0; }
+.deeper { border:1px solid var(--accent-line); background:var(--accent-soft); border-radius:10px; padding:16px 20px; font-size:12px; line-height:1.9; color:var(--body); }
+.deeper .label { color:var(--accent-ink); font-size:9px; font-weight:700; }
+.pager { margin-top:20px; font-size:11px; }
+.pager a { padding:7px 0; color:var(--accent-ink); max-width:48%; }
+.tw { border:1px solid var(--line); border-radius:9px; }
+table { font-size:12px; }
+th,td { padding:11px 14px; }
+th { background:var(--surface-2); font-size:9px; letter-spacing:1px; color:var(--text); font-weight:600; }
+tr:last-child td { border-bottom:0; }
+tbody tr:nth-child(even) { background:color-mix(in srgb,var(--bg) 55%,var(--surface)); }
+.demo { border-color:var(--accent-line); background:var(--bg); padding:22px; margin-top:20px; border-radius:11px; }
+.demo::before { content:"INTERACTIVE LAB"; display:block; font:600 9px/1.6 var(--mono); color:var(--primary); letter-spacing:1.5px; margin-bottom:19px; }
+.demo pre { background:var(--code-bg); margin:0; }
+.demo .code-block:last-child { margin-bottom:0; }
+.demo .note { font-size:12px; }
+.controls { min-width:0; }
+.controls label { font-size:11px; min-width:0; max-width:100%; }
+.controls input.field { min-width:0!important; width:min(100%,300px); }
+.controls select, .field { background:var(--surface); border-color:var(--line-strong); font-size:12px; min-height:36px; max-width:100%; }
+.controls input[type=range] { accent-color:var(--primary); }
+.stagebox { background:var(--surface); border-style:dashed; border-color:var(--line-strong); padding:20px; }
+.bm-margin { background:var(--warm-soft); outline-color:var(--warm); }
+.bm-box { border-color:var(--primary); background:var(--accent-soft); }
+.bub { color:var(--accent-ink); background:var(--accent-soft); border-color:var(--accent-line); }
+.bub .bub { background:var(--surface); }
+.bub .bub .bub { background:var(--accent-soft); }
+.pipe .step.ok { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.pipe .step.fail { background:var(--warm-soft); border-color:var(--warm); color:var(--warm); }
+.cols .code-block { margin:0; }
+.check { font-size:13px; padding:13px 4px; gap:13px; }
+.check input { width:16px; height:16px; flex:none; accent-color:var(--primary); }
+.check:has(input:checked) { color:var(--accent-ink); background:var(--accent-soft); border-radius:5px; }
+.check:has(input:checked) span { text-decoration:line-through; text-decoration-color:var(--accent-line); }
+.foot { font-size:11px; margin-top:36px; line-height:1.9; }
+.search-feedback { padding:28px 0 12px; }
+.search-feedback h2 { font-size:26px; letter-spacing:-.6px; margin-bottom:8px; }
+.search-feedback p { font-size:13px; color:var(--muted); }
+.search-feedback .btn { margin-top:8px; background:var(--surface); }
+body.searching .hero,body.searching .journey,body.searching .section-kicker { display:none; }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--accent-line); background:var(--surface); color:var(--primary); box-shadow:0 4px 18px #122c3210; border-radius:10px; width:42px; height:42px; font-size:18px; cursor:pointer; z-index:20; }
+.menu-toggle,.menu-close,.nav-backdrop { display:none; }
+.toast { position:fixed; bottom:26px; left:50%; transform:translateX(-50%); padding:10px 18px; background:var(--text); color:var(--bg); border-radius:9px; font-size:12px; z-index:100; box-shadow:0 4px 24px #0002; max-width:calc(100% - 40px); }
+@media(min-width:1440px) { .layout { gap:64px; grid-template-columns:240px minmax(0,1fr); } .hero { grid-template-columns:minmax(0,1fr) 330px; column-gap:44px; row-gap:0; } .hero-art { min-height:315px; } }
+@media(min-width:1080px) and (max-width:1250px) { .header-context,.header-divider { display:none; } .top-inner,.layout { padding-left:24px; padding-right:24px; } .layout { gap:32px; grid-template-columns:205px minmax(0,1fr); } .hero { grid-template-columns:minmax(0,1fr) 250px; gap:20px; } .hero-art { padding:17px; } .hero h1 { font-size:54px; } .art-code { font-size:10px; padding-left:14px; } .hero-actions .btn { padding:10px 12px; } }
+@media(max-width:1079px) {
+  .layout { grid-template-columns:minmax(0,1fr); padding:0 28px; gap:0; }
+  .top-inner { padding:0 28px; gap:16px; }
+  .header-context,.header-divider { display:none; }
+  .menu-toggle { display:grid; place-items:center; width:38px; height:38px; padding:0; flex:none; background:var(--surface); border:1px solid var(--line); border-radius:8px; color:var(--text); cursor:pointer; }
+  .menu-toggle svg { width:18px; height:18px; }
+  .toc { position:fixed; top:0; left:0; bottom:0; width:290px; max-width:calc(100vw - 40px); max-height:100dvh; padding:22px; background:var(--bg); border-right:1px solid var(--line); z-index:81; visibility:hidden; transform:translateX(-100%); transition:transform .2s,visibility .2s; }
+  body.nav-open .toc { visibility:visible; transform:translateX(0); }
+  .nav-backdrop { display:block; position:fixed; inset:0; background:#081b2d70; backdrop-filter:blur(3px); z-index:80; border:0; cursor:pointer; }
+  .menu-close { display:block; position:sticky; top:0; z-index:2; width:100%; margin-bottom:20px; text-align:left; border:0; background:var(--bg); color:var(--muted); font:600 12px/1.5 var(--font); cursor:pointer; padding:12px 6px; }
+  .menu-close::after { content:"×"; float:right; font-size:20px; line-height:18px; }
+  .hero { grid-template-columns:minmax(0,1fr) 290px; gap:28px; }
+  .hero h1 { font-size:58px; }
+}
+@media(max-width:760px) {
+  .top { height:116px; }
+  .top-inner { gap:10px; padding:12px 20px; flex-wrap:wrap; align-content:center; }
+  .brand { margin-right:auto; font-size:14px; gap:9px; }
+  .brand::before { width:31px; height:35px; border-radius:8px; }
+  .brand::after { font-size:13px; left:5px; top:5px; }
+  .brand span { display:block; font-size:9px; letter-spacing:.8px; }
+  .top .xlink { display:none; }
+  #theme { font-size:10px; padding:7px 9px; min-height:35px; }
+  .menu-toggle { width:35px; height:35px; }
+  .search { order:5; flex-basis:100%; flex-grow:1; max-width:none; margin:0; }
+  .search input { height:37px; font-size:12px; padding-left:37px; }
+  .search::before { top:10px; }
+  .search::after { top:23px; }
+  .search kbd { top:8px; line-height:18px; }
+  html { scroll-padding-top:140px; }
+  .topic { scroll-margin-top:140px; }
+  .layout { padding:0 20px; }
+  .workspace-bar { padding:19px 0; font-size:10px; }
+  .workspace-bar .edition { font-size:8px; padding:0 6px; }
+  .hero { display:block; padding-top:30px; }
+  .hero h1 { font-size:55px; letter-spacing:-2.8px; }
+  .hero .label { font-size:9px; letter-spacing:1px; margin-bottom:16px; }
+  .hero .lead { font-size:13px; }
+  .hero-art { display:none; }
+  .hero-actions { margin-top:22px; }
+  .hero-actions .btn { font-size:11px; padding:11px 13px; }
+  .hero-actions .btn-primary::after { margin-left:12px; }
+  .stats { margin-top:28px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .stats>div { padding:16px; }
+  .stats b { font-size:25px; }
+  .stats span { font-size:10px; }
+  .stats>div::after { right:13px; top:15px; width:23px; height:23px; }
+  .journey { padding:15px; gap:14px; flex-wrap:wrap; }
+  .journey-copy { flex:1; }
+  .journey progress { order:3; flex-basis:100%; }
+  .journey-pct { margin-left:auto; }
+  .map-head { margin-top:32px; }
+  .map-head h2 { font-size:22px; }
+  .map-head .lead { font-size:12px; }
+  .roadmap-panel summary { padding:16px; gap:11px; }
+  .roadmap-panel summary strong { font-size:11px; }
+  .roadmap-panel summary small { font-size:9px; }
+  .roadmap { margin:0 12px; }
+  .row { grid-template-columns:1fr; justify-items:center; padding:16px 0; }
+  .row>div:nth-child(2) { width:min(100%,250px); }
+  .branches { display:none; }
+  .stage-head { grid-template-columns:42px minmax(0,1fr); gap:14px; margin-bottom:20px; }
+  .stage-num { height:42px; font-size:15px; border-radius:10px; }
+  .stage-head h2 { font-size:24px; letter-spacing:-.6px; }
+  .stage-head h2 small { font-size:10px; }
+  .stage-head .lead { font-size:12px; }
+  .stage-head .btn { grid-column:2; justify-self:start; font-size:10px; margin-top:0; }
+  .grid { grid-template-columns:minmax(0,1fr); gap:14px; }
+  .topic { padding:21px; }
+  .topic h3 { font-size:17px; }
+  .topic p,.topic li { font-size:13px; }
+  .demo { padding:16px; }
+  .controls { gap:14px; }
+  .controls input[type=range] { width:130px; }
+  .code-toolbar>span::before { margin-right:7px; }
+  pre { font-size:10.5px; padding:14px; }
+  .deeper { padding:15px; font-size:12px; }
+  .back-top { width:38px; height:38px; right:16px; bottom:16px; }
+}
+@media(max-width:360px) { .top-inner,.layout { padding-left:14px; padding-right:14px; } .brand { font-size:12px; } .brand span { font-size:8px; } #theme { font-size:9px; padding:6px; } .hero h1 { font-size:48px; } .hero-actions { gap:8px; } .hero-actions .btn { padding:10px; } .workspace-bar { font-size:9px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+@media print {
+  :root,:root[data-theme="dark"] { --bg:#fff; --surface:#fff; --surface-2:#f4f4f4; --text:#111; --body:#222; --muted:#555; --primary:#14665a; --line:#ddd; --accent-soft:#f3f6f4; --accent-line:#ddd; --accent-ink:#14665a; --code-bg:#f4f4f4; --code-text:#111; }
+  .top,.toc,.nav-backdrop,.hero-art,.hero-actions,.journey,.back-top,.toast,.copy-code,.learned,.pager,.workspace-bar,.reading-progress { display:none!important; }
+  .layout { display:block; max-width:none; padding:0; }
+  .hero { display:block!important; padding-top:0; }
+  .hero h1 { font-size:40px; }
+  .hero h1 span { display:inline; }
+  .hero h1 span::after { content:" "; }
+  .grid { display:block; }
+  .topic { margin:12px 0; break-inside:avoid; box-shadow:none; }
+  .code-toolbar { background:#eee; color:#333; }
+  pre,pre code { white-space:pre-wrap; overflow-wrap:anywhere; }
+  .roadmap { break-inside:avoid; }
+  a { color:inherit; }
+}
+
+
+/* The third handbook follows one product from its first decision to release. */
+:root[data-handbook="project"] { --primary:#276a5a; --accent-soft:#e9f2ed; --accent-line:#c2d9cc; --accent-ink:#1e594b; --hero-bg:#ebf2ee; --hero-dot:#c8d9ce; }
+:root[data-handbook="project"][data-theme="dark"] { --primary:#8bd3b9; --on-primary:#103027; --accent-soft:#203a33; --accent-line:#3b5e50; --accent-ink:#ace0cb; --hero-bg:#1c322c; --hero-dot:#345247; }
+.track-switcher a { font-size:10px; gap:4px; padding:8px 3px; }
+.next-handbook { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px; margin-top:25px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:13px; text-decoration:none; }
+.next-handbook strong { display:block; color:var(--accent-ink); font-size:16px; letter-spacing:-.3px; }
+.next-handbook small { display:block; color:var(--muted); font-size:12px; margin-top:5px; }
+.next-handbook>span:last-child { font-size:22px; color:var(--primary); }
+.art-ticket { padding:17px; }
+.art-ticket small { color:var(--muted); font:9px/1.5 var(--mono); }
+.art-ticket strong { display:block; font-size:15px; line-height:1.5; color:var(--text); margin:8px 0 14px; }
+.art-ticket span { font:9px/1.5 var(--mono); background:var(--accent-soft); color:var(--accent-ink); border:1px solid var(--accent-line); padding:4px 8px; border-radius:5px; }
+.story-player { margin-top:28px; padding:26px; border:1px solid var(--accent-line); background:var(--surface); border-radius:16px; }
+.story-player>.label { color:var(--primary); font-size:10px; letter-spacing:1.5px; }
+.story-player h2 { font-size:25px; letter-spacing:-.7px; margin-bottom:8px; }
+.story-intro { font-size:13px; color:var(--muted); max-width:75ch; }
+.story-controls { display:flex; align-items:end; flex-wrap:wrap; gap:10px; margin:20px 0; }
+.story-controls label { display:flex; flex-direction:column; gap:5px; font-size:11px; color:var(--muted); margin-right:auto; min-width:200px; }
+.story-controls select { background:var(--bg); border:1px solid var(--line-strong); border-radius:8px; color:var(--text); font:12px/1.5 var(--font); padding:9px 10px; }
+.story-controls button { min-height:38px; }
+.btn:disabled { opacity:.45; cursor:default; box-shadow:none; }
+.story-track { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; padding:0; margin:20px 0; list-style:none; }
+.story-track li { padding:10px 3px; text-align:center; border:1px solid var(--line); border-radius:8px; font-size:10px; color:var(--muted); background:var(--bg); margin:0; }
+.story-track li b { font:10px/1.5 var(--mono); display:block; margin-bottom:4px; }
+.story-track li[data-state="done"] { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.story-track li[aria-current="step"] { background:var(--primary); border-color:var(--primary); color:var(--on-primary); }
+.story-track li[data-state="blocked"] { background:var(--warm-soft); border-color:var(--warm); color:var(--warm); }
+.story-scene { padding:19px; background:var(--bg); border:1px solid var(--line); border-radius:11px; }
+.story-scene .label { font:10px/1.7 var(--mono); letter-spacing:0; color:var(--primary); }
+.story-scene h3 { font-size:18px; letter-spacing:-.4px; margin-bottom:8px; }
+.story-scene p { font-size:13px; margin-bottom:8px; }
+.story-scene a { font-size:11px; }
+.story-player .code-block { margin-bottom:0; }
+.story-player progress { margin-top:20px; }
+.story-beat { display:flex; gap:9px; align-items:center; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--primary); margin-bottom:11px; }
+.story-beat::before { content:""; display:block; width:5px; height:5px; background:var(--primary); border-radius:50%; }
+body.searching .story-player { display:none; }
+@media(max-width:760px) { .story-player { padding:18px; } .story-player h2 { font-size:22px; } .story-track { grid-template-columns:repeat(4,minmax(0,1fr)); } .story-controls { gap:8px; } .story-controls label { flex-basis:100%; min-width:0; } .story-controls .btn { flex:1; padding:8px; font-size:10px; } .next-handbook { padding:18px; } .next-handbook strong { font-size:15px; } }
+@media print { .story-controls { display:none; } .story-player { break-inside:avoid; } }
+</style>
+</head>
+<body><a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="top-inner"><a class="brand" href="#top">DineshXEswar<span>Project</span></a><div class="search"><input id="q" type="search" placeholder="Search this handbook" aria-label="Search topics" autocomplete="off"></div><button class="btn" id="theme" type="button">Dark mode</button></div></header>
+<div class="layout" id="top"><nav class="toc" id="toc" aria-label="Stages"></nav><main id="main">
+<section class="hero"><p class="label">Dinesh and Eswar · From concepts to a working product</p><h1>Build an issue tracker</h1><p class="lead">The next step after Frontend and Backend. Follow Traceboard from a problem in a team chat to a private project, a complete create-issue request, tested permissions, attachments and a recoverable release. Each chapter explains a decision before showing the code it leads to.</p><div class="stats"><div><b id="n-stages">0</b><span>Decisions in order</span></div><div><b id="n-topics">0</b><span>Connected topics</span></div><div><b>5</b><span>Request scenarios</span></div><div><b>1</b><span>Project, end to end</span></div></div></section>
+<section class="story-player" aria-labelledby="story-heading">
+<p class="label">Interactive request story</p><h2 id="story-heading">Follow “Create issue”</h2>
+<p class="story-intro">Choose a scenario and step through the files. This local simulation shows where a request succeeds or stops; it does not send a request to a real server.</p>
+<div class="story-controls"><label>Request scenario<select id="story-scenario"><option value="success">Editor · valid issue</option><option value="viewer">Viewer · write forbidden</option><option value="outsider">Non-member · private project</option><option value="invalid">Editor · empty title</option><option value="signed-out">Signed out · no session</option></select></label>
+<button class="btn" id="story-prev" type="button">← Previous</button><button class="btn btn-primary" id="story-next" type="button">Next step →</button><button class="btn" id="story-play" type="button">Play flow</button><button class="btn" id="story-reset" type="button">Restart</button></div>
+<ol class="story-track" id="story-track"><li><b>01</b>Form</li><li><b>02</b>Request</li><li><b>03</b>Identity</li><li><b>04</b>Validation</li><li><b>05</b>Permission</li><li><b>06</b>Database</li><li><b>07</b>Response</li><li><b>08</b>UI update</li></ol>
+<div class="story-scene" role="status" aria-live="polite" aria-atomic="true"><p class="label" id="story-file"></p><h3 id="story-title"></h3><p id="story-description"></p><a id="story-chapter" href="#slice">Read the connected code →</a></div>
+<pre class="wrap"><code id="story-output"></code></pre><progress id="story-progress" max="8" value="1" aria-label="Request story progress"></progress></section>
+<section id="map"><div class="map-head"><p class="label">The project roadmap</p><h2>Follow the decisions</h2><p class="lead">Start with a problem, choose a small slice, model its rules, and trace it through the stack. Expand the roadmap to jump to a chapter or one of its connected topics.</p></div><div class="roadmap" id="roadmap"><svg class="edges" aria-hidden="true"></svg><ol class="rows" id="rows"></ol></div></section>
+<section class="stage" id="brief" data-title="Start with the problem">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">01 / The first conversation</div><h2>Start with the problem</h2><p class="lead">Before choosing libraries, decide whose work you are making easier. Our fictional product is Traceboard: an issue tracker for a small project team.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic" id="brief-problem" data-node data-label="Listen for a broken workflow"><h3>Listen for a broken workflow</h3><p>Bugs are scattered across chat. Nobody knows who is working on them, and a fixed bug gets reported again. The need is a shared record with ownership, discussion and a visible status.</p><div class="callout"><p><b>Decision.</b> Build a reliable place to report and follow an issue. A beautiful board alone does not solve missing permissions or lost data.</p></div></article><article class="topic" id="brief-scenario" data-node data-label="Write one concrete story"><h3>Write one concrete story</h3><p>An editor opens a project, reports “Fix the mobile navbar”, and sees the saved issue. Another editor adds a comment. A viewer can follow the discussion but cannot edit it.</p><p>That small story gives us screens, requests, rules and database records. It is more useful than starting with a list of technologies.</p></article><article class="topic" id="brief-success" data-node data-label="Define observable success"><h3>Define observable success</h3><ul><li>An authorized editor can create an issue and retrieve it after a reload.</li><li>A viewer cannot create an issue by calling the API directly.</li><li>A user outside the project cannot see its issues.</li><li>A failed save shows an error and preserves the typed text.</li></ul></article><article class="topic" id="brief-unknowns" data-node data-label="Turn assumptions into questions"><h3>Turn assumptions into questions</h3><ul><li>Are projects private? Yes, only active members can access them.</li><li>Can viewers comment? In this case study, no.</li><li>Can an issue belong to two projects? No.</li><li>Do we need live updates immediately? No; reload and refetch work for the first release.</li></ul></article></div><p class="deeper"><span class="label">Connect the dots</span>You already know the <a href="../../Backend/handbook_codex/Backend_Handbook.html#basics-trust">server must enforce rules</a>. Now each rule comes from an explicit product decision.</p></section><section class="stage" id="scope" data-title="Choose the first useful slice">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">02 / Scope before complexity</div><h2>Choose the first useful slice</h2><p class="lead">A project becomes manageable when you can name the smallest feature that reaches every layer.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic" id="scope-slice" data-node data-label="Build vertically"><h3>Build vertically</h3><p>First make one authenticated editor create and list a private project issue. Touch the form, request, API, permission check, SQL and UI update together. Finish that path before building every screen or every endpoint.</p><div class="callout"><p><b>Decision.</b> An end-to-end working slice exposes boundary mistakes earlier than completing the whole frontend first.</p></div></article><article class="topic wide" id="scope-phases" data-node data-label="Separate release stages"><h3>Separate release stages</h3><div class="tw"><table><thead><tr><th>Stage</th><th>Deliver</th><th>Leave for later</th></tr></thead><tbody><tr><td>First slice</td><td>Login, project access, create/list issues</td><td>Invitations, uploads, live updates</td></tr><tr><td>Collaboration</td><td>Owner-managed membership, comments, statuses</td><td>Automation and notifications</td></tr><tr><td>Attachments</td><td>Authorized uploads and downloads</td><td>Image processing</td></tr><tr><td>Release</td><td>Tests, monitoring, backup/restore, deployment</td><td>Scaling beyond measured needs</td></tr></tbody></table></div></article><article class="topic" id="scope-contract" data-node data-label="Write acceptance criteria"><h3>Write acceptance criteria</h3><p>Given an editor in project 7, when a valid title is submitted, the API returns <code>201</code> with the persisted issue. Given a viewer, the same request returns <code>403</code> and creates no row. A non-member receives <code>404</code> so the response does not reveal a private project.</p><p>These statements become integration tests and keep implementation choices grounded.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Keep a short “later” list. Deferring a feature is a scope decision, rather than a reason to build hidden infrastructure for it now.</p></section><section class="stage" id="architecture" data-title="Give each layer a responsibility">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">03 / Choose the shape</div><h2>Give each layer a responsibility</h2><p class="lead">Use the separate React + Express arrangement first so the network boundary stays visible. A later chapter maps the same feature to Next.js.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="architecture-stack" data-node data-label="Choose tools for the job"><h3>Choose tools for the job</h3><div class="tw"><table><thead><tr><th>Part</th><th>Choice for this story</th><th>Responsibility</th></tr></thead><tbody><tr><td>UI</td><td>React + TypeScript, developed with Vite</td><td>Forms, views, loading and error states</td></tr><tr><td>API</td><td>Express 5 + TypeScript</td><td>HTTP boundaries and permission enforcement</td></tr><tr><td>Database</td><td>PostgreSQL with the pg driver</td><td>Constraints, queries and transactions</td></tr><tr><td>Validation</td><td>Zod</td><td>Validate untrusted request bodies</td></tr><tr><td>Login</td><td>A maintained auth flow with server-side sessions</td><td>Establish identity; keep sessions in a production store</td></tr></tbody></table></div></article><article class="topic" id="architecture-decisions" data-node data-label="Keep the first architecture small"><h3>Keep the first architecture small</h3><p>One API and one database are enough. Use direct parameterized SQL here so the queries remain visible; an ORM is an alternative, not a prerequisite. Avoid a queue, Redis and WebSockets until a feature or measurement calls for them.</p><div class="callout"><p><b>Decision.</b> A modular monolith is an appropriate starting point for this product.</p></div></article><article class="topic" id="architecture-boundaries" data-node data-label="Separate identity from project permission"><h3>Separate identity from project permission</h3><p>The login system establishes a user ID. Our project-membership table answers whether that user belongs to a project and what they may do there. A successful login does not grant access to every project.</p><p>All code below is a connected design excerpt, rather than a complete downloadable application. Imports and infrastructure modules such as <code>sessionMiddleware</code>, <code>pool</code>, <code>HttpError</code> and the auth flow must be configured in the real repository.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Revisit <a href="../../Backend/handbook_codex/Backend_Handbook.html#arch">Architecture</a> when a folder starts collecting unrelated responsibilities.</p></section><section class="stage" id="setup" data-title="Make the repository explain itself">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">04 / The first files</div><h2>Make the repository explain itself</h2><p class="lead">A future developer should be able to discover how to run the application without guessing which command or database to use.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="setup-tree" data-node data-label="Keep a readable map"><h3>Keep a readable map</h3><pre><code>traceboard/
+  README.md                    setup, decisions, commands
+  web/
+    package.json               dev, build, typecheck, test
+    vite.config.ts             /api development proxy
+    src/features/issues/
+      IssueForm.tsx            form and submit handler
+      issueApi.ts              HTTP request and error handling
+  api/
+    package.json               dev, build, start, typecheck, test
+    .env.example               names and safe placeholders only
+    migrations/001_initial.sql
+    src/
+      server.ts                starts listening
+      app.ts                   middleware and router composition
+      config.ts                validated runtime configuration
+      auth.ts                  configured login/session integration
+      middleware/requireAuth.ts
+      features/issues/
+        issue.schema.ts
+        issue.routes.ts
+        issue.service.ts
+        issue.repository.ts
+      db.ts                    shared connection pool
+  .gitignore                   ignore .env, node_modules, build output</code></pre></article><article class="topic" id="setup-versions" data-node data-label="Record the environment"><h3>Record the environment</h3><p>Choose a supported Node release, declare it in the repository, and commit the package-manager lockfile. Read each package's actual scripts; do not assume <code>npm run dev</code> also performs type checking. Keep <code>tsc --noEmit</code>, tests and a production build explicit.</p><p>A fresh setup should be reproducible with documented install, environment, migration and startup steps. Pin library major versions while following examples.</p></article><article class="topic" id="setup-origin" data-node data-label="Use one browser-facing origin"><h3>Use one browser-facing origin</h3><pre><code>// web/vite.config.ts — excerpt inside defineConfig(...)
+server: {
+  port: 5173,
+  strictPort: true,
+  proxy: { "/api": "http://localhost:3001" },
+}</code></pre><p>The browser calls <code>/api/...</code> on Vite's origin. Vite forwards the request to Express. Production uses the same path behind the host or reverse proxy. This keeps first-party requests same-origin; it is not a replacement for authentication or CSRF protection. <a href="https://vite.dev/config/server-options.html#server-proxy" target="_blank" rel="noopener">Vite proxy reference</a>.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Start by reading <code>package.json</code>, the lockfile, <code>.env.example</code> and routing configuration whenever you enter an unfamiliar project.</p></section><section class="stage" id="data" data-title="Model the rules in the data">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">05 / Draw the relationships</div><h2>Model the rules in the data</h2><p class="lead">Start with the records and relationships required by the first slice. Add constraints for rules the database can enforce.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic" id="data-relations" data-node data-label="A project is the permission boundary"><h3>A project is the permission boundary</h3><p>A user can join several projects. A project has many membership records and issues. Each membership assigns a role within that project. Each issue belongs to exactly one project.</p><div class="callout"><p><b>Decision.</b> Every issue lookup includes its project ID. Never rely on a project filter that exists only in the UI.</p></div></article><article class="topic wide" id="data-schema" data-node data-label="Write the first migration"><h3>Write the first migration</h3><pre><code>CREATE TABLE users (
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  auth_subject text NOT NULL UNIQUE
+);
+CREATE TABLE projects (
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name text NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120)
+);
+CREATE TABLE project_members (
+  project_id integer NOT NULL REFERENCES projects(id),
+  user_id integer NOT NULL REFERENCES users(id),
+  role text NOT NULL CHECK (role IN ('owner', 'editor', 'viewer')),
+  active boolean NOT NULL DEFAULT true,
+  PRIMARY KEY (project_id, user_id)
+);
+CREATE TABLE issues (
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  project_id integer NOT NULL REFERENCES projects(id),
+  created_by integer NOT NULL REFERENCES users(id),
+  title text NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160),
+  description text NOT NULL DEFAULT '' CHECK (length(description) &lt;= 5000),
+  status text NOT NULL DEFAULT 'open'
+    CHECK (status IN ('open', 'in_progress', 'done')),
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (id, project_id)
+);
+CREATE INDEX issues_project_created_idx
+  ON issues(project_id, created_at DESC, id DESC);</code></pre><p>The auth subject links a local user to the configured identity system. Membership is explicit so an editor in one project can be a viewer in another. Create a project and its initial owner membership in one transaction. Membership management must preserve at least one active owner.</p></article><article class="topic" id="data-retention" data-node data-label="Choose what survives"><h3>Choose what survives</h3><p>Deactivating membership stops access while preserving issue authorship. Database references and deletion behavior should match retention requirements. Add a comment table with an author and issue reference when comments enter scope; avoid embedding an endlessly growing discussion in one issue row.</p></article><article class="topic" id="data-pagination" data-node data-label="Design list reads early"><h3>Design list reads early</h3><p>Order project issues by <code>created_at DESC, id DESC</code>, with a capped page size. A cursor must carry both sort values and the next query must use the same ordering. The composite index supports this access pattern; verify performance with <code>EXPLAIN</code> when needed.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>See <a href="../../Backend/handbook_codex/Backend_Handbook.html#db">Databases</a> for keys, transactions and indexes. A schema is a record of product decisions, not just a place to put JSON.</p></section><section class="stage" id="contract" data-title="Agree on the request and response">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">06 / Define the boundary</div><h2>Agree on the request and response</h2><p class="lead">Write down the contract before connecting the form. Make expected failures as explicit as success.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="contract-endpoints" data-node data-label="Name the operations"><h3>Name the operations</h3><div class="tw"><table><thead><tr><th>Operation</th><th>Endpoint</th><th>Permission</th></tr></thead><tbody><tr><td>List issues</td><td>GET /api/projects/:projectId/issues</td><td>Any active member</td></tr><tr><td>Create issue</td><td>POST /api/projects/:projectId/issues</td><td>Owner or editor</td></tr><tr><td>Update issue</td><td>PATCH /api/projects/:projectId/issues/:issueId</td><td>Owner or editor</td></tr><tr><td>Add comment</td><td>POST /api/projects/:projectId/issues/:issueId/comments</td><td>Owner or editor</td></tr><tr><td>Manage membership</td><td>Project membership endpoints</td><td>Owner only</td></tr></tbody></table></div></article><article class="topic" id="contract-shape" data-node data-label="Keep a consistent envelope"><h3>Keep a consistent envelope</h3><pre><code>// POST /api/projects/7/issues
+{ "title": "Fix the mobile navbar", "description": "Menu overlaps search." }
+
+// 201 Created
+{ "data": { "id": 42, "project_id": 7,
+  "title": "Fix the mobile navbar", "status": "open", "version": 1 } }
+
+// 400 Bad Request
+{ "error": { "code": "VALIDATION", "message": "Check the title.",
+  "field": "title" } }</code></pre><p>The actor ID comes from the verified session. The project ID comes from the validated route. The server sets the initial status and version. A request body must not assign itself an owner, role or creator.</p></article><article class="topic" id="contract-validation" data-node data-label="Validate and whitelist input"><h3>Validate and whitelist input</h3><pre><code>// api/src/features/issues/issue.schema.ts
+import { z } from "zod";
+export const CreateIssue = z.object({
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().max(5000).default(""),
+});
+export type CreateIssueInput = z.infer&lt;typeof CreateIssue&gt;;
+export type CreateIssueArgs = {
+  projectId: number; actorId: number; input: CreateIssueInput;
+};
+export type Issue = {
+  id: number; project_id: number; title: string; description: string;
+  status: "open" | "in_progress" | "done"; version: number;
+};</code></pre><p>Use <code>result.data</code> from a successful parse when building the insert. Zod's ordinary object schema strips unknown keys; never forward the original <code>req.body</code> wholesale. Define a separate schema for updates.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>The contract answers “what crosses this boundary?” The service answers “is this action permitted, and what should it do?”</p></section><section class="stage" id="identity" data-title="Decide who can do what">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">07 / Identity and authority</div><h2>Decide who can do what</h2><p class="lead">A permission matrix is easier to review than scattered guesses inside button handlers.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="identity-matrix" data-node data-label="Write the role matrix"><h3>Write the role matrix</h3><div class="tw"><table><thead><tr><th>Action</th><th>Owner</th><th>Editor</th><th>Viewer</th><th>Non-member</th></tr></thead><tbody><tr><td>Read issues and comments</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Create/update issues and comment</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Upload attachments</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Manage members</td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr></tbody></table></div></article><article class="topic" id="identity-session" data-node data-label="Establish identity first"><h3>Establish identity first</h3><p>Use a maintained login flow. In this case study, the configured session middleware exposes a verified local user ID as <code>req.session.userId</code>. Store sessions outside process memory in production, set appropriate cookie attributes, rotate the session at login, and support logout.</p><pre><code>// api/src/middleware/requireAuth.ts — handler excerpt
+if (!req.session?.userId) {
+  return res.status(401).json({
+    error: { code: "UNAUTHENTICATED", message: "Sign in first." },
+  });
+}
+req.user = { id: req.session.userId };
+next();</code></pre><p>Add the matching Express/session TypeScript declarations in the real project. The user ID must come from the server-side session, never a trusted-looking header supplied by the browser. <a href="https://expressjs.com/en/resources/middleware/session/" target="_blank" rel="noopener">Session middleware reference</a>.</p></article><article class="topic" id="identity-csrf" data-node data-label="Guard the cookie boundary"><h3>Guard the cookie boundary</h3><p>SameSite and HttpOnly have different jobs. For this same-origin browser app, reject state-changing requests from an unexpected Origin and use the auth framework's appropriate CSRF protection. Apply the policy consistently to login, membership and issue mutations. Hiding an edit button improves usability; it does not enforce the permission.</p></article><article class="topic" id="identity-object" data-node data-label="Check the specific project"><h3>Check the specific project</h3><p>A member of project 7 must not gain access to project 8 by changing a URL. Check active membership against the route's project ID for every protected operation. Read/update/delete queries also scope the issue to that project. Choose error messages that do not reveal private objects.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>This is the distinction between <a href="../../Backend/handbook_codex/Backend_Handbook.html#auth">authentication and authorization</a> applied to a real feature.</p></section><section class="stage" id="slice" data-title="Follow one issue through the stack">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">08 / The first working feature</div><h2>Follow one issue through the stack</h2><p class="lead">Now connect the decisions to the actual files. Keep the request contract open while you read both sides.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="slice-route" data-node data-label="Receive the request"><h3>Receive the request</h3><pre><code>// issue.routes.ts — router mounted at /api/projects
+router.post("/:projectId/issues", requireAuth, async (req, res, next) =&gt; {
+  try {
+    const rawId = req.params.projectId;
+    if (typeof rawId !== "string" || !/^\d+$/.test(rawId)) {
+      throw new HttpError(400, "BAD_PROJECT_ID");
+    }
+    const projectId = Number(rawId);
+    if (!Number.isSafeInteger(projectId) || projectId &lt; 1 || projectId &gt; 2147483647) {
+      throw new HttpError(400, "BAD_PROJECT_ID");
+    }
+    const result = CreateIssue.safeParse(req.body);
+    if (!result.success) {
+      const field = result.error.issues[0]?.path[0];
+      throw new HttpError(400, "VALIDATION", typeof field === "string" ? field : undefined);
+    }
+    const issue = await createIssue({
+      projectId, actorId: req.user.id, input: result.data,
+    });
+    return res.status(201).json({ data: issue });
+  } catch (error) { next(error); }
+});</code></pre><p>Before this router, configure the session, JSON parser, request-size limits and mutation-origin/CSRF policy. After the router, install one error middleware that translates <code>HttpError(status, code, field?)</code> into the agreed JSON envelope and hides unexpected exception details.</p></article><article class="topic wide" id="slice-service" data-node data-label="Enforce the rule in a transaction"><h3>Enforce the rule in a transaction</h3><pre><code>// issue.service.ts — pool, HttpError and insertIssue are imported
+import type { CreateIssueArgs, Issue } from "./issue.schema.js";
+export async function createIssue({ projectId, actorId, input }: CreateIssueArgs): Promise&lt;Issue&gt; {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { rows: [member] } = await client.query(
+      `SELECT role FROM project_members
+       WHERE project_id = $1 AND user_id = $2 AND active = true
+       FOR SHARE`, [projectId, actorId]);
+    if (!member) throw new HttpError(404, "NOT_FOUND");
+    if (!["owner", "editor"].includes(member.role)) {
+      throw new HttpError(403, "FORBIDDEN");
+    }
+    const issue = await insertIssue(client, { projectId, actorId, input });
+    await client.query("COMMIT");
+    return issue;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally { client.release(); }
+}</code></pre><p>The membership row is share-locked while the issue is created, so a concurrent membership revocation waits until this operation finishes. The same database client must execute every statement in the transaction. This is an explicit permission-consistency decision; a transaction alone would not solve that race. <a href="https://node-postgres.com/features/transactions" target="_blank" rel="noopener">pg transactions</a> and <a href="https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS" target="_blank" rel="noopener">PostgreSQL row locks</a>.</p></article><article class="topic wide" id="slice-repository" data-node data-label="Persist the whitelisted fields"><h3>Persist the whitelisted fields</h3><pre><code>// issue.repository.ts — same client as the service transaction
+import type { PoolClient } from "pg";
+import type { CreateIssueArgs, Issue } from "./issue.schema.js";
+export async function insertIssue(client: PoolClient, { projectId, actorId, input }: CreateIssueArgs): Promise&lt;Issue&gt; {
+  const { rows: [issue] } = await client.query&lt;Issue&gt;(
+    `INSERT INTO issues (project_id, created_by, title, description)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id, project_id, title, description, status, version`,
+    [projectId, actorId, input.title, input.description]);
+  if (!issue) throw new Error("Insert returned no issue");
+  return issue;
+}</code></pre><p>Parameters keep user text separate from SQL syntax. The database supplies the ID, initial status and version. Return an explicit set of fields, not user/session secrets or an arbitrary database object.</p></article><article class="topic wide" id="slice-ui" data-node data-label="Return to the user"><h3>Return to the user</h3><pre><code>// web/src/features/issues/issueApi.ts
+export async function createIssue(projectId: number, input: {
+  title: string; description: string;
+}) {
+  const res = await fetch(`/api/projects/${projectId}/issues`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify(input),
+  });
+  const body = await res.json(); // this API's contract is JSON
+  if (!res.ok) throw new Error(body.error?.message ?? `HTTP ${res.status}`);
+  return body.data; // type and/or validate this response in the real client
+}
+
+// IssueForm.tsx — excerpt inside the component
+async function onSubmit(event: React.FormEvent) {
+  event.preventDefault();
+  if (saving) return;
+  setSaving(true);
+  setError(null);
+  try {
+    const saved = await createIssue(projectId, { title, description });
+    setNotice(`Issue #${saved.id} saved.`);
+    setTitle("");
+    setDescription("");
+    try {
+      await refreshIssues();
+    } catch {
+      setError("Issue saved. The list could not refresh; reload the list.");
+    }
+  } catch (error) {
+    setError(error instanceof Error ? error.message : "Save failed.");
+  } finally { setSaving(false); }
+}</code></pre><p>The form uses <code>onSubmit</code>, displays <code>error</code>, and disables submission while <code>saving</code>. The example refetches after saving for simplicity. The handler separates “save succeeded, list refresh failed” so a user does not retry an already-created issue; an idempotency key can make retries safer. A later server-state cache can insert the confirmed result or invalidate the list.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Use the story player above to compare a successful write with a viewer, a non-member, invalid input, and a missing login. Notice where the request stops.</p></section><section class="stage" id="iteration" data-title="Grow the feature without losing the boundary">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">09 / Add the next behavior</div><h2>Grow the feature without losing the boundary</h2><p class="lead">Only after create/list works do we introduce collaboration and files. Each addition gets its own rules and failure cases.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic" id="iteration-comments" data-node data-label="Comments need the same permission checks"><h3>Comments need the same permission checks</h3><p>A comment records issue, project, author, body and creation time. Verify project membership and comment permission, then verify that the issue belongs to that project. Use a composite reference to prevent storing a comment against the wrong project/issue pair.</p><pre><code>-- Both columns point to the same issue/project pair.
+FOREIGN KEY (issue_id, project_id)
+  REFERENCES issues(id, project_id)</code></pre></article><article class="topic" id="iteration-conflicts" data-node data-label="Two editors can race"><h3>Two editors can race</h3><p>Suppose both editors read version 3. Their status updates must not silently overwrite each other. Require an expected version, increment it on success, and return <code>409</code> if the conditional update changed no row. The permission check still runs first.</p><pre><code>UPDATE issues
+SET status = $1, version = version + 1
+WHERE id = $2 AND project_id = $3 AND version = $4
+RETURNING id, status, version;</code></pre></article><article class="topic wide" id="iteration-files" data-node data-label="Uploads are a multi-step workflow"><h3>Uploads are a multi-step workflow</h3><ul><li>Authorize the editor and issue before issuing a short-lived upload URL for a server-generated storage key.</li><li>Create pending attachment metadata, scoped to the project and issue.</li><li>After upload, verify the stored object and enforce the size/content policy before marking it ready; use scanning where appropriate.</li><li>Authorize downloads and issue short-lived access rather than exposing private permanent public URLs.</li><li>Clean up abandoned pending uploads and orphaned objects.</li></ul></article><article class="topic" id="iteration-notify" data-node data-label="Introduce asynchronous work when needed"><h3>Introduce asynchronous work when needed</h3><p>A comment notification can become a queue job. If saving a comment and guaranteeing a notification must be atomic, write an outbox record in the same database transaction and let a worker deliver it. Handle retries and duplicate delivery. Do not add a queue merely because a full-stack diagram includes one.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Attachments involve the database and object storage, which do not share a normal SQL transaction. Pending states and cleanup are part of the design.</p></section><section class="stage" id="quality" data-title="Test the decisions, not just the happy path">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">10 / Prove the boundaries</div><h2>Test the decisions, not just the happy path</h2><p class="lead">A useful test suite protects the promises we wrote before the first route.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="quality-matrix" data-node data-label="Make the acceptance criteria executable"><h3>Make the acceptance criteria executable</h3><div class="tw"><table><thead><tr><th>Case</th><th>Expected result</th><th>Database assertion</th></tr></thead><tbody><tr><td>Editor, valid title</td><td>201 with saved issue</td><td>Exactly one row in the requested project</td></tr><tr><td>Empty or overlong title</td><td>400 validation error</td><td>No new issue</td></tr><tr><td>Signed out</td><td>401</td><td>No new issue</td></tr><tr><td>Viewer in project</td><td>403</td><td>No new issue</td></tr><tr><td>Member of a different project</td><td>404</td><td>No disclosure or write</td></tr><tr><td>Two updates with one expected version</td><td>One succeeds; one gets 409</td><td>Exactly one version increment</td></tr></tbody></table></div></article><article class="topic" id="quality-example" data-node data-label="Keep a real permission integration test"><h3>Keep a real permission integration test</h3><pre><code>// Vitest + Supertest; fixture helpers create isolated test data.
+test("a viewer cannot create a project issue", async () =&gt; {
+  const { project, viewerAgent } = await seedProjectWithViewer();
+  const before = await issueCount(project.id);
+  const response = await viewerAgent
+    .post(`/api/projects/${project.id}/issues`)
+    .send({ title: "Attempted write" });
+  expect(response.status).toBe(403);
+  expect(await issueCount(project.id)).toBe(before);
+});</code></pre><p>Use a separate test database. The authenticated agent should go through the configured session flow; do not replace the membership enforcement you are testing with a mock. Test fixture helpers and required imports are abbreviated here.</p></article><article class="topic" id="quality-debug" data-node data-label="Debug one boundary at a time"><h3>Debug one boundary at a time</h3><p>For a failed save, first inspect the actual Network request and response. Follow its request ID into the API logs. Confirm which middleware and service ran, then inspect the parameterized query and constraints. A frontend error toast alone does not identify the failing layer.</p><p>Use breakpoints and a failing test to verify the explanation before editing code. Avoid logging session tokens or private attachment contents.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Tests are evidence for a specific behavior under specified conditions. Passing tests do not prove that every possible interaction is correct.</p></section><section class="stage" id="release" data-title="Plan the release before calling it done">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">11 / First real release</div><h2>Plan the release before calling it done</h2><p class="lead">Deployment is another boundary: code, configuration, data and operational ownership must fit together.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic" id="release-pipeline" data-node data-label="Build a short release path"><h3>Build a short release path</h3><ul><li>CI checks types, lint, unit/integration tests and the production build.</li><li>Use a staging environment with separate database, session store and object storage configuration.</li><li>Apply reviewed, compatible database migrations through the documented deployment workflow.</li><li>Serve the UI and /api behind the intended HTTPS origin; configure cookie and proxy trust settings for that topology.</li><li>Run a smoke test: login, create an issue, reload it, and confirm a viewer is blocked.</li></ul></article><article class="topic" id="release-recovery" data-node data-label="Define how to recover"><h3>Define how to recover</h3><p>Back up the database and test a restore. Keep a known previous application release and understand whether it is compatible with the new schema. A code rollback does not automatically undo a migration. Monitor request failures and latency, and have a way to locate an issue by request ID.</p></article><article class="topic" id="release-ownership" data-node data-label="Use a release checklist"><h3>Use a release checklist</h3><ul><li>Secrets are runtime configuration and excluded from Git, client bundles and images.</li><li>Production sessions survive API restarts; no default in-memory session store.</li><li>Upload limits, authorization and cleanup paths are verified.</li><li>Health/readiness checks and graceful shutdown match the host.</li><li>A fresh environment can be recreated from documentation, migrations and versioned code.</li></ul></article></div><p class="deeper"><span class="label">Connect the dots</span>A working localhost screen is one milestone. A recoverable deployment with the correct permissions is the release milestone.</p></section><section class="stage" id="next-version" data-title="Revisit the design with evidence">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">12 / Learn what stays the same</div><h2>Revisit the design with evidence</h2><p class="lead">Once the feature works, change architecture only for an observed need. Then translate the same responsibilities into Next.js.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid"><article class="topic wide" id="next-version-next" data-node data-label="Map the feature to Next.js"><h3>Map the feature to Next.js</h3><div class="tw"><table><thead><tr><th>Express version</th><th>Possible Next.js App Router version</th></tr></thead><tbody><tr><td>React page fetches a project list</td><td>Server Component reads authorized project data</td></tr><tr><td>POST route and handler</td><td>Server Action for the form, or a Route Handler for an HTTP API</td></tr><tr><td>Session and membership checks</td><td>Checks in actions/routes and the data-access layer</td></tr><tr><td>Service and repository</td><td>The same server-side responsibilities</td></tr><tr><td>Client state for saving/error</td><td>Client interactivity or form-state hooks as appropriate</td></tr></tbody></table></div></article><article class="topic" id="next-version-rules" data-node data-label="Move plumbing, retain the rules"><h3>Move plumbing, retain the rules</h3><p>Next.js does not make a private project secure by itself. Reuse the validated input contract, server-side membership checks, scoped SQL and tests. A Server Action is a callable server boundary; its inputs remain untrusted. Proxy can help with redirects but does not replace data-level authorization.</p><div class="callout"><p><b>Decision.</b> Compare the same feature in two architectures. That makes the framework's contribution visible.</p></div></article><article class="topic" id="next-version-scale" data-node data-label="Let measurements choose the next tool"><h3>Let measurements choose the next tool</h3><p>Add live updates when users need timely collaboration, then decide between polling, SSE and WebSockets. Add an index after inspecting query plans. Add caching with an invalidation policy when repeated reads justify it. Split a service only when independent deployment or scaling has a concrete benefit.</p></article></div><p class="deeper"><span class="label">Connect the dots</span>The aim is to explain each decision well enough that a change of framework does not erase your understanding of the product.</p></section><section class="stage" id="finish" data-title="The complete project story" data-plain>
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Wrap up / Think before adding code</div><h2>The complete project story</h2><p class="lead">You now have a repeatable way to turn an idea into a sequence of decisions and verifiable behavior.</p></div></header>
+<div class="grid"><article class="topic wide" id="finish-process" data-node data-label="Keep this decision order"><h3>Keep this decision order</h3><div class="tw"><table><thead><tr><th>Step</th><th>Question to answer</th></tr></thead><tbody><tr><td>Problem</td><td>Whose workflow is broken, and what outcome matters?</td></tr><tr><td>Scope</td><td>What is the smallest useful end-to-end behavior?</td></tr><tr><td>Rules</td><td>Who may do what, and what must always remain true?</td></tr><tr><td>Data</td><td>Which records, relationships and constraints represent those rules?</td></tr><tr><td>Boundaries</td><td>What crosses UI, API, auth and database boundaries?</td></tr><tr><td>Implementation</td><td>Which files own each responsibility?</td></tr><tr><td>Evidence</td><td>Which tests and observations prove the behavior?</td></tr><tr><td>Release</td><td>How is it configured, deployed, monitored and recovered?</td></tr></tbody></table></div></article><article class="topic wide" id="finish-check" data-node data-label="Explain the decisions in your own project"><h3>Explain the decisions in your own project</h3><label class="check"><input type="checkbox" data-k="project-1"><span>Explain why a project needs a membership record rather than a global role alone.</span></label><label class="check"><input type="checkbox" data-k="project-2"><span>Trace “Create issue” through the exact UI, route, service and repository files.</span></label><label class="check"><input type="checkbox" data-k="project-3"><span>Explain which layer rejects a viewer and prove no row was inserted.</span></label><label class="check"><input type="checkbox" data-k="project-4"><span>Explain how project IDs stay attached to issue, comment and attachment queries.</span></label><label class="check"><input type="checkbox" data-k="project-5"><span>Distinguish input validation, authentication, authorization and SQL constraints.</span></label><label class="check"><input type="checkbox" data-k="project-6"><span>Describe what happens when a save succeeds but the list refresh fails.</span></label><label class="check"><input type="checkbox" data-k="project-7"><span>Explain why an upload needs a pending state and cleanup.</span></label><label class="check"><input type="checkbox" data-k="project-8"><span>Describe the first CI/deployment steps and how a failed release can be recovered.</span></label><label class="check"><input type="checkbox" data-k="project-9"><span>Map the feature to Next.js while retaining the permission and data rules.</span></label></article><article class="topic" id="finish-ai" data-node data-label="Use AI with a specific decision"><h3>Use AI with a specific decision</h3><p>Ask for a comparison when a tradeoff is unclear, a trace through specific files when reading code, or an adversarial review of a permission boundary. Supply the contract and acceptance criteria. Verify the answer against the running request, schema and tests before accepting the change.</p><p>A useful prompt is: “Trace this create-issue request through these files. Identify where project membership is enforced, what can fail, and which integration test proves a viewer cannot write.”</p></article></div><p class="deeper"><span class="label">Connect the dots</span>Return to the relevant <a href="../../Frontend/handbook_codex/Frontend_Handbook.html">Frontend</a> or <a href="../../Backend/handbook_codex/Backend_Handbook.html">Backend</a> definition whenever one of the decisions needs a refresher.</p></section>
+<p class="foot">Made for the DineshXEswar learning repo. Read after the Frontend and Backend handbooks. Traceboard is a fictional case study; the code blocks are connected excerpts with surrounding setup described in the text. Story controls run locally, and progress is saved only in your browser.</p></main></div>
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+/* theme */
+const root=document.documentElement, tbtn=$("#theme");
+function setTheme(t){root.dataset.theme=t;tbtn.textContent=t==="dark"?"Light mode":"Dark mode";store.set("hb-codex-theme",t)}
+setTheme(root.dataset.theme==="light"?"light":"dark");
+tbtn.addEventListener("click",()=>setTheme(root.dataset.theme==="dark"?"light":"dark"));
+
+/* stages: numbers, counts */
+const stages=$$(".stage");
+stages.forEach((s,i)=>{s.dataset.n=String(i+1).padStart(2,"0");$(".stage-num",s).textContent=s.dataset.n});
+const learnable=stages.filter(s=>!("plain" in s.dataset));
+$("#n-stages").textContent=learnable.length;
+$("#n-topics").textContent=$$(".topic",$("main")).filter(t=>!t.closest("[data-plain]")).length;
+
+/* learned state */
+const LKEY="hb-codex-project-learned";
+let learned=new Set(store.get(LKEY,[]));
+function paintLearned(){
+  stages.forEach(s=>{
+    const on=learned.has(s.id), b=$(".learned",s);
+    if(b){b.setAttribute("aria-pressed",on);b.textContent=on?"Learned":"Mark learned"}
+    const n=$('.node.stage[data-stage="'+s.id+'"]'); if(n)n.classList.toggle("done",on);
+    const t=$('#toc a[href="#'+s.id+'"]'); if(t)t.classList.toggle("done",on);
+  });
+}
+$$(".learned").forEach(b=>b.addEventListener("click",()=>{
+  const id=b.closest(".stage").id;
+  learned.has(id)?learned.delete(id):learned.add(id);
+  store.set(LKEY,[...learned]);paintLearned();
+}));
+
+/* toc */
+$("#toc").innerHTML='<p class="label" style="padding-left:12px">Stages</p>'+stages.map(s=>`<a href="#${s.id}" data-id="${s.id}">${s.dataset.n} ${s.dataset.title}</a>`).join("");
+
+/* roadmap */
+const rows=$("#rows");
+learnable.forEach(s=>{
+  const li=document.createElement("li");li.className="row";
+  const left=document.createElement("div");left.className="branches left";
+  const mid=document.createElement("div");
+  const right=document.createElement("div");right.className="branches right";
+  const a=document.createElement("a");a.className="node stage";a.href="#"+s.id;a.dataset.stage=s.id;
+  a.innerHTML=`<small>${s.dataset.n}</small>`;a.append(s.dataset.title);
+  mid.append(a);
+  $$(".topic[data-node]",s).forEach((t,i)=>{
+    const side=i%2===0?"l":"r";
+    const n=document.createElement("a");n.className="node branch";n.href="#"+t.id;
+    n.dataset.stage=s.id;n.dataset.side=side;n.textContent=t.dataset.label||$("h3",t).textContent;
+    (side==="l"?left:right).append(n);
+  });
+  li.append(left,mid,right);rows.append(li);
+});
+
+const box=$("#roadmap"), svg=$("svg",box), mq=matchMedia("(max-width:760px)");
+function draw(){
+  const c=box.getBoundingClientRect();
+  if(!c.width)return;
+  svg.setAttribute("width",c.width);svg.setAttribute("height",c.height);
+  const P=el=>{const r=el.getBoundingClientRect();return{l:r.left-c.left,r:r.right-c.left,t:r.top-c.top,b:r.bottom-c.top,cx:(r.left+r.right)/2-c.left,cy:(r.top+r.bottom)/2-c.top}};
+  const nodes=$$(".node.stage",box);
+  let paths="";
+  nodes.forEach((n,i)=>{
+    const a=P(n);
+    if(i<nodes.length-1){const b=P(nodes[i+1]);paths+=`<path class="spine" marker-end="url(#arr)" d="M${a.cx} ${a.b}L${b.cx} ${b.t-3}"/>`}
+    if(!mq.matches)$$('.node.branch[data-stage="'+n.dataset.stage+'"]',box).forEach(bn=>{
+      const b=P(bn),isL=bn.dataset.side==="l",x1=isL?a.l:a.r,x2=isL?b.r:b.l,dx=(x2-x1)/2;
+      paths+=`<path class="branch" d="M${x1} ${a.cy}C${x1+dx} ${a.cy} ${x2-dx} ${b.cy} ${x2} ${b.cy}"/>`;
+    });
+  });
+  svg.innerHTML='<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M0 0L10 5L0 10z"/></marker></defs>'+paths;
+}
+new ResizeObserver(draw).observe(box);
+addEventListener("load",draw);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+draw();paintLearned();
+
+/* pagers */
+stages.forEach((s,i)=>{
+  const p=stages[i-1],n=stages[i+1];
+  const nav=document.createElement("nav");nav.className="pager";nav.setAttribute("aria-label","Stage navigation");
+  nav.innerHTML=(p?`<a href="#${p.id}">&larr; ${p.dataset.title}</a>`:"<span></span>")+(n?`<a href="#${n.id}">${n.dataset.title} &rarr;</a>`:"<span></span>");
+  s.append(nav);
+});
+
+/* search */
+const q=$("#q");
+q.addEventListener("input",()=>{
+  const t=q.value.trim().toLowerCase();
+  $$(".topic").forEach(a=>{a.hidden=!!t&&!a.textContent.toLowerCase().includes(t)});
+  stages.forEach(s=>s.classList.toggle("empty",!$$(".topic",s).some(a=>!a.hidden)));
+  $("#map").hidden=!!t;
+  if(!t)draw();
+});
+addEventListener("keydown",e=>{
+  if(e.key==="/"&&!/input|textarea|select/i.test(document.activeElement.tagName)){e.preventDefault();q.focus()}
+  if(e.key==="Escape"&&document.activeElement===q){q.value="";q.dispatchEvent(new Event("input"));q.blur()}
+});
+
+/* checklist */
+const CKEY="hb-codex-project-check";
+const checked=new Set(store.get(CKEY,[]));
+$$("input[data-k]").forEach(i=>{
+  i.checked=checked.has(i.dataset.k);
+  i.addEventListener("change",()=>{i.checked?checked.add(i.dataset.k):checked.delete(i.dataset.k);store.set(CKEY,[...checked])});
+});
+
+
+})();
+</script>
+<script id="codex-interface">
+/* Interface enhancements. Lesson markup and the original demos are retained. */
+(() => {
+  'use strict';
+  const $ = (s, parent = document) => parent.querySelector(s);
+  const $$ = (s, parent = document) => [...parent.querySelectorAll(s)];
+  const root = document.documentElement;
+  const track = root.dataset.handbook;
+  const project = track === 'project';
+  const backend = track === 'backend';
+  const name = project ? 'Project' : backend ? 'Backend' : 'Frontend';
+  const main = $('main');
+  const hero = $('.hero');
+  const toc = $('#toc');
+  const stages = $$('section.stage');
+  const learnable = stages.filter(s => !s.hasAttribute('data-plain'));
+  const topicText = new Map($$('.topic').map(t => [t, t.textContent.toLowerCase()]));
+  const mobile = matchMedia('(max-width:1079px)');
+  const reduced = matchMedia('(prefers-reduced-motion:reduce)');
+  const svg = (paths, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${paths}</svg>`;
+  const icons = {
+    frontend: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/>'),
+    backend: svg('<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 7h5M12 18h5"/>'),
+    map: svg('<rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="15" width="6" height="6" rx="1.5"/><path d="M9 6h7a2 2 0 0 1 2 2v7M6 9v9h9"/>'),
+    book: svg('<path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15"/>'),
+    menu: svg('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+    database: svg('<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/>')
+  };
+
+  // Give the top bar a compact identity and a consistently placed search field.
+  $('.brand').innerHTML = `<div class="brand-copy">DineshXEswar<span>Developer handbooks</span></div>`;
+  const context = document.createElement('div');
+  context.className = 'header-context';
+  context.innerHTML = '<i></i> A little progress, every day';
+  const divider = document.createElement('span');
+  divider.className = 'header-divider';
+  $('.brand').after(divider, context);
+  $('#q').placeholder = 'Search this handbook…';
+  $('.search').insertAdjacentHTML('beforeend', '<kbd aria-hidden="true">/</kbd>');
+  $('#theme').setAttribute('aria-label', 'Switch color theme');
+  const menu = document.createElement('button');
+  menu.className = 'menu-toggle';
+  menu.type = 'button';
+  menu.setAttribute('aria-label', 'Open chapter navigation');
+  menu.setAttribute('aria-expanded', 'false');
+  menu.setAttribute('aria-controls', 'toc');
+  menu.innerHTML = icons.menu;
+  $('.brand').before(menu);
+  $('.top').insertAdjacentHTML('beforeend', '<div class="reading-progress" aria-hidden="true"><span></span></div>');
+
+  const workspace = document.createElement('div');
+  workspace.className = 'workspace-bar';
+  workspace.innerHTML = `<span>${icons.book} Learning library <span aria-hidden="true">/</span> <strong>${name}</strong></span><span class="edition">CODEX EDITION</span>`;
+  main.prepend(workspace);
+
+  const copy = document.createElement('div');
+  copy.className = 'hero-copy';
+  [...hero.children].filter(el => !el.classList.contains('stats')).forEach(el => copy.append(el));
+  hero.prepend(copy);
+  const h1 = $('h1', copy);
+  h1.innerHTML = project ? '<span>Issue tracker</span>from scratch' : `<span>${name}</span>handbook`;
+  const actions = document.createElement('div');
+  actions.className = 'hero-actions';
+  actions.innerHTML = `<a class="btn btn-primary" id="continue-learning" href="#${learnable[0].id}">Start learning</a><a class="btn btn-secondary" id="explore-roadmap" href="#map">Explore roadmap ↗</a>`;
+  copy.append(actions);
+
+  const art = document.createElement('aside');
+  art.className = 'hero-art';
+  art.setAttribute('aria-hidden', 'true');
+  art.innerHTML = project
+    ? '<div class="art-label">ONE FEATURE. EVERY LAYER.</div><div class="art-window"><div class="art-window-bar"><i></i><i></i><i></i><span>traceboard / issues</span></div><div class="art-ticket"><small>ISSUE #42 · WEB APP</small><strong>Fix the mobile navbar</strong><span>OPEN</span></div></div><div class="art-tags"><span>UI</span><span>API</span><span>Permissions</span><span>Database</span></div><div class="art-caption"><b>Follow the decision, then the code.</b><span>↗</span></div>'
+    : backend
+    ? `<div class="art-label">BEHIND EVERY INTERACTION</div><div class="art-server"><span>${icons.frontend}Client</span><i>→</i><span>${icons.backend}Server</span><i>→</i><span>${icons.database}Data</span></div><div class="art-response"><span>200 OK</span> &nbsp; application/json<br>{ "ready": true }</div><div class="art-tags"><span>Node.js</span><span>Express</span><span>Next.js</span></div><div class="art-caption"><b>One request. A whole world.</b><span>↗</span></div>`
+    : '<div class="art-label">FROM IDEA TO INTERFACE</div><div class="art-window"><div class="art-window-bar"><i></i><i></i><i></i><span>hello-world.jsx</span></div><div class="art-code"><em>function</em> HelloWorld() {\n  <em>return</em> (\n    &lt;<b>h1</b>&gt;Hello, world.&lt;/<b>h1</b>&gt;\n  );\n}</div></div><div class="art-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>React</span></div><div class="art-caption"><b>Small pieces. Endless possibilities.</b><span>↗</span></div>';
+  copy.after(art);
+
+  const journey = document.createElement('div');
+  journey.className = 'journey';
+  journey.innerHTML = '<div class="journey-copy"><strong>Your learning journey</strong><small id="journey-count"></small></div><progress id="journey-progress" value="0" aria-label="Stages learned"></progress><span class="journey-pct" aria-hidden="true">0%</span>';
+  hero.after(journey);
+
+  // The full original roadmap remains available on demand.
+  const details = document.createElement('details');
+  details.className = 'roadmap-panel';
+  const summary = document.createElement('summary');
+  summary.innerHTML = `<span class="roadmap-icon">${icons.map}</span><span><strong>View the complete learning roadmap</strong><small>${learnable.length} stages · connected topics · follow your own pace</small></span>`;
+  details.append(summary);
+  $('#roadmap').before(details);
+  details.append($('#roadmap'));
+  details.addEventListener('toggle', () => {
+    if (details.open) window.dispatchEvent(new Event('resize'));
+  });
+  $('#explore-roadmap').addEventListener('click', () => { details.open = true; });
+  const kicker = document.createElement('div');
+  kicker.className = 'section-kicker';
+  kicker.textContent = 'THE CURRICULUM';
+  stages[0].before(kicker);
+
+  // Numbered chapter navigation, with a persistent route to both editions.
+  $$('#toc a[data-id]').forEach(a => {
+    const stage = stages.find(s => s.id === a.dataset.id);
+    a.replaceChildren();
+    const n = document.createElement('span');
+    n.className = 'toc-number';
+    n.textContent = stage.dataset.n;
+    n.setAttribute('aria-hidden', 'true');
+    const label = document.createElement('span');
+    label.textContent = stage.dataset.title;
+    a.append(n, label);
+  });
+  const switcher = document.createElement('div');
+  switcher.className = 'track-switcher';
+  switcher.setAttribute('aria-label', 'Choose handbook');
+  switcher.innerHTML = [
+    ['frontend', 'Frontend', '../../Frontend/handbook_codex/Frontend_Handbook.html', icons.frontend],
+    ['backend', 'Backend', '../../Backend/handbook_codex/Backend_Handbook.html', icons.backend],
+    ['project', 'Build', '../../Projects/handbook_codex/Project_Handbook.html', icons.map]
+  ].map(([id, label, href, icon]) => `<a href="${href}" ${track === id ? 'aria-current="page"' : ''} ${id === 'project' ? 'aria-label="Build an issue tracker from scratch"' : ''}>${icon}${label}</a>`).join('');
+  toc.prepend(switcher);
+  switcher.insertAdjacentHTML('afterend', `<a href="#top" class="toc-overview active">${icons.book}Handbook overview</a>`);
+  const sidebarProgress = document.createElement('div');
+  sidebarProgress.className = 'sidebar-progress';
+  sidebarProgress.innerHTML = '<p>Your progress <span id="sidebar-count"></span></p><progress id="sidebar-meter" value="0" aria-label="Stages learned"></progress><small>Saved in this browser. Keep going.</small>';
+  toc.append(sidebarProgress);
+  const closeMenu = document.createElement('button');
+  closeMenu.type = 'button';
+  closeMenu.className = 'menu-close';
+  closeMenu.textContent = 'Chapter navigation';
+  closeMenu.setAttribute('aria-label', 'Close chapter navigation');
+  toc.prepend(closeMenu);
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.hidden = true;
+  document.body.append(toast);
+  let toastTimer;
+  function announce(message) {
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.hidden = false;
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 2400);
+  }
+  function updateProgress() {
+    const done = learnable.filter(s => $('.learned', s)?.getAttribute('aria-pressed') === 'true').length;
+    const total = learnable.length;
+    const pct = Math.round(done / total * 100);
+    $('#journey-count').textContent = `${done} of ${total} stages learned`;
+    $('#sidebar-count').textContent = `${done} / ${total}`;
+    $('.journey-pct').textContent = pct + '%';
+    [$('#journey-progress'), $('#sidebar-meter')].forEach(p => { p.max = total; p.value = done; });
+    const next = learnable.find(s => $('.learned', s)?.getAttribute('aria-pressed') !== 'true') || learnable[0];
+    $('#continue-learning').href = '#' + next.id;
+    $('#continue-learning').textContent = done === total ? 'Review handbook' : done ? 'Continue learning' : 'Start learning';
+  }
+  $$('.learned').forEach(b => b.addEventListener('click', () => {
+    updateProgress();
+    announce(b.getAttribute('aria-pressed') === 'true' ? 'Stage marked as learned. Nice progress.' : 'Stage marked for another look.');
+  }));
+  updateProgress();
+
+  // Keep output text separate from controls, so copy never changes a lesson or demo.
+  $$('pre').forEach((pre, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    const toolbar = document.createElement('div');
+    toolbar.className = 'code-toolbar';
+    const label = document.createElement('span');
+    label.textContent = pre.closest('.demo, .story-player') ? 'Live output' : 'Code example';
+    const button = document.createElement('button');
+    button.className = 'copy-code';
+    button.type = 'button';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-label', `Copy ${label.textContent.toLowerCase()} ${index + 1}`);
+    toolbar.append(label, button);
+    pre.before(wrapper);
+    wrapper.append(toolbar, pre);
+    button.addEventListener('click', async () => {
+      const text = pre.textContent;
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch (_) { /* Local-file and browser clipboard permissions vary. */ }
+      if (!copied) {
+        const field = document.createElement('textarea');
+        field.value = text;
+        field.style.cssText = 'position:fixed;left:-9999px;top:0';
+        document.body.append(field);
+        field.select();
+        try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+        field.remove();
+        button.focus({preventScroll:true});
+      }
+      if (copied) {
+        button.textContent = 'Copied ✓';
+        announce('Copied to clipboard.');
+        setTimeout(() => { button.textContent = 'Copy'; }, 1800);
+      } else announce('Select the code and use your browser’s copy command.');
+    });
+  });
+
+  // Add useful result and empty states to the original topic filtering.
+  const feedback = document.createElement('section');
+  feedback.className = 'search-feedback';
+  feedback.hidden = true;
+  feedback.setAttribute('aria-label', 'Search results');
+  feedback.innerHTML = '<h2>Search results</h2><p role="status" aria-live="polite" id="search-count"></p><button class="btn" id="clear-search" type="button">Clear search</button>';
+  journey.after(feedback);
+  const q = $('#q');
+  let wasSearching = false;
+  q.addEventListener('input', () => {
+    const term = q.value.trim().toLowerCase();
+    const searching = !!term;
+    let matches = 0;
+    stages.forEach(stage => {
+      const stageMatch = stage.dataset.title.toLowerCase().includes(term);
+      $$('.topic', stage).forEach(topic => {
+        topic.hidden = searching && !stageMatch && !topicText.get(topic).includes(term);
+        if (!topic.hidden) matches++;
+      });
+      stage.classList.toggle('empty', !$$('.topic', stage).some(t => !t.hidden));
+    });
+    document.body.classList.toggle('searching', searching);
+    feedback.hidden = !searching;
+    $('#search-count').textContent = matches
+      ? `${matches} ${matches === 1 ? 'topic' : 'topics'} matching “${q.value.trim()}”`
+      : `No topics found for “${q.value.trim()}”. Try a shorter phrase, a technology, or a stage name.`;
+    $('h2', feedback).textContent = matches ? 'Search results' : 'A different search might help';
+    if (searching && !wasSearching) window.scrollTo({top:0, behavior:'instant'});
+    wasSearching = searching;
+  });
+  $('#clear-search').addEventListener('click', () => {
+    q.value = '';
+    q.dispatchEvent(new Event('input'));
+    q.focus();
+  });
+  // Anchors from the navigation should remain useful while a search is active.
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (link && q.value && !link.closest('.topic')) {
+      q.value = '';
+      q.dispatchEvent(new Event('input'));
+    }
+  });
+
+  // Mobile chapter drawer: focus stays inside; Escape and the backdrop close it.
+  const backdrop = document.createElement('button');
+  backdrop.className = 'nav-backdrop';
+  backdrop.hidden = true;
+  backdrop.type = 'button';
+  backdrop.tabIndex = -1;
+  backdrop.setAttribute('aria-label', 'Close chapter navigation');
+  document.body.append(backdrop);
+  let returnFocus = null;
+  function setMenu(open, restore = true) {
+    open = open && mobile.matches;
+    if (open) returnFocus = document.activeElement;
+    document.body.classList.toggle('nav-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    backdrop.hidden = !open;
+    menu.setAttribute('aria-expanded', String(open));
+    main.inert = open;
+    $('.top').inert = open;
+    if (open) {
+      toc.setAttribute('role', 'dialog');
+      toc.setAttribute('aria-modal', 'true');
+      closeMenu.focus({preventScroll:true});
+    } else {
+      toc.removeAttribute('role');
+      toc.removeAttribute('aria-modal');
+      if (restore && returnFocus) returnFocus.focus({preventScroll:true});
+      returnFocus = null;
+    }
+  }
+  menu.addEventListener('click', () => setMenu(true));
+  closeMenu.addEventListener('click', () => setMenu(false));
+  backdrop.addEventListener('click', () => setMenu(false));
+  toc.addEventListener('click', e => {
+    if (e.target.closest('a') && mobile.matches) setMenu(false);
+  });
+  mobile.addEventListener('change', () => setMenu(false, false));
+  document.addEventListener('keydown', e => {
+    if (document.body.classList.contains('nav-open')) {
+      if (e.key === 'Escape') { e.preventDefault(); setMenu(false); }
+      if (e.key === 'Tab') {
+        const focusable = $$('button,a[href]', toc).filter(el => el.getClientRects().length);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault(); q.focus();
+    }
+  });
+
+  const backTop = document.createElement('button');
+  backTop.className = 'back-top';
+  backTop.type = 'button';
+  backTop.textContent = '↑';
+  backTop.hidden = true;
+  backTop.setAttribute('aria-label', 'Back to top');
+  document.body.append(backTop);
+  backTop.addEventListener('click', () => {
+    window.scrollTo({top:0, behavior:reduced.matches ? 'instant' : 'smooth'});
+    $('.brand').focus({preventScroll:true});
+  });
+  let frame = false;
+  function paintScroll() {
+    const available = root.scrollHeight - root.clientHeight;
+    $('.reading-progress span').style.width = (available > 0 ? window.scrollY / available * 100 : 0) + '%';
+    backTop.hidden = window.scrollY < 800;
+    const line = $('.top').getBoundingClientRect().height + 65;
+    const current = stages.filter(s => !s.classList.contains('empty') && s.getBoundingClientRect().top <= line).at(-1);
+    $$('#toc a[data-id]').forEach(a => {
+      const active = a.dataset.id === current?.id;
+      a.classList.toggle('active', active);
+      if (active) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+    $('.toc-overview').classList.toggle('active', !current);
+    $$('.node.stage').forEach(a => a.classList.toggle('active', a.dataset.stage === current?.id));
+    frame = false;
+  }
+  addEventListener('scroll', () => {
+    if (!frame) { frame = true; requestAnimationFrame(paintScroll); }
+  }, {passive:true});
+  addEventListener('resize', paintScroll);
+  paintScroll();
+
+  let printOpen;
+  addEventListener('beforeprint', () => { printOpen = details.open; details.open = true; });
+  addEventListener('afterprint', () => { details.open = printOpen; });
+})();
+
+</script>
+<script id="project-story">
+(() => {
+  const $ = s => document.querySelector(s);
+  const scenes = [
+    ['IssueForm.tsx', 'An editor reports a real problem', 'The form owns typed text and save/error state. It will call the API helper, rather than writing to the database.', 'contract'],
+    ['issueApi.ts → POST /api/projects/7/issues', 'Cross the HTTP boundary', 'The browser sends JSON to its own /api origin. The configured proxy forwards it to Express, together with an eligible session cookie.', 'setup-origin'],
+    ['middleware/requireAuth.ts', 'Establish the actor', 'The server-side session establishes the user ID. The request body cannot select a different actor.', 'identity-session'],
+    ['issue.schema.ts + issue.routes.ts', 'Validate the input', 'Validate the project ID and parse the whitelisted body. A valid editor role cannot make an invalid title acceptable.', 'contract-validation'],
+    ['issue.service.ts → project_members', 'Check this project permission', 'Inside a transaction, find the active membership for project 7 and this actor. Only an owner or editor may create the issue.', 'slice-service'],
+    ['issue.repository.ts → issues', 'Persist the permitted change', 'Use the same transaction client and parameterized values. The database assigns the issue ID, initial status and version, then the service commits.', 'slice-repository'],
+    ['issue.routes.ts → HTTP 201', 'Return the confirmed result', 'The API returns the selected fields in the agreed JSON envelope. A successful queue job or an optimistic UI alone would not prove this write was committed.', 'contract-shape'],
+    ['IssueForm.tsx → refreshIssues()', 'Return to a usable screen', 'Refetch the list and show the persisted issue. Treat a failed list refresh separately from a failed save so the user does not unknowingly create a duplicate.', 'slice-ui']
+  ];
+  const failures = {
+    'viewer': [4, 403, 'FORBIDDEN', 'The viewer is an active member, but has no write permission. No issue is inserted.'],
+    'outsider': [4, 404, 'NOT_FOUND', 'There is no active membership in this private project. Return no private project data, and insert nothing.'],
+    'invalid': [3, 400, 'VALIDATION', 'The trimmed title is empty. Reject it before calling the service; there is no issue insert.'],
+    'signed-out': [2, 401, 'UNAUTHENTICATED', 'No verified session is present. Stop before validation, project lookup or an issue insert.']
+  };
+  let step = 0, timer = null;
+  const scenario = $('#story-scenario');
+  const next = $('#story-next'), previous = $('#story-prev'), play = $('#story-play');
+  const stop = () => { if (timer !== null) clearTimeout(timer); timer = null; play.textContent = 'Play flow'; };
+  function limit() { return failures[scenario.value]?.[0] ?? 7; }
+  function render() {
+    const [file, title, description, chapter] = scenes[step];
+    const failed = failures[scenario.value];
+    const blocked = failed && step === failed[0];
+    $('#story-file').textContent = `STEP ${step + 1} / 8 · ${file}`;
+    $('#story-title').textContent = blocked ? `Request stopped · HTTP ${failed[1]}` : title;
+    $('#story-description').textContent = blocked ? failed[3] : description;
+    $('#story-chapter').href = '#' + chapter;
+    $('#story-progress').value = step + 1;
+    const titleValue = scenario.value === 'invalid' ? '' : 'Fix the mobile navbar';
+    const header = `POST /api/projects/7/issues
+${JSON.stringify({title:titleValue,description:'Menu overlaps search.'},null,2)}`;
+    const result = blocked ? `HTTP ${failed[1]}
+${JSON.stringify({error:{code:failed[2]}},null,2)}
+
+Issue rows inserted: 0`
+      : step >= 6 ? `HTTP 201 Created
+{ "data": { "id": 42, "project_id": 7, "status": "open", "version": 1 } }
+
+Issue rows inserted: 1`
+      : `${file}
+${step < 5 ? 'No issue has been inserted yet.' : 'Issue inserted and transaction committed.'}`;
+    $('#story-output').textContent = header + '\n\n' + result;
+    [...$('#story-track').children].forEach((li,index) => {
+      li.dataset.state = index < step ? 'done' : index === step && blocked ? 'blocked' : 'pending';
+      if (index === step) li.setAttribute('aria-current','step'); else li.removeAttribute('aria-current');
+    });
+    previous.disabled = step === 0;
+    next.disabled = step >= limit();
+  }
+  function advance() { if (step < limit()) { step++; render(); } }
+  next.addEventListener('click', () => { stop(); advance(); });
+  previous.addEventListener('click', () => { stop(); if (step) { step--; render(); } });
+  $('#story-reset').addEventListener('click', () => { stop(); step = 0; render(); });
+  scenario.addEventListener('change', () => { stop(); step = 0; render(); });
+  play.addEventListener('click', () => {
+    if (timer !== null) { stop(); return; }
+    if (step >= limit()) step = 0;
+    render(); play.textContent = 'Pause';
+    const tick = () => {
+      advance();
+      if (step >= limit()) stop();
+      else timer = setTimeout(tick, matchMedia('(prefers-reduced-motion:reduce)').matches ? 80 : 850);
+    };
+    timer = setTimeout(tick, matchMedia('(prefers-reduced-motion:reduce)').matches ? 80 : 850);
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+  render();
+})();
+</script>
+</body>
+</html>

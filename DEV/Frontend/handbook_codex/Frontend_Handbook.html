@@ -1,0 +1,2133 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-handbook="frontend">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A map of frontend development in order, from HTML and CSS to React, TSX and Next.js. Made for Dinesh and Eswar.">
+<title>Frontend Handbook</title>
+<script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("hb-codex-theme"))||"light"}catch(e){}</script>
+<style>
+:root{
+  --bg:#0a0a0a;--surface:#1a1a1a;--surface-2:#1f1f1f;
+  --line:#1f1f1f;--line-strong:#3a3a3a;
+  --text:#fffaf0;--body:#e5e5e5;--muted:#9a9a9a;--faint:#6a6a6a;
+  --primary:#fffaf0;--on-primary:#0a0a0a;
+  --r:12px;--r-sm:8px;--r-pill:999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+  --font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#fffaf0;--surface:#faf5e8;--surface-2:#ebe6d6;
+  --line:#ebe6d6;--line-strong:#9a9a9a;
+  --text:#0a0a0a;--body:#1a1a1a;--muted:#6a6a6a;--faint:#9a9a9a;
+  --primary:#0a0a0a;--on-primary:#fffaf0;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--body);font:15px/1.7 var(--font);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+a{color:var(--text);text-underline-offset:4px}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+h1,h2,h3{color:var(--text);margin:0;font-weight:600}
+p{margin:0 0 var(--s3)}
+ul,ol{margin:0 0 var(--s3);padding-left:var(--s5)}
+li{margin-bottom:var(--s1)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+pre{margin:var(--s3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);overflow:auto;font:13px/1.6 var(--mono);color:var(--body)}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.label{font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin:0 0 var(--s2)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary);color:var(--on-primary);padding:8px 16px;border-radius:var(--r-pill);z-index:100}
+.skip:focus{left:16px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:50;height:56px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1280px;margin:0 auto;height:100%;padding:0 var(--s5);display:flex;align-items:center;gap:var(--s4)}
+.brand{font-weight:600;text-decoration:none;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:400;margin-left:var(--s2)}
+.search{flex:1;max-width:420px;margin-left:auto}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-pill);color:var(--text);font:inherit;font-size:14px;padding:6px 16px}
+.search input::placeholder{color:var(--muted)}
+.search{min-width:0}
+a.btn{text-decoration:none;display:inline-block}a.btn:hover{color:var(--text)}
+@media(max-width:640px){.brand span,.top .xlink{display:none}.top-inner{padding:0 var(--s4);gap:var(--s2)}.search input{padding:6px 12px}}
+.btn{border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:var(--r-pill);padding:6px 16px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+/* layout */
+.layout{max-width:1280px;margin:0 auto;padding:0 var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s7)}
+.toc{display:none}
+@media(min-width:1100px){
+  .layout{grid-template-columns:200px minmax(0,1fr)}
+  .toc{display:block;position:sticky;top:80px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;padding:var(--s6) 0}
+}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;font-size:13px;line-height:1.4}
+.toc a:hover{color:var(--text)}
+.toc a.active{color:var(--text);border-left-color:var(--primary)}
+.toc a.done::after{content:" \2713";color:var(--faint)}
+main{padding-bottom:var(--s8);min-width:0}
+
+/* hero */
+.hero{padding:var(--s8) 0 var(--s6)}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:var(--s4)}
+.lead{font-size:17px;line-height:1.6;color:var(--muted);max-width:68ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;margin-top:var(--s6)}
+.stats>div{background:var(--bg);padding:var(--s5)}
+.stats b{display:block;font-size:28px;line-height:1.1;font-weight:600;color:var(--text)}
+.stats span{font-size:13px;color:var(--muted)}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* roadmap */
+.map-head{margin-top:var(--s7)}
+.map-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.roadmap{position:relative;padding:var(--s5) 0}
+.roadmap svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--faint);stroke-width:1.5}
+.edges .spine{stroke:var(--muted);stroke-width:2}
+.edges .branch{stroke-dasharray:4 4}
+.edges .arrow{fill:var(--muted);stroke:none}
+.rows{position:relative;z-index:1;margin:0;padding:0;list-style:none}
+.row{display:grid;grid-template-columns:1fr minmax(200px,240px) 1fr;gap:var(--s7);align-items:center;padding:var(--s5) 0;margin:0}
+.branches{display:flex;flex-direction:column;gap:var(--s2)}
+.branches.left{align-items:flex-end}
+.branches.right{align-items:flex-start}
+.node{display:block;text-decoration:none;border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:6px 12px;font-size:13px;line-height:1.4;color:var(--muted);background:var(--bg)}
+.node:hover{border-color:var(--primary);color:var(--text)}
+.node.stage{text-align:center;border-radius:var(--r);padding:12px 16px;background:var(--surface);color:var(--text);font-weight:600;font-size:15px}
+.node.stage small{display:block;font-size:11px;letter-spacing:.08em;font-weight:500;color:var(--muted);text-transform:uppercase}
+.node.stage.active{border-color:var(--primary)}
+.node.stage.done{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.node.stage.done small{color:inherit;opacity:.7}
+@media(max-width:760px){
+  .row{grid-template-columns:1fr;justify-items:center;padding:var(--s4) 0}
+  .branches{display:none}
+}
+
+/* stages */
+.stage{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--line)}
+.stage.empty{display:none}
+.stage-head{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:start;margin-bottom:var(--s5)}
+.stage-num{font-size:48px;line-height:1;font-weight:600;color:var(--faint)}
+.stage-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.stage-head h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:var(--s2)}
+.stage-head .lead{margin:0}
+@media(max-width:640px){.stage-head{grid-template-columns:auto 1fr}.stage-head .btn{grid-column:1/-1;justify-self:start}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:var(--s4)}
+.topic{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);min-width:0}
+.topic:hover{border-color:var(--line-strong)}
+.topic:target{border-color:var(--primary)}
+.topic.wide{grid-column:1/-1}
+.topic h3{font-size:17px;line-height:1.35;margin-bottom:var(--s2)}
+.topic>:last-child{margin-bottom:0}
+.deeper{margin:var(--s5) 0 0;color:var(--muted);font-size:14px}
+.deeper .label{display:inline;margin-right:var(--s2)}
+.pager{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s5);font-size:14px}
+.pager a{color:var(--muted);text-decoration:none}
+.pager a:hover{color:var(--text)}
+.callout{border-left:3px solid var(--primary);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:var(--s3) var(--s4);margin:var(--s3) 0}
+.callout p:last-child{margin:0}
+.tw{overflow-x:auto;margin:var(--s3) 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);border-bottom-color:var(--line-strong)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s4)}
+.cols pre{margin:0}
+
+/* demos */
+.demo{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s5);margin-top:var(--s3)}
+.controls{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.controls label{display:flex;flex-direction:column;gap:var(--s1);font-size:13px;color:var(--muted)}
+.controls label.inline{flex-direction:row;align-items:center;gap:var(--s2)}
+.controls output{color:var(--text);font-family:var(--mono);margin-left:var(--s2)}
+.controls input[type=range]{width:150px;accent-color:var(--primary)}
+.controls input[type=checkbox]{accent-color:var(--primary)}
+.controls select{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);font:inherit;font-size:13px;padding:4px 8px}
+.stagebox{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4);overflow:auto}
+.demo pre{margin:var(--s3) 0 0;background:var(--bg)}
+.bm-margin{display:inline-block;padding:var(--m,16px);outline:1px dashed var(--faint)}
+.bm-box{border:var(--b,4px) solid var(--text);padding:var(--p,24px);background:var(--surface-2)}
+.bm-content{background:var(--primary);color:var(--on-primary);padding:8px 16px;font-size:13px;font-weight:500}
+.fx{display:flex;height:200px;border:1px dashed var(--faint);border-radius:var(--r-sm)}
+.fx div{background:var(--primary);color:var(--on-primary);border-radius:6px;font-weight:600;display:grid;place-items:center}
+.fx div:nth-child(1){min-width:48px;min-height:40px}
+.fx div:nth-child(2){min-width:64px;min-height:72px;opacity:.8}
+.fx div:nth-child(3){min-width:48px;min-height:32px;opacity:.6}
+.tf{display:grid;place-items:center;height:240px}
+.tf>div{grid-area:1/1;width:80px;height:80px;border-radius:var(--r-sm)}
+.tf-ghost{border:1px dashed var(--faint)}
+.tf-box{background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:600;font-size:13px}
+.bub{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s3) var(--s4);cursor:pointer;color:var(--muted);font-size:13px}
+.bub .bub{margin-top:var(--s2)}
+.bub:hover{border-color:var(--primary)}
+.log{min-height:96px;white-space:pre-wrap}
+
+/* checklist */
+.check{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--primary)}
+.foot{margin-top:var(--s8);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+<style id="codex-design">
+/* Codex edition: a quiet workspace for a long learning journey. */
+:root, :root[data-theme="light"] {
+  --bg:#f6f7f9; --surface:#fff; --surface-2:#eef2f5;
+  --line:#e2e7eb; --line-strong:#cbd5dd; --text:#182b37; --body:#415461;
+  --muted:#617380; --faint:#728592; --primary:#087c72; --on-primary:#fff;
+  --accent-soft:#e7f4ef; --accent-line:#bbddd2; --accent-ink:#06685f;
+  --hero-bg:#eaf3ef; --hero-dot:#c4d8d0; --warm:#a86525; --warm-soft:#fff3df;
+  --code-bg:#172b35; --code-text:#e1ecee; --shadow:0 3px 14px #243b4b05;
+  --r:16px; --r-sm:9px; --font:"Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+:root[data-handbook="backend"] {
+  --primary:#4258a6; --accent-soft:#e9eef9; --accent-line:#c6d1e7;
+  --accent-ink:#334786; --hero-bg:#edf1f8; --hero-dot:#cbd6e7;
+}
+:root[data-theme="dark"] {
+  --bg:#101c24; --surface:#172731; --surface-2:#203440;
+  --line:#2a3e49; --line-strong:#3c5461; --text:#e9f1f3; --body:#bdcdd4;
+  --muted:#9cafb9; --faint:#91a5b0; --primary:#72ceba; --on-primary:#102b27;
+  --accent-soft:#1a3a37; --accent-line:#30594e; --accent-ink:#8bdfcb;
+  --hero-bg:#19332f; --hero-dot:#2d5148; --warm:#ebc185; --warm-soft:#3b3023;
+  --code-bg:#0c1820; --code-text:#dce9ec; --shadow:0 3px 14px #00000010;
+  color-scheme:dark;
+}
+:root[data-handbook="backend"][data-theme="dark"] {
+  --primary:#9eb7ff; --on-primary:#142445; --accent-soft:#20324b;
+  --accent-line:#405878; --accent-ink:#b7caff; --hero-bg:#1b2d40; --hero-dot:#354e68;
+}
+html { scroll-padding-top:100px; }
+body { font-size:15px; line-height:1.75; }
+button, a, input, select, textarea, summary { -webkit-tap-highlight-color:transparent; }
+button, .btn { touch-action:manipulation; }
+button, input, select, textarea { font-family:var(--font); }
+::selection { background:var(--accent-line); color:var(--text); }
+a { color:var(--accent-ink); }
+a:hover { color:var(--primary); }
+:focus-visible { outline:3px solid var(--primary); outline-offset:4px; }
+.top { height:76px; background:color-mix(in srgb,var(--surface) 94%,transparent); backdrop-filter:blur(18px); }
+.top-inner { max-width:1536px; padding:0 36px; gap:24px; }
+.brand { display:flex; align-items:center; gap:12px; color:var(--text); font-size:15px; letter-spacing:-.35px; }
+.brand::before { content:""; display:block; width:36px; height:40px; flex:none; border-radius:10px; background:var(--primary); mask:none; }
+.brand { position:relative; }
+.brand::after { content:"</>"; position:absolute; left:5px; top:7px; font:700 16px/26px var(--mono); color:var(--on-primary); }
+.brand span { display:block; margin:1px 0 0; font-size:10px; line-height:1.3; font-weight:500; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); }
+.brand-copy { display:block; }
+.header-divider { width:1px; height:25px; background:var(--line); }
+.header-context { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); white-space:nowrap; }
+.header-context i { height:6px; width:6px; border-radius:50%; background:var(--primary); }
+.search { position:relative; max-width:320px; margin-left:auto; }
+.search::before { content:""; position:absolute; width:12px; height:12px; border:1.5px solid var(--muted); border-radius:50%; left:15px; top:13px; pointer-events:none; }
+.search::after { content:""; position:absolute; width:6px; height:1.5px; background:var(--muted); left:26px; top:26px; transform:rotate(45deg); pointer-events:none; }
+.search input { height:42px; padding:8px 38px 8px 40px; border-radius:9px; background:var(--bg); border:1px solid var(--line); font-size:12px; }
+.search kbd { position:absolute; right:12px; top:10px; padding:0 5px; border:1px solid var(--line-strong); border-radius:4px; font:11px/20px var(--mono); color:var(--muted); pointer-events:none; }
+.btn { border-radius:8px; min-height:38px; padding:7px 13px; font-size:12px; font-weight:600; line-height:1.6; transition:background .16s,border-color .16s,box-shadow .16s; }
+.btn:hover { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.xlink { border:0; color:var(--muted); }
+.xlink::after { content:" ↗"; margin-left:5px; }
+#theme { background:var(--surface); border-color:var(--line); }
+.reading-progress { position:absolute; left:0; bottom:-1px; height:2px; width:100%; pointer-events:none; }
+.reading-progress span { display:block; height:100%; width:0; background:var(--primary); }
+.layout { max-width:1536px; padding:0 36px; grid-template-columns:228px minmax(0,1fr); gap:48px; }
+.toc { display:block; position:sticky; top:76px; align-self:start; max-height:calc(100dvh - 76px); overflow:auto; padding:30px 0 24px; scrollbar-width:thin; scrollbar-color:var(--line-strong) transparent; }
+.toc .label { font-size:10px; font-weight:700; letter-spacing:1.6px; padding:0!important; margin:26px 12px 12px; }
+.toc a { border-left:0; border-radius:7px; margin:3px 0; padding:8px 11px; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; line-height:1.6; }
+.toc a:hover { background:var(--surface-2); color:var(--text); }
+.toc a.active { background:var(--accent-soft); color:var(--accent-ink); font-weight:600; }
+.toc-number { font:10px/21px var(--mono); opacity:.8; width:20px; flex:none; }
+.toc a.done::after { content:"✓"; margin-left:auto; color:var(--primary); font-size:12px; }
+.toc a.active .toc-number { color:var(--primary); opacity:1; }
+.track-switcher { border:1px solid var(--line); border-radius:10px; padding:4px; background:var(--surface); display:flex; gap:3px; }
+.track-switcher a { margin:0; flex:1; justify-content:center; font-size:11px; padding:8px 4px; gap:6px; }
+.track-switcher a[aria-current="page"] { background:var(--accent-soft); color:var(--accent-ink); font-weight:700; }
+.track-switcher svg { width:14px; height:14px; }
+.toc .toc-overview { margin-bottom:15px; color:var(--text); }
+.toc-overview svg { width:15px; height:15px; color:var(--primary); }
+.sidebar-progress { margin:25px 2px 0; padding:16px; border:1px solid var(--accent-line); background:var(--accent-soft); border-radius:12px; }
+.sidebar-progress p { font-size:11px; color:var(--accent-ink); font-weight:600; margin:0 0 10px; display:flex; justify-content:space-between; gap:8px; }
+.sidebar-progress small { color:var(--muted); font-size:10px; display:block; margin-top:8px; }
+progress { appearance:none; width:100%; height:5px; display:block; border:0; border-radius:10px; overflow:hidden; background:var(--line); accent-color:var(--primary); }
+progress::-webkit-progress-bar { background:var(--line); border-radius:10px; }
+progress::-webkit-progress-value { background:var(--primary); border-radius:10px; }
+progress::-moz-progress-bar { background:var(--primary); border-radius:10px; }
+main { padding-bottom:70px; }
+.workspace-bar { display:flex; align-items:center; justify-content:space-between; padding:25px 0; gap:12px; border-bottom:1px solid var(--line); font-size:11px; color:var(--muted); }
+.workspace-bar span { display:flex; align-items:center; gap:9px; }
+.workspace-bar svg { width:14px; height:14px; }
+.workspace-bar .edition { border:1px solid var(--line); border-radius:5px; padding:2px 8px; font:9px/20px var(--mono); letter-spacing:.8px; white-space:nowrap; }
+.workspace-bar strong { color:var(--text); font-weight:500; }
+.hero { display:grid; grid-template-columns:minmax(0,1fr) 300px; column-gap:32px; align-items:center; padding:44px 0 0; }
+.hero .label { color:var(--accent-ink); font-size:10px; font-weight:700; letter-spacing:1.5px; margin-bottom:18px; }
+.hero .label::before { content:""; width:6px; height:6px; display:inline-block; background:var(--primary); margin-right:8px; vertical-align:2px; border-radius:50%; }
+.hero h1 { font-size:clamp(46px,4.5vw,68px); letter-spacing:-3px; line-height:1.06; font-weight:650; margin-bottom:20px; }
+.hero h1 span { display:block; color:var(--primary); }
+.hero .lead { font-size:14px; line-height:1.85; max-width:62ch; color:var(--muted); }
+.hero-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:25px; }
+.hero-actions .btn { padding:11px 17px; font-size:12px; }
+.btn-primary { background:var(--primary); color:var(--on-primary); border-color:var(--primary); box-shadow:0 3px 8px color-mix(in srgb,var(--primary) 15%,transparent); }
+.btn-primary:hover { background:var(--accent-ink); color:var(--on-primary); border-color:var(--accent-ink); }
+.hero-actions .btn-primary::after { content:" →"; margin-left:20px; }
+.hero-actions .btn-secondary { border-color:var(--line-strong); color:var(--body); background:var(--surface); }
+.hero-art { min-height:298px; position:relative; display:flex; flex-direction:column; padding:22px; border:1px solid var(--accent-line); border-radius:20px; background-color:var(--hero-bg); background-image:radial-gradient(var(--hero-dot) .8px,transparent .8px); background-size:14px 14px; overflow:hidden; }
+.art-label { font:9px/1.5 var(--mono); letter-spacing:1.5px; color:var(--accent-ink); display:flex; align-items:center; gap:7px; }
+.art-label::before { content:""; display:inline-block; width:6px; height:6px; border:1px solid var(--primary); border-radius:50%; }
+.art-window { margin-top:20px; padding:0 0 16px; border:1px solid var(--accent-line); border-radius:11px; background:var(--surface); box-shadow:0 10px 25px #102c2910; transform:rotate(-3deg); }
+.art-window-bar { display:flex; align-items:center; gap:4px; padding:10px; border-bottom:1px solid var(--line); }
+.art-window-bar i { width:5px; height:5px; background:var(--accent-line); border-radius:50%; }
+.art-window-bar span { margin-left:auto; color:var(--muted); font:8px/1 var(--mono); }
+.art-code { padding:15px 19px 4px; font:11px/1.85 var(--mono); color:var(--muted); white-space:pre; }
+.art-code em { color:var(--primary); font-style:normal; }
+.art-code b { color:var(--warm); font-weight:400; }
+.art-tags { display:flex; gap:6px; margin-top:23px; flex-wrap:wrap; }
+.art-tags span { font:9px/1.5 var(--mono); padding:5px 10px; border:1px solid var(--accent-line); color:var(--accent-ink); border-radius:6px; background:var(--surface); }
+.art-caption { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:18px; font-size:9px; color:var(--accent-ink); }
+.art-caption b { font-weight:500; }
+.art-server { display:flex; align-items:center; justify-content:space-between; margin-top:28px; gap:8px; }
+.art-server span { display:flex; flex-direction:column; align-items:center; gap:8px; border:1px solid var(--accent-line); border-radius:10px; padding:13px 10px; flex:1; background:var(--surface); font:9px/1.4 var(--mono); color:var(--accent-ink); }
+.art-server svg { width:24px; height:24px; }
+.art-server i { color:var(--primary); font-style:normal; }
+.art-response { background:var(--surface); padding:12px; margin-top:15px; border-radius:8px; border:1px solid var(--accent-line); font:10px/1.6 var(--mono); color:var(--muted); }
+.art-response span { color:var(--primary); }
+.stats { grid-column:1/-1; gap:12px; background:none; border:0; border-radius:0; overflow:visible; margin-top:34px; }
+.stats>div { background:var(--surface); padding:18px 20px 16px; border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); position:relative; }
+.stats b { font-size:27px; letter-spacing:-1px; margin-bottom:5px; font-weight:600; }
+.stats span { font-size:11px; }
+.stats>div::after { position:absolute; right:16px; top:17px; width:26px; height:26px; border-radius:7px; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent-ink); font:12px/1 var(--mono); }
+.stats>div:nth-child(1)::after { content:"↗"; }
+.stats>div:nth-child(2)::after { content:"≡"; }
+.stats>div:nth-child(3)::after { content:"▷"; background:var(--warm-soft); color:var(--warm); }
+.stats>div:nth-child(4)::after { content:"{}"; }
+.journey { display:flex; align-items:center; gap:24px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:17px 20px; margin-top:16px; }
+.journey-copy { flex:none; }
+.journey-copy strong { display:block; color:var(--text); font-size:12px; font-weight:600; }
+.journey-copy small { color:var(--muted); font-size:11px; }
+.journey progress { flex:1; }
+.journey-pct { font:11px/1.5 var(--mono); color:var(--primary); }
+.map-head { margin-top:40px; }
+.map-head .label { color:var(--accent-ink); font-size:10px; letter-spacing:1.4px; font-weight:600; }
+.map-head h2 { font-size:24px; letter-spacing:-.6px; font-weight:600; }
+.map-head .lead { font-size:12px; max-width:none; line-height:1.8; }
+.roadmap-panel { margin-top:18px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.roadmap-panel summary { list-style:none; display:flex; align-items:center; gap:14px; padding:19px 20px; cursor:pointer; color:var(--text); }
+.roadmap-panel summary::-webkit-details-marker { display:none; }
+.roadmap-panel summary::after { content:"+"; margin-left:auto; font-size:22px; color:var(--primary); font-weight:300; }
+.roadmap-panel[open] summary::after { content:"−"; }
+.roadmap-panel summary:hover { background:var(--accent-soft); border-radius:12px; }
+.roadmap-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:9px; background:var(--accent-soft); color:var(--primary); flex:none; }
+.roadmap-icon svg { width:19px; height:19px; }
+.roadmap-panel summary strong { display:block; font-size:12px; font-weight:600; }
+.roadmap-panel summary small { display:block; font-size:10px; color:var(--muted); margin-top:1px; }
+.roadmap { margin:0 24px; padding:8px 0 24px; }
+.row { grid-template-columns:1fr minmax(180px,210px) 1fr; gap:30px; padding:16px 0; }
+.node { background:var(--surface); font-size:11px; padding:7px 11px; border-color:var(--line); box-shadow:var(--shadow); }
+.node:hover { background:var(--accent-soft); border-color:var(--accent-line); }
+.node.stage { margin-top:0; font-size:13px; padding:13px 12px; border:1px solid var(--accent-line); background:var(--accent-soft); color:var(--accent-ink); }
+.node.stage small { color:var(--accent-ink); font:9px/1.7 var(--mono); }
+.node.stage.done { background:var(--primary); color:var(--on-primary); }
+.edges .spine { stroke:var(--primary); stroke-width:1.3; }
+.edges .branch { stroke:var(--line-strong); }
+.edges .arrow { fill:var(--primary); }
+.section-kicker { display:flex; align-items:center; gap:14px; color:var(--muted); font-size:10px; letter-spacing:1.6px; margin-top:42px; font-weight:600; }
+.section-kicker::after { content:""; flex:1; height:1px; background:var(--line); }
+section.stage { margin-top:34px; padding-top:34px; }
+.section-kicker + section.stage { margin-top:0; border-top:0; padding-top:26px; }
+.stage-head { grid-template-columns:54px 1fr auto; gap:18px; align-items:start; margin-bottom:25px; }
+.stage-num { display:grid; place-items:center; height:54px; border:1px solid var(--accent-line); border-radius:13px; background:var(--accent-soft); color:var(--primary); font:500 19px/1 var(--mono); }
+.stage-head h2 { font-size:26px; letter-spacing:-.7px; line-height:1.25; margin:0 0 10px; }
+.stage-head h2 small { display:block; font-size:11px; color:var(--primary); margin:6px 0 0; letter-spacing:0; font-weight:500; }
+.stage-head .lead { font-size:13px; line-height:1.8; }
+.stage-head .btn { background:var(--surface); margin-top:3px; font-size:11px; }
+.stage-head .btn[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent-line); }
+.stage-head .btn[aria-pressed="true"]::before { content:"✓ "; }
+.grid { gap:16px; grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr)); }
+.topic { background:var(--surface); border-color:var(--line); padding:25px; border-radius:13px; box-shadow:var(--shadow); scroll-margin-top:100px; }
+.topic:hover { border-color:var(--accent-line); }
+.topic:target { border-color:var(--primary); box-shadow:0 0 0 3px var(--accent-soft); }
+.topic h3 { font-size:17px; letter-spacing:-.3px; margin-bottom:12px; color:var(--text); font-weight:600; }
+.topic h4 { color:var(--text); font-size:13px; }
+.topic p, .topic li { font-size:14px; line-height:1.85; }
+.topic b { color:var(--text); font-weight:600; }
+.topic ul, .topic ol { padding-left:20px; }
+.topic li::marker { color:var(--primary); }
+code { background:var(--accent-soft); color:var(--accent-ink); border-color:transparent; border-radius:4px; font-size:.86em; padding:2px 5px; overflow-wrap:anywhere; }
+pre { color:var(--code-text); background:var(--code-bg); border:0; border-radius:0 0 9px 9px; font:12px/1.85 var(--mono); padding:17px 18px; tab-size:2; margin:0; }
+pre code { color:inherit; white-space:pre; overflow-wrap:normal; }
+.wrap code { white-space:pre-wrap; overflow-wrap:anywhere; }
+.jwt .p1 { color:#a7bdc6; }
+.jwt .p2 { color:#e9f2ef; }
+.jwt .p3 { color:#a7bdc6; }
+.code-block { margin:16px 0; border:1px solid var(--line); border-radius:10px; overflow:hidden; min-width:0; }
+.code-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 12px; background:var(--code-bg); border-bottom:1px solid #ffffff16; color:#a7bdc6; font:9px/1.5 var(--mono); letter-spacing:.3px; }
+.code-toolbar>span::before { content:"● ● ●"; color:#7f9aa5; font-size:7px; letter-spacing:2px; margin-right:12px; }
+.copy-code { background:transparent; border:1px solid #ffffff2b; color:#d4e1e6; border-radius:4px; font-size:9px; line-height:1.5; padding:3px 7px; cursor:pointer; min-width:49px; }
+.copy-code:hover { background:#ffffff18; }
+.callout { background:var(--accent-soft); border-color:var(--primary); padding:15px 18px; color:var(--body); border-radius:0 9px 9px 0; }
+.deeper { border:1px solid var(--accent-line); background:var(--accent-soft); border-radius:10px; padding:16px 20px; font-size:12px; line-height:1.9; color:var(--body); }
+.deeper .label { color:var(--accent-ink); font-size:9px; font-weight:700; }
+.pager { margin-top:20px; font-size:11px; }
+.pager a { padding:7px 0; color:var(--accent-ink); max-width:48%; }
+.tw { border:1px solid var(--line); border-radius:9px; }
+table { font-size:12px; }
+th,td { padding:11px 14px; }
+th { background:var(--surface-2); font-size:9px; letter-spacing:1px; color:var(--text); font-weight:600; }
+tr:last-child td { border-bottom:0; }
+tbody tr:nth-child(even) { background:color-mix(in srgb,var(--bg) 55%,var(--surface)); }
+.demo { border-color:var(--accent-line); background:var(--bg); padding:22px; margin-top:20px; border-radius:11px; }
+.demo::before { content:"INTERACTIVE LAB"; display:block; font:600 9px/1.6 var(--mono); color:var(--primary); letter-spacing:1.5px; margin-bottom:19px; }
+.demo pre { background:var(--code-bg); margin:0; }
+.demo .code-block:last-child { margin-bottom:0; }
+.demo .note { font-size:12px; }
+.controls { min-width:0; }
+.controls label { font-size:11px; min-width:0; max-width:100%; }
+.controls input.field { min-width:0!important; width:min(100%,300px); }
+.controls select, .field { background:var(--surface); border-color:var(--line-strong); font-size:12px; min-height:36px; max-width:100%; }
+.controls input[type=range] { accent-color:var(--primary); }
+.stagebox { background:var(--surface); border-style:dashed; border-color:var(--line-strong); padding:20px; }
+.bm-margin { background:var(--warm-soft); outline-color:var(--warm); }
+.bm-box { border-color:var(--primary); background:var(--accent-soft); }
+.bub { color:var(--accent-ink); background:var(--accent-soft); border-color:var(--accent-line); }
+.bub .bub { background:var(--surface); }
+.bub .bub .bub { background:var(--accent-soft); }
+.pipe .step.ok { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.pipe .step.fail { background:var(--warm-soft); border-color:var(--warm); color:var(--warm); }
+.cols .code-block { margin:0; }
+.check { font-size:13px; padding:13px 4px; gap:13px; }
+.check input { width:16px; height:16px; flex:none; accent-color:var(--primary); }
+.check:has(input:checked) { color:var(--accent-ink); background:var(--accent-soft); border-radius:5px; }
+.check:has(input:checked) span { text-decoration:line-through; text-decoration-color:var(--accent-line); }
+.foot { font-size:11px; margin-top:36px; line-height:1.9; }
+.search-feedback { padding:28px 0 12px; }
+.search-feedback h2 { font-size:26px; letter-spacing:-.6px; margin-bottom:8px; }
+.search-feedback p { font-size:13px; color:var(--muted); }
+.search-feedback .btn { margin-top:8px; background:var(--surface); }
+body.searching .hero,body.searching .journey,body.searching .section-kicker { display:none; }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--accent-line); background:var(--surface); color:var(--primary); box-shadow:0 4px 18px #122c3210; border-radius:10px; width:42px; height:42px; font-size:18px; cursor:pointer; z-index:20; }
+.menu-toggle,.menu-close,.nav-backdrop { display:none; }
+.toast { position:fixed; bottom:26px; left:50%; transform:translateX(-50%); padding:10px 18px; background:var(--text); color:var(--bg); border-radius:9px; font-size:12px; z-index:100; box-shadow:0 4px 24px #0002; max-width:calc(100% - 40px); }
+@media(min-width:1440px) { .layout { gap:64px; grid-template-columns:240px minmax(0,1fr); } .hero { grid-template-columns:minmax(0,1fr) 330px; column-gap:44px; row-gap:0; } .hero-art { min-height:315px; } }
+@media(min-width:1080px) and (max-width:1250px) { .header-context,.header-divider { display:none; } .top-inner,.layout { padding-left:24px; padding-right:24px; } .layout { gap:32px; grid-template-columns:205px minmax(0,1fr); } .hero { grid-template-columns:minmax(0,1fr) 250px; gap:20px; } .hero-art { padding:17px; } .hero h1 { font-size:54px; } .art-code { font-size:10px; padding-left:14px; } .hero-actions .btn { padding:10px 12px; } }
+@media(max-width:1079px) {
+  .layout { grid-template-columns:minmax(0,1fr); padding:0 28px; gap:0; }
+  .top-inner { padding:0 28px; gap:16px; }
+  .header-context,.header-divider { display:none; }
+  .menu-toggle { display:grid; place-items:center; width:38px; height:38px; padding:0; flex:none; background:var(--surface); border:1px solid var(--line); border-radius:8px; color:var(--text); cursor:pointer; }
+  .menu-toggle svg { width:18px; height:18px; }
+  .toc { position:fixed; top:0; left:0; bottom:0; width:290px; max-width:calc(100vw - 40px); max-height:100dvh; padding:22px; background:var(--bg); border-right:1px solid var(--line); z-index:81; visibility:hidden; transform:translateX(-100%); transition:transform .2s,visibility .2s; }
+  body.nav-open .toc { visibility:visible; transform:translateX(0); }
+  .nav-backdrop { display:block; position:fixed; inset:0; background:#081b2d70; backdrop-filter:blur(3px); z-index:80; border:0; cursor:pointer; }
+  .menu-close { display:block; position:sticky; top:0; z-index:2; width:100%; margin-bottom:20px; text-align:left; border:0; background:var(--bg); color:var(--muted); font:600 12px/1.5 var(--font); cursor:pointer; padding:12px 6px; }
+  .menu-close::after { content:"×"; float:right; font-size:20px; line-height:18px; }
+  .hero { grid-template-columns:minmax(0,1fr) 290px; gap:28px; }
+  .hero h1 { font-size:58px; }
+}
+@media(max-width:760px) {
+  .top { height:116px; }
+  .top-inner { gap:10px; padding:12px 20px; flex-wrap:wrap; align-content:center; }
+  .brand { margin-right:auto; font-size:14px; gap:9px; }
+  .brand::before { width:31px; height:35px; border-radius:8px; }
+  .brand::after { font-size:13px; left:5px; top:5px; }
+  .brand span { display:block; font-size:9px; letter-spacing:.8px; }
+  .top .xlink { display:none; }
+  #theme { font-size:10px; padding:7px 9px; min-height:35px; }
+  .menu-toggle { width:35px; height:35px; }
+  .search { order:5; flex-basis:100%; flex-grow:1; max-width:none; margin:0; }
+  .search input { height:37px; font-size:12px; padding-left:37px; }
+  .search::before { top:10px; }
+  .search::after { top:23px; }
+  .search kbd { top:8px; line-height:18px; }
+  html { scroll-padding-top:140px; }
+  .topic { scroll-margin-top:140px; }
+  .layout { padding:0 20px; }
+  .workspace-bar { padding:19px 0; font-size:10px; }
+  .workspace-bar .edition { font-size:8px; padding:0 6px; }
+  .hero { display:block; padding-top:30px; }
+  .hero h1 { font-size:55px; letter-spacing:-2.8px; }
+  .hero .label { font-size:9px; letter-spacing:1px; margin-bottom:16px; }
+  .hero .lead { font-size:13px; }
+  .hero-art { display:none; }
+  .hero-actions { margin-top:22px; }
+  .hero-actions .btn { font-size:11px; padding:11px 13px; }
+  .hero-actions .btn-primary::after { margin-left:12px; }
+  .stats { margin-top:28px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .stats>div { padding:16px; }
+  .stats b { font-size:25px; }
+  .stats span { font-size:10px; }
+  .stats>div::after { right:13px; top:15px; width:23px; height:23px; }
+  .journey { padding:15px; gap:14px; flex-wrap:wrap; }
+  .journey-copy { flex:1; }
+  .journey progress { order:3; flex-basis:100%; }
+  .journey-pct { margin-left:auto; }
+  .map-head { margin-top:32px; }
+  .map-head h2 { font-size:22px; }
+  .map-head .lead { font-size:12px; }
+  .roadmap-panel summary { padding:16px; gap:11px; }
+  .roadmap-panel summary strong { font-size:11px; }
+  .roadmap-panel summary small { font-size:9px; }
+  .roadmap { margin:0 12px; }
+  .row { grid-template-columns:1fr; justify-items:center; padding:16px 0; }
+  .row>div:nth-child(2) { width:min(100%,250px); }
+  .branches { display:none; }
+  .stage-head { grid-template-columns:42px minmax(0,1fr); gap:14px; margin-bottom:20px; }
+  .stage-num { height:42px; font-size:15px; border-radius:10px; }
+  .stage-head h2 { font-size:24px; letter-spacing:-.6px; }
+  .stage-head h2 small { font-size:10px; }
+  .stage-head .lead { font-size:12px; }
+  .stage-head .btn { grid-column:2; justify-self:start; font-size:10px; margin-top:0; }
+  .grid { grid-template-columns:minmax(0,1fr); gap:14px; }
+  .topic { padding:21px; }
+  .topic h3 { font-size:17px; }
+  .topic p,.topic li { font-size:13px; }
+  .demo { padding:16px; }
+  .controls { gap:14px; }
+  .controls input[type=range] { width:130px; }
+  .code-toolbar>span::before { margin-right:7px; }
+  pre { font-size:10.5px; padding:14px; }
+  .deeper { padding:15px; font-size:12px; }
+  .back-top { width:38px; height:38px; right:16px; bottom:16px; }
+}
+@media(max-width:360px) { .top-inner,.layout { padding-left:14px; padding-right:14px; } .brand { font-size:12px; } .brand span { font-size:8px; } #theme { font-size:9px; padding:6px; } .hero h1 { font-size:48px; } .hero-actions { gap:8px; } .hero-actions .btn { padding:10px; } .workspace-bar { font-size:9px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+@media print {
+  :root,:root[data-theme="dark"] { --bg:#fff; --surface:#fff; --surface-2:#f4f4f4; --text:#111; --body:#222; --muted:#555; --primary:#14665a; --line:#ddd; --accent-soft:#f3f6f4; --accent-line:#ddd; --accent-ink:#14665a; --code-bg:#f4f4f4; --code-text:#111; }
+  .top,.toc,.nav-backdrop,.hero-art,.hero-actions,.journey,.back-top,.toast,.copy-code,.learned,.pager,.workspace-bar,.reading-progress { display:none!important; }
+  .layout { display:block; max-width:none; padding:0; }
+  .hero { display:block!important; padding-top:0; }
+  .hero h1 { font-size:40px; }
+  .hero h1 span { display:inline; }
+  .hero h1 span::after { content:" "; }
+  .grid { display:block; }
+  .topic { margin:12px 0; break-inside:avoid; box-shadow:none; }
+  .code-toolbar { background:#eee; color:#333; }
+  pre,pre code { white-space:pre-wrap; overflow-wrap:anywhere; }
+  .roadmap { break-inside:avoid; }
+  a { color:inherit; }
+}
+
+
+/* The third handbook follows one product from its first decision to release. */
+:root[data-handbook="project"] { --primary:#276a5a; --accent-soft:#e9f2ed; --accent-line:#c2d9cc; --accent-ink:#1e594b; --hero-bg:#ebf2ee; --hero-dot:#c8d9ce; }
+:root[data-handbook="project"][data-theme="dark"] { --primary:#8bd3b9; --on-primary:#103027; --accent-soft:#203a33; --accent-line:#3b5e50; --accent-ink:#ace0cb; --hero-bg:#1c322c; --hero-dot:#345247; }
+.track-switcher a { font-size:10px; gap:4px; padding:8px 3px; }
+.next-handbook { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px; margin-top:25px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:13px; text-decoration:none; }
+.next-handbook strong { display:block; color:var(--accent-ink); font-size:16px; letter-spacing:-.3px; }
+.next-handbook small { display:block; color:var(--muted); font-size:12px; margin-top:5px; }
+.next-handbook>span:last-child { font-size:22px; color:var(--primary); }
+.art-ticket { padding:17px; }
+.art-ticket small { color:var(--muted); font:9px/1.5 var(--mono); }
+.art-ticket strong { display:block; font-size:15px; line-height:1.5; color:var(--text); margin:8px 0 14px; }
+.art-ticket span { font:9px/1.5 var(--mono); background:var(--accent-soft); color:var(--accent-ink); border:1px solid var(--accent-line); padding:4px 8px; border-radius:5px; }
+.story-player { margin-top:28px; padding:26px; border:1px solid var(--accent-line); background:var(--surface); border-radius:16px; }
+.story-player>.label { color:var(--primary); font-size:10px; letter-spacing:1.5px; }
+.story-player h2 { font-size:25px; letter-spacing:-.7px; margin-bottom:8px; }
+.story-intro { font-size:13px; color:var(--muted); max-width:75ch; }
+.story-controls { display:flex; align-items:end; flex-wrap:wrap; gap:10px; margin:20px 0; }
+.story-controls label { display:flex; flex-direction:column; gap:5px; font-size:11px; color:var(--muted); margin-right:auto; min-width:200px; }
+.story-controls select { background:var(--bg); border:1px solid var(--line-strong); border-radius:8px; color:var(--text); font:12px/1.5 var(--font); padding:9px 10px; }
+.story-controls button { min-height:38px; }
+.btn:disabled { opacity:.45; cursor:default; box-shadow:none; }
+.story-track { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; padding:0; margin:20px 0; list-style:none; }
+.story-track li { padding:10px 3px; text-align:center; border:1px solid var(--line); border-radius:8px; font-size:10px; color:var(--muted); background:var(--bg); margin:0; }
+.story-track li b { font:10px/1.5 var(--mono); display:block; margin-bottom:4px; }
+.story-track li[data-state="done"] { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.story-track li[aria-current="step"] { background:var(--primary); border-color:var(--primary); color:var(--on-primary); }
+.story-track li[data-state="blocked"] { background:var(--warm-soft); border-color:var(--warm); color:var(--warm); }
+.story-scene { padding:19px; background:var(--bg); border:1px solid var(--line); border-radius:11px; }
+.story-scene .label { font:10px/1.7 var(--mono); letter-spacing:0; color:var(--primary); }
+.story-scene h3 { font-size:18px; letter-spacing:-.4px; margin-bottom:8px; }
+.story-scene p { font-size:13px; margin-bottom:8px; }
+.story-scene a { font-size:11px; }
+.story-player .code-block { margin-bottom:0; }
+.story-player progress { margin-top:20px; }
+.story-beat { display:flex; gap:9px; align-items:center; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--primary); margin-bottom:11px; }
+.story-beat::before { content:""; display:block; width:5px; height:5px; background:var(--primary); border-radius:50%; }
+body.searching .story-player { display:none; }
+@media(max-width:760px) { .story-player { padding:18px; } .story-player h2 { font-size:22px; } .story-track { grid-template-columns:repeat(4,minmax(0,1fr)); } .story-controls { gap:8px; } .story-controls label { flex-basis:100%; min-width:0; } .story-controls .btn { flex:1; padding:8px; font-size:10px; } .next-handbook { padding:18px; } .next-handbook strong { font-size:15px; } }
+@media print { .story-controls { display:none; } .story-player { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#top">DineshXEswar<span>Frontend</span></a>
+    <div class="search"><input id="q" type="search" placeholder="Search topics (press /)" aria-label="Search topics" autocomplete="off"></div>
+    <a class="btn xlink" href="../../Backend/handbook_codex/Backend_Handbook.html">Backend handbook</a>
+    <button class="btn" id="theme" type="button">Light mode</button>
+  </div>
+</header>
+
+<div class="layout" id="top">
+<nav class="toc" id="toc" aria-label="Stages"></nav>
+<main id="main">
+
+<section class="hero">
+  <p class="label">Dinesh and Eswar &middot; Learning handbook</p>
+  <h1>Frontend handbook</h1>
+  <p class="lead">A map of frontend development in the order you would learn it, from HTML to Next.js. Each stage says what a thing is, why it exists, and what to look up next. The handbook is meant for explaining to each other on a call, so it skips the deep code on purpose.</p>
+  <div class="stats">
+    <div><b id="n-stages">0</b><span>Stages in order</span></div>
+    <div><b id="n-topics">0</b><span>Topics</span></div>
+    <div><b>4</b><span>Live demos</span></div>
+    <div><b>0</b><span>Libraries needed</span></div>
+  </div>
+</section>
+
+<section id="map">
+  <div class="map-head">
+    <p class="label">The roadmap</p>
+    <h2>Follow the arrows</h2>
+    <p class="lead">Big boxes are stages, small boxes are topics inside them. Click any box to jump to it. Mark a stage as learned and its box fills in.</p>
+  </div>
+  <div class="roadmap" id="roadmap"><svg class="edges" aria-hidden="true"></svg><ol class="rows" id="rows"></ol></div>
+</section>
+
+<!-- ============ 1 WEB ============ -->
+<section class="stage" id="web" data-title="How the web works">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>How the web works <small>the base for everything</small></h2>
+    <p class="lead">Every page you build is delivered the same way. Knowing the delivery route makes the rest easier to place.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="web-request" data-node data-label="Request and response">
+      <h3>Request and response</h3>
+      <p>The browser is the client. It asks a server for something over HTTP, and the server answers. HTTPS is the same thing with encryption. Every click that loads data is a request.</p>
+    </article>
+    <article class="topic" id="web-journey" data-node data-label="What happens on a URL">
+      <h3>What happens when you open a URL</h3>
+      <ol>
+        <li>DNS turns <code>example.com</code> into an IP address.</li>
+        <li>The browser connects and sends a request.</li>
+        <li>The server replies with HTML.</li>
+        <li>The browser reads the HTML and asks for the CSS, JS and images it mentions.</li>
+        <li>The browser renders the page.</li>
+      </ol>
+    </article>
+    <article class="topic" id="web-url" data-node data-label="Parts of a URL">
+      <h3>Parts of a URL</h3>
+<pre><code>https://example.com:443/blog/5?sort=asc#intro
+protocol  domain     port path  query    fragment</code></pre>
+    </article>
+    <article class="topic" id="web-http" data-node data-label="Methods and status codes">
+      <h3>Methods and status codes</h3>
+      <p>Methods say what you want: <code>GET</code> read, <code>POST</code> create, <code>PUT</code>/<code>PATCH</code> update, <code>DELETE</code> remove.</p>
+      <p>Status codes say what happened: <code>200</code> ok, <code>201</code> created, <code>301</code> moved, <code>400</code> bad request, <code>401</code> not logged in, <code>403</code> forbidden, <code>404</code> not found, <code>500</code> server error.</p>
+    </article>
+    <article class="topic" id="web-render" data-node data-label="How the browser renders">
+      <h3>How the browser renders</h3>
+      <p>HTML becomes the DOM tree. CSS becomes a style tree. The browser combines them, works out sizes and positions (layout), then draws pixels (paint). Changing layout is more costly than changing color, which matters later for animations.</p>
+    </article>
+    <article class="topic" id="web-sides">
+      <h3>Frontend and backend</h3>
+      <p>Frontend is the code that runs in the browser: what users see and click. Backend runs on a server: logic, storage and security. They talk through APIs. Someone who does both is a full-stack developer.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Open DevTools, go to the Network tab, reload any site, and watch the requests happen. Then read <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank" rel="noopener">MDN: An overview of HTTP</a>. The <a href="../../Backend/handbook_codex/Backend_Handbook.html#http">Backend handbook's HTTP stage</a> shows the server side.</p>
+</section>
+
+<!-- ============ 2 HTML ============ -->
+<section class="stage" id="html" data-title="HTML">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>HTML <small>structure</small></h2>
+    <p class="lead">HTML says what is on the page: headings, paragraphs, images, links, forms. It is a markup language with no logic, only structure.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="html-elements" data-node data-label="Elements and attributes">
+      <h3>Elements and attributes</h3>
+      <p>Most elements have an opening tag, content, and a closing tag. Void elements such as <code>img</code> and <code>input</code> have no closing tag or child content. Attributes add settings to the opening tag.</p>
+<pre><code>&lt;a href="/about" class="link"&gt;About&lt;/a&gt;
+&lt;img src="cat.png" alt="A sleeping cat"&gt;</code></pre>
+    </article>
+    <article class="topic" id="html-skeleton" data-node data-label="Page skeleton">
+      <h3>Page skeleton</h3>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;My page&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+  &lt;/head&gt;
+  &lt;body&gt;...&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <p>The <code>head</code> holds metadata and resource links, including the title shown in the browser tab. The <code>body</code> holds the page content.</p>
+    </article>
+    <article class="topic" id="html-text">
+      <h3>Text, links and media</h3>
+      <p><code>h1</code> to <code>h6</code> for headings (one <code>h1</code> per page), <code>p</code> for paragraphs, <code>strong</code> and <code>em</code> for emphasis, <code>a</code> for links, <code>img</code>, <code>video</code> and <code>audio</code> for media.</p>
+    </article>
+    <article class="topic" id="html-lists">
+      <h3>Lists and tables</h3>
+      <p><code>ul</code> is a bullet list, <code>ol</code> is numbered, each item is an <code>li</code>. Tables use <code>table</code>, <code>tr</code> for rows, <code>th</code> and <code>td</code> for cells. Use tables for data, never for page layout.</p>
+    </article>
+    <article class="topic" id="html-forms" data-node data-label="Forms">
+      <h3>Forms</h3>
+      <p>Forms are how users send data. Each input needs a <code>name</code> and a matching <code>label</code>.</p>
+<pre><code>&lt;form action="/signup" method="post"&gt;
+  &lt;label for="email"&gt;Email&lt;/label&gt;
+  &lt;input id="email" name="email" type="email" required&gt;
+  &lt;button type="submit"&gt;Sign up&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+      <p>Other inputs: <code>text</code>, <code>password</code>, <code>checkbox</code>, <code>radio</code>, <code>textarea</code>, <code>select</code>.</p>
+      <p>The browser checks <code>required</code>, <code>minlength</code>, <code>pattern</code> and <code>type="email"</code> before the form submits. That check is only for convenience, because the server must validate everything again.</p>
+    </article>
+    <article class="topic" id="html-semantic" data-node data-label="Semantic HTML">
+      <h3>Semantic HTML</h3>
+      <p>Use tags that describe meaning: <code>header</code>, <code>nav</code>, <code>main</code>, <code>section</code>, <code>article</code>, <code>aside</code>, <code>footer</code>. Search engines and screen readers use them to understand the page. A pile of <code>div</code>s tells them nothing.</p>
+    </article>
+    <article class="topic" id="html-block">
+      <h3>Block and inline, id and class</h3>
+      <p>Block elements (<code>div</code>, <code>p</code>) take a full row. Inline elements (<code>span</code>, <code>a</code>) sit inside a line of text. An <code>id</code> must be unique on the page. A <code>class</code> can be reused anywhere, and it is what CSS mostly targets.</p>
+    </article>
+    <article class="topic" id="html-a11y" data-node data-label="Accessibility">
+      <h3>Accessibility</h3>
+      <p>Write <code>alt</code> text for images, connect labels to inputs, keep headings in order, make everything reachable by keyboard, and keep enough color contrast. Reach for <code>aria-*</code> attributes only when no plain tag does the job.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Keep <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element" target="_blank" rel="noopener">MDN's HTML elements reference</a> open and build one small page using only semantic tags.</p>
+</section>
+
+<!-- ============ 3 CSS BASICS ============ -->
+<section class="stage" id="css" data-title="CSS basics">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>CSS basics <small>style</small></h2>
+    <p class="lead">CSS controls how HTML looks: color, fonts, spacing and layout. A rule is a selector that picks elements and a list of property: value pairs.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="css-add">
+      <h3>Three ways to add CSS</h3>
+      <p>Inline with <code>style=""</code>, internal in a <code>&lt;style&gt;</code> tag, or external in a <code>.css</code> file linked from the head. External is the normal choice because many pages can share one file.</p>
+    </article>
+    <article class="topic" id="css-selectors" data-node data-label="Selectors">
+      <h3>Selectors</h3>
+<pre><code>p { }              /* every p */
+.card { }          /* class="card" */
+#header { }        /* id="header" */
+nav a { }          /* any a inside nav */
+ul &gt; li { }        /* direct children only */
+a:hover { }        /* pseudo-class: a state */
+p::first-line { }  /* pseudo-element: a part */</code></pre>
+    </article>
+    <article class="topic" id="css-cascade" data-node data-label="Cascade and specificity">
+      <h3>Cascade and specificity</h3>
+      <p>The cascade considers origin, importance and cascade layers before selector specificity. Among ordinary rules in the same origin and layer, IDs outrank classes, which outrank element selectors; normal inline styles outrank normal stylesheet declarations. Source order breaks otherwise equal ties. <code>!important</code> changes precedence rather than making a selector more specific, and is not an absolute winner: transitions and other cascade rules still matter. Properties such as <code>color</code> and <code>font-family</code> are often inherited.</p>
+    </article>
+    <article class="topic wide" id="css-box" data-node data-label="Box model">
+      <h3>The box model</h3>
+      <p>Every element is a box with four layers, from inside out: content, padding, border, margin. Most layout confusion comes from forgetting this. Set <code>box-sizing: border-box</code> so a width includes padding and border. Try it:</p>
+      <div class="demo" id="demo-box">
+        <div class="controls">
+          <label>margin <output></output><input type="range" min="0" max="48" value="16" data-p="m"></label>
+          <label>border <output></output><input type="range" min="0" max="16" value="4" data-p="b"></label>
+          <label>padding <output></output><input type="range" min="0" max="48" value="24" data-p="p"></label>
+        </div>
+        <div class="stagebox"><div class="bm-margin"><div class="bm-box"><div class="bm-content">content</div></div></div></div>
+        <pre><code class="out"></code></pre>
+        <p class="deeper" style="margin-bottom:0">The dashed outline marks the margin, the solid border surrounds the box, and the tinted area between that border and the content is padding.</p>
+      </div>
+    </article>
+    <article class="topic" id="css-units" data-node data-label="Units">
+      <h3>Units</h3>
+      <p><code>px</code> is a CSS pixel, not necessarily one device pixel. Percentage reference sizes depend on the property; a percentage width usually uses the containing block's width. For <code>font-size</code>, <code>em</code> uses the parent's font size; for most other properties it uses the element's own font size. <code>rem</code> uses the root font size. <code>vw</code> and <code>vh</code> refer to viewport dimensions. On mobile, <code>dvh</code> tracks the changing visible viewport height.</p>
+    </article>
+    <article class="topic" id="css-type">
+      <h3>Colors and typography</h3>
+      <p>Colors come as hex (<code>#fffaf0</code>), <code>rgb()</code> or <code>hsl()</code>. For text, learn <code>font-family</code>, <code>font-size</code>, <code>font-weight</code>, <code>line-height</code> and <code>letter-spacing</code>. A <code>line-height</code> of 1.5 to 1.7 reads well.</p>
+    </article>
+    <article class="topic" id="css-decor">
+      <h3>Backgrounds, borders and shadows</h3>
+      <p><code>background</code>, <code>border</code>, <code>border-radius</code> for rounded corners, <code>box-shadow</code> for depth, and <code>overflow</code> to decide what happens when content spills out of its box.</p>
+    </article>
+    <article class="topic" id="css-vars" data-node data-label="CSS variables">
+      <h3>CSS variables</h3>
+<pre><code>:root { --brand: #0a0a0a; --gap: 16px; }
+.card { background: var(--brand); padding: var(--gap); }</code></pre>
+      <p>Define a value once, reuse it everywhere. This page switches between dark and light by redefining a handful of variables.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Work through <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks" target="_blank" rel="noopener">MDN's CSS building blocks</a>. Then rebuild a simple landing page and edit its CSS live in DevTools to watch the cascade.</p>
+</section>
+
+<!-- ============ 4 CSS LAYOUT ============ -->
+<section class="stage" id="layout" data-title="CSS layout">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>CSS layout <small>placing things</small></h2>
+    <p class="lead">Once boxes look right, you arrange them. Modern layout is mostly flexbox, grid, and media queries.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="layout-display" data-node data-label="display">
+      <h3>display</h3>
+      <p><code>block</code> takes a full row, <code>inline</code> flows in text, <code>inline-block</code> flows but accepts width and height, <code>none</code> removes the element. <code>flex</code> and <code>grid</code> turn an element into a layout container.</p>
+    </article>
+    <article class="topic" id="layout-position" data-node data-label="position and z-index">
+      <h3>position and z-index</h3>
+<pre><code>position: static;    /* default, normal flow */
+position: relative;  /* offset from its own spot */
+position: absolute;  /* placed inside nearest positioned parent */
+position: fixed;     /* stuck to the screen */
+position: sticky;    /* normal, then sticks while scrolling */</code></pre>
+      <p><code>z-index</code> decides which overlapping element sits on top.</p>
+    </article>
+    <article class="topic wide" id="layout-flex" data-node data-label="Flexbox">
+      <h3>Flexbox</h3>
+      <p>Flexbox lays items out along one direction, a row or a column. It handles alignment, spacing and centering with very little code. Use it for navbars, button groups and card rows.</p>
+      <div class="demo" id="demo-flex">
+        <div class="controls">
+          <label>flex-direction<select data-p="flexDirection"><option>row</option><option>column</option></select></label>
+          <label>justify-content<select data-p="justifyContent"><option>flex-start</option><option>center</option><option>flex-end</option><option>space-between</option><option>space-around</option></select></label>
+          <label>align-items<select data-p="alignItems"><option>stretch</option><option>flex-start</option><option>center</option><option>flex-end</option></select></label>
+          <label>gap <output></output><input type="range" min="0" max="40" value="8" data-p="gap"></label>
+        </div>
+        <div class="stagebox"><div class="fx"><div>1</div><div>2</div><div>3</div></div></div>
+        <pre><code class="out"></code></pre>
+      </div>
+    </article>
+    <article class="topic" id="layout-grid" data-node data-label="Grid">
+      <h3>Grid</h3>
+      <p>Grid arranges items in rows and columns at once. Use it for page layouts and galleries.</p>
+<pre><code>.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}</code></pre>
+      <p>Rule of thumb: flexbox for one direction, grid for two.</p>
+    </article>
+    <article class="topic" id="layout-responsive" data-node data-label="Responsive design">
+      <h3>Responsive design</h3>
+      <p>The same page has to work on a phone, a tablet and a desktop. You need the viewport meta tag, flexible units, and media queries. Start from the phone layout and add rules for larger screens (mobile-first).</p>
+<pre><code>.cards { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .cards { grid-template-columns: repeat(3, 1fr); }
+}</code></pre>
+      <p><code>clamp(16px, 2.5vw, 22px)</code> gives a size that grows with the screen but never goes below the minimum or above the maximum. Heading sizes are the usual use.</p>
+    </article>
+    <article class="topic" id="layout-center">
+      <h3>Centering, the common recipe</h3>
+<pre><code>.parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}</code></pre>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span><a href="https://flexboxfroggy.com" target="_blank" rel="noopener">Flexbox Froggy</a> and <a href="https://cssgridgarden.com" target="_blank" rel="noopener">Grid Garden</a> are short games that teach both. Then rebuild a pricing-card page that works at phone width.</p>
+</section>
+
+<!-- ============ 5 CSS MOTION ============ -->
+<section class="stage" id="motion" data-title="Transforms and motion">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>Transforms and motion <small>movement</small></h2>
+    <p class="lead">Transforms move, rotate and scale an element. Transitions and animations spread a change over time.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic wide" id="motion-transform" data-node data-label="Transform">
+      <h3>transform</h3>
+      <p><code>translate</code> moves, <code>rotate</code> turns, <code>scale</code> resizes, <code>skew</code> slants. A transform does not change the layout, so neighboring elements stay where they are. The dashed box below is the original position. Order matters, because each step happens in the already transformed space.</p>
+      <div class="demo" id="demo-tf">
+        <div class="controls">
+          <label>translateX <output></output><input type="range" min="-100" max="100" value="60" data-p="x"></label>
+          <label>rotate <output></output><input type="range" min="-180" max="180" value="30" data-p="r"></label>
+          <label>scale <output></output><input type="range" min="0.5" max="2" step="0.1" value="1" data-p="s"></label>
+          <label class="inline"><input type="checkbox" data-p="swap"> rotate first</label>
+        </div>
+        <div class="stagebox"><div class="tf"><div class="tf-ghost"></div><div class="tf-box">box</div></div></div>
+        <pre><code class="out"></code></pre>
+      </div>
+    </article>
+    <article class="topic" id="motion-transition" data-node data-label="Transition">
+      <h3>transition</h3>
+      <p>Tells the browser to animate a property change instead of jumping. You give it the property, duration, easing and optional delay.</p>
+<pre><code>.btn { transition: transform 200ms ease, background 200ms ease; }
+.btn:hover { transform: translateY(-2px); }</code></pre>
+    </article>
+    <article class="topic" id="motion-keyframes" data-node data-label="Keyframe animation">
+      <h3>@keyframes and animation</h3>
+      <p>When you need more than a start and an end, or something that loops, describe the steps in <code>@keyframes</code> and attach them with <code>animation</code>.</p>
+<pre><code>@keyframes pulse { from { opacity: 1 } to { opacity: .4 } }
+.dot { animation: pulse 1s ease-in-out infinite alternate; }</code></pre>
+    </article>
+    <article class="topic" id="motion-perf" data-node data-label="Smooth animation">
+      <h3>Keeping it smooth</h3>
+      <p>Prefer animating <code>transform</code> and <code>opacity</code>: these usually avoid layout and can be handled by compositing. GPU acceleration depends on browser decisions and is not guaranteed. Animating <code>width</code>, <code>height</code>, <code>top</code> or <code>left</code> can trigger repeated layout and cause stutter. Check the browser performance tools when an animation is slow.</p>
+    </article>
+    <article class="topic" id="motion-3d">
+      <h3>3D basics</h3>
+      <p>Add <code>perspective</code> to a parent and use <code>rotateX</code> or <code>rotateY</code> on the child for card flips and tilt effects.</p>
+    </article>
+    <article class="topic" id="motion-a11y">
+      <h3>Reduced motion</h3>
+      <p>Some people get dizzy from animation. Wrap big motion in <code>@media (prefers-reduced-motion: no-preference)</code>, or switch it off inside <code>prefers-reduced-motion: reduce</code>.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Read <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions" target="_blank" rel="noopener">MDN: Using CSS transitions</a>, then build a card that lifts on hover and a loading spinner using only CSS.</p>
+</section>
+
+<!-- ============ 6 JS ============ -->
+<section class="stage" id="js" data-title="JavaScript">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>JavaScript <small>behavior</small></h2>
+    <p class="lead">JavaScript is the programming language of the browser. It reacts to clicks, checks forms, fetches data and changes the page without a reload. It also runs on servers through Node.js.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="js-vars" data-node data-label="Variables and types">
+      <h3>Variables and types</h3>
+      <p>Use <code>const</code> by default and <code>let</code> when a binding must be reassigned. A <code>const</code> object or array can still be mutated; the binding itself cannot point to a different value. The primitive types are string, number, bigint, boolean, symbol, <code>null</code> and <code>undefined</code>. Other values are objects, including arrays and functions. Use <code>Array.isArray(value)</code> to identify an array. Prefer <code>===</code> when you do not intend type coercion.</p>
+    </article>
+    <article class="topic" id="js-functions" data-node data-label="Functions">
+      <h3>Functions</h3>
+      <p>Functions are values: you can store them, pass them in, and return them. Arrow functions offer concise syntax and capture <code>this</code> from the surrounding scope; they are not interchangeable with normal functions in every situation.</p>
+<pre><code>function add(a, b) { return a + b; }
+const add2 = (a, b) =&gt; a + b;</code></pre>
+    </article>
+    <article class="topic" id="js-collections" data-node data-label="Arrays and objects">
+      <h3>Arrays and objects</h3>
+      <p>Your two main data structures. The array methods below show up in nearly every project.</p>
+<pre><code>const nums = [1, 2, 3, 4];
+nums.map(n =&gt; n * 2);               // [2, 4, 6, 8]
+nums.filter(n =&gt; n % 2 === 0);      // [2, 4]
+nums.reduce((sum, n) =&gt; sum + n, 0); // 10
+nums.find(n =&gt; n &gt; 2);              // 3</code></pre>
+    </article>
+    <article class="topic" id="js-flow">
+      <h3>Control flow</h3>
+      <p><code>if / else</code>, <code>switch</code>, and loops such as <code>for</code>, <code>while</code> and <code>for...of</code> control which code runs. Common falsy values are <code>false</code>, <code>0</code>, <code>-0</code>, <code>0n</code>, <code>""</code>, <code>null</code>, <code>undefined</code> and <code>NaN</code>. Empty arrays and objects are truthy.</p>
+    </article>
+    <article class="topic" id="js-scope" data-node data-label="Scope and closures">
+      <h3>Scope and closures</h3>
+      <p>Scope determines where a binding can be accessed. <code>let</code> and <code>const</code> are block-scoped; <code>var</code> is function-scoped. Inner functions can access bindings in their outer scopes. A closure is a function that retains access to its surrounding lexical environment.</p>
+<pre><code>function counter() { let c = 0; return () =&gt; ++c; }
+const next = counter();
+next(); // 1
+next(); // 2</code></pre>
+      <p><b>Why it matters.</b> Closures give you private data: nothing outside <code>counter</code> can touch <code>c</code>. They let an event handler remember which item it was created for. Every React hook depends on them. They also cause the "stale closure" bug, where a function created during an old render still sees old values. If a timer inside <code>useEffect</code> keeps printing an old count, this is why.</p>
+    </article>
+    <article class="topic" id="js-modern" data-node data-label="Modern syntax">
+      <h3>Modern syntax (ES6+)</h3>
+<pre><code>const { name, age } = user;            // destructuring
+const all = [...a, ...b];              // spread
+const city = user?.address?.city;      // optional chaining
+console.log(`Hi ${name}`);             // template string
+import { add } from "./math.js";       // modules</code></pre>
+    </article>
+    <article class="topic" id="js-this" data-node data-label="this">
+      <h3>The this keyword</h3>
+      <p><code>this</code> is decided when a function is called, not where it is written. The rules:</p>
+      <ul>
+        <li><code>obj.method()</code>: <code>this</code> is <code>obj</code>.</li>
+        <li>A plain call <code>fn()</code>: <code>undefined</code> in modules and strict mode.</li>
+        <li>Arrow functions have no <code>this</code> of their own. They use the one from the code around them.</li>
+        <li>A normal-function event listener: <code>this</code> is the element.</li>
+        <li><code>bind</code>, <code>call</code> and <code>apply</code> set it by hand.</li>
+      </ul>
+<pre><code>const user = {
+  name: "Eswar",
+  hi() { return this.name; },
+  later() { setTimeout(() =&gt; console.log(this.name), 100); },
+};
+user.hi();                    // "Eswar"
+const f = user.hi; f();       // error: this is undefined
+user.hi.bind(user)();         // "Eswar"
+user.later();                 // "Eswar", the arrow keeps this</code></pre>
+      <p>The classic bug is passing <code>user.hi</code> as a callback and losing <code>this</code>. An arrow function or <code>bind</code> fixes it.</p>
+    </article>
+    <article class="topic" id="js-classes">
+      <h3>Classes</h3>
+      <p><code>class</code> is a cleaner way to write object blueprints with a <code>constructor</code>, methods and <code>extends</code>, built on prototypes underneath. You will see classes in older React code, in Node libraries and in custom error types. Modern React uses functions instead.</p>
+    </article>
+    <article class="topic" id="js-json" data-node data-label="Errors and JSON">
+      <h3>Errors and JSON</h3>
+      <p><code>try</code> / <code>catch</code> handles errors without crashing. JSON is the text format for sending data between frontend and backend.</p>
+<pre><code>const text = JSON.stringify({ name: "Dinesh" });
+const obj = JSON.parse(text);</code></pre>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Part 1 of <a href="https://javascript.info" target="_blank" rel="noopener">javascript.info</a> covers this stage and is the clearest free course. Solve a few array problems with <code>map</code> and <code>filter</code> before moving on.</p>
+</section>
+
+<!-- ============ 7 DOM ============ -->
+<section class="stage" id="dom" data-title="The DOM">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>The DOM <small>JavaScript meets the page</small></h2>
+    <p class="lead">The browser turns your HTML into a live tree of objects. JavaScript can read that tree and change it, and the screen updates.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="dom-what" data-node data-label="What the DOM is">
+      <h3>What the DOM is</h3>
+      <p>The DOM is not your HTML file. The file is the starting blueprint, and the DOM is the living copy in memory. The DOM is a browser API, reached through the global <code>document</code> object, and is not part of the JavaScript language itself.</p>
+<pre><code>document
+└── html
+    └── body
+        ├── h1#title   "Hello"
+        └── button.btn "Click"</code></pre>
+      <p>Longer notes are in <a href="../DOM/DOM_Notes.md">DOM/DOM_Notes.md</a>.</p>
+    </article>
+    <article class="topic" id="dom-select" data-node data-label="Selecting elements">
+      <h3>Selecting elements</h3>
+<pre><code>document.getElementById("title");
+document.querySelector(".card");        // first match
+document.querySelectorAll("li");        // all matches</code></pre>
+      <p><code>querySelector</code> takes any CSS selector, so it is the one to learn first.</p>
+    </article>
+    <article class="topic" id="dom-change" data-node data-label="Changing elements">
+      <h3>Changing elements</h3>
+<pre><code>const title = document.querySelector("#title");
+title.textContent = "Hello";
+title.classList.add("active");
+title.setAttribute("data-id", "5");
+title.style.color = "red";</code></pre>
+      <p>Prefer <code>textContent</code> over <code>innerHTML</code> for user text. <code>innerHTML</code> parses HTML, so untrusted input can inject scripts (XSS).</p>
+    </article>
+    <article class="topic" id="dom-create" data-node data-label="Creating and removing">
+      <h3>Creating and removing</h3>
+<pre><code>const li = document.createElement("li");
+li.textContent = "New item";
+document.querySelector("ul").append(li);
+li.remove();</code></pre>
+    </article>
+    <article class="topic" id="dom-events" data-node data-label="Events">
+      <h3>Events</h3>
+      <p>Things that happen on the page: <code>click</code>, <code>input</code>, <code>submit</code>, <code>keydown</code>. You attach a listener, and the browser passes an event object.</p>
+<pre><code>btn.addEventListener("click", (e) =&gt; {
+  console.log(e.target);
+});
+form.addEventListener("submit", (e) =&gt; {
+  e.preventDefault();   // stop the page reload
+});</code></pre>
+    </article>
+    <article class="topic wide" id="dom-bubbling" data-node data-label="Bubbling and delegation">
+      <h3>Bubbling and delegation</h3>
+      <p>An event does not stay on the element you clicked. It bubbles up through every parent. That is why one listener on a list can handle clicks on all its items, which is called event delegation. Click the inner box:</p>
+      <div class="demo" id="demo-bub">
+        <div class="controls">
+          <label class="inline"><input type="checkbox" data-p="stop"> stop propagation at inner</label>
+          <button class="btn" type="button" data-p="clear">Clear log</button>
+        </div>
+        <div class="stagebox">
+          <div class="bub" data-name="outer">outer
+            <div class="bub" data-name="middle">middle
+              <div class="bub" data-name="inner">inner</div>
+            </div>
+          </div>
+        </div>
+        <pre><code class="out log">Click a box to see the order.</code></pre>
+      </div>
+<pre><code>list.addEventListener("click", (e) =&gt; {
+  const item = e.target.closest("li");
+  if (item) item.classList.toggle("done");
+});</code></pre>
+    </article>
+    <article class="topic" id="dom-debounce" data-node data-label="Debounce and throttle">
+      <h3>Debounce and throttle</h3>
+      <p>Some events fire dozens of times a second: <code>input</code>, <code>scroll</code>, <code>resize</code>. Running heavy work on each one makes the page lag and floods the server.</p>
+      <ul>
+        <li><b>Debounce</b> waits until the events stop for a moment, then runs once. Use it for search-as-you-type, so typing "react" sends one request instead of five.</li>
+        <li><b>Throttle</b> runs at most once per interval while events keep coming. Use it for scroll position or infinite scroll.</li>
+      </ul>
+<pre><code>function debounce(fn, ms) {
+  let t;
+  return (...args) =&gt; {
+    clearTimeout(t);
+    t = setTimeout(() =&gt; fn(...args), ms);
+  };
+}
+input.addEventListener("input", debounce(search, 300));</code></pre>
+      <p>This is a closure at work: <code>t</code> survives between calls.</p>
+    </article>
+    <article class="topic" id="dom-walk">
+      <h3>Moving around the tree</h3>
+      <p><code>parentElement</code>, <code>children</code>, <code>nextElementSibling</code> and <code>closest()</code> let you go from one element to its relatives.</p>
+    </article>
+    <article class="topic" id="dom-storage" data-node data-label="Browser storage">
+      <h3>Browser storage</h3>
+<pre><code>localStorage.setItem("theme", "dark");
+localStorage.getItem("theme");   // "dark"</code></pre>
+      <p>Values are always strings, so use <code>JSON.stringify</code> for objects. <code>localStorage</code> survives a restart, <code>sessionStorage</code> is cleared when the tab closes, and cookies are also sent to the server. For login tokens, read <a href="../../Backend/handbook_codex/Backend_Handbook.html#auth-storage">where the browser should keep the token</a> before reaching for <code>localStorage</code>.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>The repo has <code>DEV/Frontend/DOM/Practice_1</code> to <code>Practice_8</code> and <code>bonus_01</code>. Do them in order, with <a href="https://javascript.info/document" target="_blank" rel="noopener">javascript.info's Document chapter</a> as the reference.</p>
+</section>
+
+<!-- ============ 8 ASYNC ============ -->
+<section class="stage" id="async" data-title="Async JS and fetch">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>Async JS and fetch <small>talking to servers</small></h2>
+    <p class="lead">Network calls take time. Asynchronous code lets the page stay responsive while it waits.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="async-loop" data-node data-label="Event loop">
+      <h3>The event loop</h3>
+      <p>JavaScript does one thing at a time. When it starts something slow, like a request or a timer, it hands the job to the browser and keeps going. When the job finishes, the callback joins a queue and runs when the main code is free. Think of a waiter who takes your order and serves other tables while the kitchen cooks.</p>
+      <p>Node.js uses a similar event-loop model on the server, with its own phases and scheduling details. The Backend handbook has a <a href="../../Backend/handbook_codex/Backend_Handbook.html#node-loop">live demo of the order</a> that callbacks run in.</p>
+    </article>
+    <article class="topic wide" id="async-styles" data-node data-label="Promises and async/await">
+      <h3>Callbacks, promises, async/await</h3>
+      <p>Callbacks came first and nested badly. Promises fixed that with <code>.then()</code>. <code>async</code>/<code>await</code> reads like normal top-to-bottom code and is what you should write.</p>
+      <div class="cols">
+<pre><code>// promise style
+fetch("/api/users")
+  .then(r =&gt; r.json())
+  .then(users =&gt; console.log(users))
+  .catch(err =&gt; console.error(err));</code></pre>
+<pre><code>// async/await, same thing
+async function load() {
+  try {
+    const res = await fetch("/api/users");
+    if (!res.ok) throw new Error(res.status);
+    const users = await res.json();
+  } catch (err) {
+    // show an error message
+  }
+}</code></pre>
+      </div>
+    </article>
+    <article class="topic" id="async-parallel" data-node data-label="Promise.all">
+      <h3>Running requests in parallel</h3>
+<pre><code>// one after another: about 2 seconds
+const user = await getUser();
+const posts = await getPosts();
+
+// at the same time: about 1 second
+const [u, p] = await Promise.all([getUser(), getPosts()]);</code></pre>
+      <ul>
+        <li><code>Promise.all</code> fails as soon as one promise fails.</li>
+        <li><code>Promise.allSettled</code> waits for every promise and reports each result, success or failure.</li>
+        <li><code>Promise.race</code> settles with whichever finishes first. Racing a request against a timer can implement a timeout result, but does not cancel the request; use an <code>AbortController</code> when cancellation is needed.</li>
+      </ul>
+      <p>Only run requests in parallel when neither needs the other's result.</p>
+    </article>
+    <article class="topic" id="async-fetch" data-node data-label="fetch">
+      <h3>fetch</h3>
+      <p><code>fetch</code> sends HTTP requests from the browser. For a POST, send JSON in the body and say so in the headers.</p>
+<pre><code>await fetch("/api/tasks", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ title: "Learn DOM" }),
+});</code></pre>
+    </article>
+    <article class="topic" id="async-api" data-node data-label="Working with APIs">
+      <h3>Working with APIs</h3>
+      <p>An HTTP API exposes endpoints that clients can call to read data or perform actions, often using JSON. Handle loading, success, empty and error states in the UI. CORS controls whether browser JavaScript may read responses from another origin; some requests also need a successful preflight before being sent. It is not server-side permission checking. The <a href="../../Backend/handbook_codex/Backend_Handbook.html#sec-cors">Backend CORS card</a> explains the distinction, and its <a href="../../Backend/handbook_codex/Backend_Handbook.html#rest">REST stage</a> covers API design.</p>
+    </article>
+    <article class="topic" id="async-timers">
+      <h3>Timers</h3>
+      <p><code>setTimeout(fn, ms)</code> runs once later. <code>setInterval(fn, ms)</code> repeats until you call <code>clearInterval</code>. Always clear intervals you no longer need.</p>
+    </article>
+    <article class="topic" id="async-pitfalls">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Forgetting <code>await</code>, so you hold a promise instead of data.</li>
+        <li>Not checking <code>res.ok</code>. A 404 does not throw.</li>
+        <li>No error handling, so the UI hangs on "loading".</li>
+      </ul>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Read <a href="https://javascript.info/async" target="_blank" rel="noopener">javascript.info: Promises, async/await</a>. Then build a weather app on <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (free, no API key) with loading and error states.</p>
+</section>
+
+<!-- ============ 9 TOOLING ============ -->
+<section class="stage" id="tooling" data-title="Tooling">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>Tooling <small>the workshop</small></h2>
+    <p class="lead">The tools you use every day while building. None of them is hard, but React and Next.js assume you know them.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="tool-devtools" data-node data-label="DevTools">
+      <h3>Browser DevTools</h3>
+      <p>Press F12. Elements shows the live DOM and CSS. Console shows logs and errors. Network shows every request. Application shows storage. Lighthouse scores speed and accessibility.</p>
+    </article>
+    <article class="topic" id="tool-git" data-node data-label="Git and GitHub">
+      <h3>Git and GitHub</h3>
+      <p>Git keeps the history of your code. Learn: commit, branch, merge, pull, push, pull request, merge conflict. GitHub hosts the repo online. In this repo the habit is simple: pull before you start, push when you finish.</p>
+    </article>
+    <article class="topic" id="tool-terminal">
+      <h3>Terminal basics</h3>
+      <p><code>cd</code> to move, <code>ls</code> (or <code>dir</code>) to list, <code>mkdir</code> to make a folder. Most tools below are run from here.</p>
+    </article>
+    <article class="topic" id="tool-npm" data-node data-label="npm">
+      <h3>npm and package.json</h3>
+      <p><code>npm</code> installs dependencies. <code>package.json</code> declares the project's dependencies and scripts; the lockfile records the resolved dependency versions. Packages are installed into <code>node_modules</code>, which is normally ignored by Git. Read the repository's declared Node and package-manager versions before running it.</p>
+<pre><code>npm install
+npm run dev</code></pre>
+    </article>
+    <article class="topic" id="tool-vite" data-node data-label="Vite and bundlers">
+      <h3>Vite and bundlers</h3>
+      <p>A bundler combines many source files into a few the browser can load, and a dev server reloads the page as you save. Vite is the common choice for React: <code>npm create vite@latest</code>.</p>
+    </article>
+    <article class="topic" id="tool-lint">
+      <h3>ESLint and Prettier</h3>
+      <p>ESLint flags likely mistakes. Prettier formats code the same way every time, which stops style arguments between two people sharing a repo.</p>
+    </article>
+    <article class="topic" id="tool-env" data-node data-label=".env files">
+      <h3>Environment variables</h3>
+      <p>Secrets and config like API keys live in a <code>.env</code> file that is ignored by Git. Anything shipped to the browser is public, so never put a real secret in frontend code.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Follow the <a href="https://vite.dev/guide/" target="_blank" rel="noopener">Vite getting started guide</a> to create a project, push it to GitHub, and confirm <code>node_modules</code> is not in the repo.</p>
+</section>
+
+<!-- ============ 10 REACT CORE ============ -->
+<section class="stage" id="react" data-title="React">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>React <small>components, props, state</small></h2>
+    <p class="lead">Plain DOM code gets messy as pages grow. React lets you describe what the UI should look like for the current data, and it updates the DOM for you.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="react-why" data-node data-label="Why React">
+      <h3>The core idea</h3>
+      <div class="callout"><p>UI is a function of state. Change the data, and React redraws the parts that depend on it.</p></div>
+      <p>You stop writing "find this element and change its text". You write what the screen should show, and update the data.</p>
+    </article>
+    <article class="topic" id="react-components" data-node data-label="Components">
+      <h3>Components</h3>
+      <p>A component is a function that returns markup. Names start with a capital letter. A page is a tree of components, such as <code>Navbar</code>, <code>ProductCard</code> and <code>Footer</code>, each reusable.</p>
+    </article>
+    <article class="topic" id="react-jsx" data-node data-label="JSX">
+      <h3>JSX</h3>
+      <p>JSX is HTML-like syntax written inside JavaScript. Curly braces drop in any JS expression.</p>
+      <ul>
+        <li>Return one root element, or wrap in <code>&lt;&gt;...&lt;/&gt;</code>.</li>
+        <li>Write <code>className</code>, not <code>class</code>.</li>
+        <li>Attributes are camelCase, like <code>onClick</code>.</li>
+        <li>Close every tag, including <code>&lt;img /&gt;</code>.</li>
+      </ul>
+    </article>
+    <article class="topic" id="react-props" data-node data-label="Props">
+      <h3>Props</h3>
+      <p>Props are inputs a parent passes to a child, like function arguments. A child cannot change its props. The special prop <code>children</code> holds whatever sits between the tags.</p>
+<pre><code>function Card({ title, children }) {
+  return (
+    &lt;div className="card"&gt;
+      &lt;h3&gt;{title}&lt;/h3&gt;
+      {children}
+    &lt;/div&gt;
+  );
+}
+
+&lt;Card title="Hello"&gt;&lt;p&gt;Body text&lt;/p&gt;&lt;/Card&gt;</code></pre>
+    </article>
+    <article class="topic" id="react-state" data-node data-label="State">
+      <h3>State</h3>
+      <p>State is data a component owns and can change. When you call the setter, React re-renders. Never edit state directly, always make a new value.</p>
+<pre><code>import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
+      Clicked {count}
+    &lt;/button&gt;
+  );
+}</code></pre>
+    </article>
+    <article class="topic" id="react-events" data-node data-label="Events and forms">
+      <h3>Events and forms</h3>
+      <p>Handlers are props like <code>onClick</code> and <code>onChange</code>. A controlled input keeps its value in state, so the state is the single source of truth.</p>
+<pre><code>&lt;input value={name} onChange={e =&gt; setName(e.target.value)} /&gt;</code></pre>
+    </article>
+    <article class="topic" id="react-lists" data-node data-label="Conditions and lists">
+      <h3>Conditional rendering and lists</h3>
+<pre><code>{tasks.length === 0 ? (
+  &lt;p&gt;No tasks yet&lt;/p&gt;
+) : (
+  &lt;ul&gt;
+    {tasks.map(t =&gt; &lt;li key={t.id}&gt;{t.title}&lt;/li&gt;)}
+  &lt;/ul&gt;
+)}</code></pre>
+      <p>Each list item needs a stable, unique <code>key</code>, so React can tell items apart when the list changes.</p>
+    </article>
+    <article class="topic" id="react-flow" data-node data-label="Data flow">
+      <h3>One-way data flow</h3>
+      <p>Data goes down through props. Changes go up through functions passed as props. When two components need the same data, move the state to their nearest common parent. This is called lifting state up.</p>
+    </article>
+    <article class="topic" id="react-routing">
+      <h3>Routing</h3>
+      <p>React Router gives one page many URLs without reloading, which makes it a single page app (SPA). Clicking a link swaps components instead of downloading a new HTML page. Next.js replaces this with file-based routing.</p>
+    </article>
+    <article class="topic" id="react-tailwind" data-node data-label="Tailwind CSS">
+      <h3>Styling with Tailwind CSS</h3>
+      <p>Tailwind is a CSS framework made of small utility classes, each doing one job. You style in the markup without inventing class names.</p>
+<pre><code>&lt;button className="rounded-lg bg-black px-4 py-2 text-white
+                   hover:bg-gray-800 md:px-6"&gt;
+  Save
+&lt;/button&gt;</code></pre>
+      <p><code>px-4</code> is horizontal padding, <code>hover:</code> applies on hover, and <code>md:</code> applies from medium screens up. Everything from the CSS stages still applies, because Tailwind is shorthand for it. Other options: plain CSS files, CSS Modules (class names scoped to one component), and component kits like shadcn/ui built on Tailwind.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Read <a href="https://react.dev/learn" target="_blank" rel="noopener">react.dev/learn</a> through "Managing State", then build a to-do list and a movie search.</p>
+</section>
+
+<!-- ============ 11 HOOKS ============ -->
+<section class="stage" id="hooks" data-title="React hooks">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>React hooks <small>giving components abilities</small></h2>
+    <p class="lead">Hooks are functions that start with <code>use</code>. They let a function component hold state, run side effects, and share logic.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="hooks-rules" data-node data-label="Rules of hooks">
+      <h3>The two rules</h3>
+      <ul>
+        <li>Call hooks at the top level of a component, never inside an <code>if</code>, loop or nested function.</li>
+        <li>Call them only from components or from your own hooks.</li>
+      </ul>
+      <p>React tracks hooks by call order, so the order must never change.</p>
+    </article>
+    <article class="topic" id="hooks-state" data-node data-label="useState">
+      <h3>useState</h3>
+      <p>Local state can trigger a re-render when updated. The hook returns the current value and a setter. When the next value depends on the previous one, use a functional update, such as <code>setItems(items =&gt; [...items, newItem])</code>. Copy objects and arrays instead of mutating existing state. React may skip an update when the next value is equal by <code>Object.is</code>.</p>
+    </article>
+    <article class="topic wide" id="hooks-effect" data-node data-label="useEffect">
+      <h3>useEffect</h3>
+      <p>An effect synchronizes a component with an external system, such as a request, timer or event subscription. React runs it after a render commits; effects do not run during server rendering. The dependency array controls when setup is repeated. Each reactive value used by the effect belongs in that array.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Dependency array</th><th>Effect runs</th></tr></thead>
+        <tbody>
+          <tr><td><code>useEffect(fn)</code></td><td>after every committed render</td></tr>
+          <tr><td><code>useEffect(fn, [])</code></td><td>on mount; cleanup on unmount (see Strict Mode below)</td></tr>
+          <tr><td><code>useEffect(fn, [id])</code></td><td>on mount, then after commits where <code>id</code> changes</td></tr>
+        </tbody>
+      </table></div>
+      <div class="cols">
+<pre><code>// setUsers and setError are component state setters.
+useEffect(() =&gt; {
+  const controller = new AbortController();
+  let ignore = false;
+  setError(null);
+  async function load() {
+    try {
+      const res = await fetch("/api/users", { signal: controller.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const users = await res.json();
+      if (!ignore) setUsers(users);
+    } catch (error) {
+      if (!ignore &amp;&amp; error.name !== "AbortError") setError(error);
+    }
+  }
+  load();
+  return () =&gt; { ignore = true; controller.abort(); };
+}, []);</code></pre>
+<pre><code>useEffect(() =&gt; {
+  const id = setInterval(tick, 1000);
+  return () =&gt; clearInterval(id);
+}, [tick]); // restart if the tick function changes</code></pre>
+      </div>
+      <p>Cleanup runs before setup repeats with changed dependencies, and on unmount. In development, Strict Mode also performs an extra setup/cleanup cycle to find missing cleanup. The request example cancels work and ignores stale results. An effect captures the values from its render, so omitted dependencies can produce <a href="#js-scope">stale closures</a>. These are JavaScript excerpts; import the hooks and define the surrounding component state. <a href="https://react.dev/reference/react/useEffect" target="_blank" rel="noopener">React's effect reference</a> explains the lifecycle.</p>
+    </article>
+    <article class="topic" id="hooks-ref" data-node data-label="useRef">
+      <h3>useRef</h3>
+      <p>Holds a value that survives renders without causing one. The usual job is grabbing a DOM element.</p>
+<pre><code>const inputRef = useRef(null);
+&lt;input ref={inputRef} /&gt;
+&lt;button onClick={() =&gt; inputRef.current.focus()}&gt;Focus&lt;/button&gt;</code></pre>
+    </article>
+    <article class="topic" id="hooks-context" data-node data-label="useContext">
+      <h3>useContext</h3>
+      <p>Shares data with many components without passing props through every level (prop drilling). Good for theme, current user, language.</p>
+<pre><code>const ThemeContext = createContext("dark");
+// wrap the tree: &lt;ThemeContext.Provider value="light"&gt;
+// any child:     const theme = useContext(ThemeContext);</code></pre>
+    </article>
+    <article class="topic" id="hooks-memo" data-node data-label="React.memo, useMemo, useCallback">
+      <h3>React.memo, useMemo and useCallback</h3>
+      <p>A parent update normally causes React to render its child components, though memoization and reuse can avoid some work. Rendering does not necessarily change the DOM. If rendering is measurably expensive:</p>
+      <ul>
+        <li><code>React.memo(Component)</code> can skip rendering when props compare equal. Its own state or a consumed context can still cause rendering; memoization is a performance optimization, not a correctness guarantee.</li>
+        <li><code>useMemo</code> remembers a calculated value until its dependencies change.</li>
+        <li><code>useCallback</code> remembers a function, so a memoized child does not receive a "new" function every render.</li>
+      </ul>
+<pre><code>const Row = React.memo(function Row({ item, onSelect }) { /* ... */ });
+
+const sorted = useMemo(() =&gt; sortItems(items), [items]);
+const onSelect = useCallback(id =&gt; setSelected(id), []);</code></pre>
+      <p>All three are speed tweaks. Measure with the React DevTools Profiler first. The React Compiler can add most of this automatically in newer setups.</p>
+    </article>
+    <article class="topic" id="hooks-reducer">
+      <h3>useReducer</h3>
+      <p>An alternative to <code>useState</code> when state has many related pieces. You send actions like <code>"add"</code> or <code>"remove"</code> to one function that decides the next state.</p>
+    </article>
+    <article class="topic wide" id="hooks-custom" data-node data-label="Custom hooks">
+      <h3>Custom hooks</h3>
+      <p>Your own function starting with <code>use</code> that bundles other hooks, so logic can be reused.</p>
+<pre><code>import { useEffect, useState } from "react";
+
+function useFetch(url) {
+  const [result, setResult] = useState({
+    data: null, error: null, loading: true,
+  });
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+    let ignore = false;
+    setResult({ data: null, error: null, loading: true });
+    async function load() {
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!ignore) setResult({ data, error: null, loading: false });
+      } catch (error) {
+        if (!ignore &amp;&amp; error.name !== "AbortError") {
+          setResult({ data: null, error, loading: false });
+        }
+      }
+    }
+    load();
+    return () =&gt; { ignore = true; controller.abort(); };
+  }, [url]);
+  return result;
+}</code></pre>
+    </article>
+    <article class="topic" id="hooks-libs">
+      <h3>Libraries built on hooks</h3>
+      <p>TanStack Query handles fetching, caching and loading states. Zustand and Redux Toolkit manage global state. Learn the built-in hooks first.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Read <a href="https://react.dev/learn/escape-hatches" target="_blank" rel="noopener">react.dev: Escape Hatches</a> on refs and effects. Then build a stopwatch (needs <code>useEffect</code> cleanup) and a <a href="#dom-debounce">debounced</a> search box that fetches as you type.</p>
+</section>
+
+<!-- ============ 12 TSX ============ -->
+<section class="stage" id="tsx" data-title="JSX vs TSX">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>JSX vs TSX <small>adding types</small></h2>
+    <p class="lead">TSX is JSX written in TypeScript. The React you learned stays the same. You only add types.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="tsx-ts" data-node data-label="What TypeScript is">
+      <h3>What TypeScript is</h3>
+      <p>TypeScript adds static types to JavaScript. An editor or the TypeScript checker can detect type mismatches before execution. Build tools remove the types to produce JavaScript, but merely stripping types does not check them. Keep a type-check step such as <code>tsc --noEmit</code> in development or CI. Types do not validate incoming JSON at runtime; use a runtime schema for that.</p>
+<pre><code>function add(a: number, b: number): number { return a + b; }
+add("1", 2);   // error while coding</code></pre>
+    </article>
+    <article class="topic wide" id="tsx-diff" data-node data-label="JSX vs TSX">
+      <h3>The difference</h3>
+      <div class="tw"><table>
+        <thead><tr><th></th><th>.jsx</th><th>.tsx</th></tr></thead>
+        <tbody>
+          <tr><td>Language</td><td>JavaScript + markup</td><td>TypeScript + markup</td></tr>
+          <tr><td>Types</td><td>None</td><td>Yes, checked</td></tr>
+          <tr><td>Markup like <code>&lt;div&gt;</code> allowed</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td>Runs in browser as</td><td>JavaScript</td><td>The same JavaScript, types removed</td></tr>
+        </tbody>
+      </table></div>
+      <p>A plain <code>.ts</code> file cannot contain markup, so any component with TypeScript goes in a <code>.tsx</code> file. Files with no markup, like utilities, stay <code>.ts</code>. Here is the same component both ways:</p>
+      <div class="cols">
+<pre><code>// Card.jsx
+function Card({ title, count = 0 }) {
+  return &lt;h3&gt;{title} ({count})&lt;/h3&gt;;
+}</code></pre>
+<pre><code>// Card.tsx
+interface CardProps {
+  title: string;
+  count?: number;   // optional
+}
+function Card({ title, count = 0 }: CardProps) {
+  return &lt;h3&gt;{title} ({count})&lt;/h3&gt;;
+}</code></pre>
+      </div>
+    </article>
+    <article class="topic" id="tsx-state" data-node data-label="Typing state and events">
+      <h3>Typing state and events</h3>
+<pre><code>const [count, setCount] = useState&lt;number&gt;(0);
+const [user, setUser] = useState&lt;User | null&gt;(null);
+
+function onChange(e: React.ChangeEvent&lt;HTMLInputElement&gt;) {
+  setName(e.target.value);
+}</code></pre>
+      <p>Often TypeScript works out the type itself, so you only write it where it cannot guess.</p>
+    </article>
+    <article class="topic" id="tsx-basics" data-node data-label="Core TypeScript ideas">
+      <h3>Core TypeScript ideas</h3>
+<pre><code>type Id = number | string;            // union
+interface User {
+  id: Id;
+  name: string;
+  email?: string;                     // optional
+}
+function first&lt;T&gt;(arr: T[]): T | undefined { // empty arrays return undefined
+  return arr[0];
+}</code></pre>
+    </article>
+    <article class="topic" id="tsx-why">
+      <h3>Why teams use it</h3>
+      <p>Wrong props, missing fields and typos are caught while typing. Refactors are safer. Next.js projects are created with TypeScript by default, so you will read a lot of <code>.tsx</code>.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>Keep the <a href="https://react-typescript-cheatsheet.netlify.app/" target="_blank" rel="noopener">React TypeScript Cheatsheet</a> open while you convert one small React project from <code>.jsx</code> to <code>.tsx</code>, and fix every error the compiler reports.</p>
+</section>
+
+<!-- ============ 13 NEXT ============ -->
+<section class="stage" id="nextjs" data-title="Next.js">
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>Next.js <small>React with everything included</small></h2>
+    <p class="lead">React is only a UI library. Next.js is a framework on top of it that adds routing, server rendering, and a backend in the same project.</p></div>
+    <button class="btn learned" type="button" aria-pressed="false">Mark learned</button>
+  </header>
+  <div class="grid">
+    <article class="topic" id="next-why" data-node data-label="What and why">
+      <h3>What it is and why it exists</h3>
+      <p>A client-rendered React SPA often starts with a small HTML shell and builds its UI in the browser. That can delay meaningful content and make indexing harder for some crawlers. React itself also supports server rendering. Next.js coordinates server rendering, routing and data access, so a route can deliver useful HTML before all of its client JavaScript loads.</p>
+      <p>Next.js also makes many decisions for you: how to route, fetch, optimize and deploy.</p>
+    </article>
+    <article class="topic" id="next-routing" data-node data-label="File-based routing">
+      <h3>File-based routing</h3>
+      <p>Folders are URLs. No router setup.</p>
+<pre><code>app/
+├── layout.tsx            shared navbar and footer
+├── page.tsx              /
+├── about/page.tsx        /about
+├── blog/[id]/page.tsx    /blog/5   (dynamic)
+└── api/users/route.ts    /api/users (backend)</code></pre>
+    </article>
+    <article class="topic wide" id="next-render" data-node data-label="Rendering strategies">
+      <h3>Rendering strategies</h3>
+      <p>The big idea in Next.js is choosing where and when the HTML is made.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Name</th><th>HTML is made</th><th>Good for</th></tr></thead>
+        <tbody>
+          <tr><td>SSR, server-side rendering</td><td>on the server, per request</td><td>fresh data, dashboards, SEO</td></tr>
+          <tr><td>SSG, static generation</td><td>once, at build time</td><td>blogs, docs, marketing pages</td></tr>
+          <tr><td>ISR, incremental regeneration</td><td>generated and cached, then revalidated by time or an explicit trigger</td><td>static pages that change sometimes</td></tr>
+          <tr><td>CSR, client-side rendering</td><td>in the browser, often after an initial HTML response</td><td>highly interactive widgets</td></tr>
+        </tbody>
+      </table></div>
+    </article>
+    <article class="topic wide" id="next-components" data-node data-label="Server vs client components">
+      <h3>Server and client components</h3>
+      <p>In the App Router, pages and layouts are Server Components by default. Their implementation runs on the server and is not shipped as component JavaScript to the browser. They can read a database and render Client Components. A <code>"use client"</code> directive marks a client-module boundary for state, effects and event handlers; imports below that boundary join the client bundle.</p>
+      <p><b>Hydration</b> makes pre-rendered HTML interactive by connecting it to React in the browser. Client Components can also contribute server-rendered HTML on the initial load; <code>"use client"</code> does not mean browser-only execution. Keep browser APIs such as <code>window</code> in effects or event handlers. A subtree can still ship client JavaScript even when its parent is a Server Component.</p>
+      <div class="cols">
+<pre><code>// server component (default)
+export default async function Page() {
+  const res = await fetch("https://api.example.com/users");
+  const users = await res.json();
+  return &lt;UserList users={users} /&gt;;
+}</code></pre>
+<pre><code>"use client";   // client component
+import { useState } from "react";
+
+export function LikeButton() {
+  const [n, setN] = useState(0);
+  return &lt;button onClick={() =&gt; setN(n + 1)}&gt;{n}&lt;/button&gt;;
+}</code></pre>
+      </div>
+    </article>
+    <article class="topic" id="next-backend" data-node data-label="Route handlers and actions">
+      <h3>Route handlers and server actions</h3>
+      <p>A file at <code>app/api/users/route.ts</code> becomes a backend endpoint. Server actions let a form call a server function directly. For many apps this removes the need for a separate Express server. The <a href="../../Backend/handbook_codex/Backend_Handbook.html#nextjs">Backend handbook</a> covers how.</p>
+<pre><code>export async function GET() {
+  return Response.json([{ id: 1, name: "Dinesh" }]);
+}</code></pre>
+    </article>
+    <article class="topic" id="next-builtins" data-node data-label="Built-in features">
+      <h3>Built-in features</h3>
+      <ul>
+        <li><code>&lt;Link&gt;</code> for fast navigation with prefetching.</li>
+        <li><code>&lt;Image&gt;</code> for resizing and lazy loading.</li>
+        <li>Font loading and <code>metadata</code> for titles and SEO.</li>
+        <li><code>loading.tsx</code>, <code>error.tsx</code>, <code>not-found.tsx</code> for those states.</li>
+        <li><code>proxy.ts</code> for request-time redirects and preliminary auth checks in Next.js 16; older projects use <code>middleware.ts</code>. Enforce authorization again near protected data and mutations.</li>
+      </ul>
+    </article>
+    <article class="topic" id="next-deploy">
+      <h3>Deploying</h3>
+      <p>Vercel, made by the Next.js team, deploys straight from a GitHub repo. A common stack is Next.js, TypeScript, Tailwind, a database with Prisma or Drizzle, and Auth.js for login.</p>
+      <p>Variables prefixed with <code>NEXT_PUBLIC_</code> can be included in client JavaScript and must be treated as public. Keep secrets in server-only modules and environment variables. An unprefixed name alone does not prevent you from leaking a value through a response or rendered props.</p>
+    </article>
+  </div>
+  <p class="deeper"><span class="label">Go deeper</span>The <a href="https://nextjs.org/learn" target="_blank" rel="noopener">nextjs.org Learn course</a> builds a full dashboard. After it, build a blog or task manager of your own.</p>
+</section>
+
+<!-- ============ ORDER + CHECKLIST ============ -->
+<section class="stage" id="finish" data-title="Order and checklist" data-plain>
+  <header class="stage-head">
+    <span class="stage-num"></span>
+    <div><h2>Learning order and checklist <small>wrap up</small></h2>
+    <p class="lead">Read a stage, then build something small with it. Building teaches more than reading.</p></div>
+    <span></span>
+  </header>
+  <div class="grid">
+    <article class="topic wide" id="finish-order">
+      <h3>Suggested order</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Stage</th><th>Learn</th><th>Build to practice</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>HTML, CSS, flexbox, grid, responsive</td><td>Portfolio or landing page clone</td></tr>
+          <tr><td>2</td><td>JavaScript, DOM, fetch</td><td>To-do app, weather app, quiz</td></tr>
+          <tr><td>3</td><td>Git and GitHub</td><td>Push every project</td></tr>
+          <tr><td>4</td><td>React and hooks</td><td>Movie search, expense tracker</td></tr>
+          <tr><td>5</td><td>TypeScript and TSX</td><td>Convert one React project</td></tr>
+          <tr><td>6</td><td>Next.js</td><td>Blog or task manager</td></tr>
+        </tbody>
+      </table></div>
+      <p>After this comes the backend: Node, Express, databases and login. Continue in the <a href="../../Backend/handbook_codex/Backend_Handbook.html">Backend handbook</a>.</p>
+    </article>
+    <article class="topic wide" id="finish-flow">
+      <h3>How frontend and backend meet</h3>
+      <p>Follow one click in a to-do app through the whole stack. Each step links to where it is explained.</p>
+      <ol>
+        <li>The user types a task and presses Add. A React <a href="#react-events">event handler</a> runs and updates <a href="#react-state">state</a>.</li>
+        <li>The handler calls <a href="#async-fetch"><code>fetch("/api/tasks", { method: "POST" })</code></a> with the task as <a href="#js-json">JSON</a>.</li>
+        <li>The request crosses the network as <a href="../../Backend/handbook_codex/Backend_Handbook.html#http">HTTP</a>, and <a href="../../Backend/handbook_codex/Backend_Handbook.html#sec-cors">CORS</a> applies if the API lives on another origin.</li>
+        <li>Express runs its <a href="../../Backend/handbook_codex/Backend_Handbook.html#middleware">middleware</a>: parse the JSON, check the <a href="../../Backend/handbook_codex/Backend_Handbook.html#auth">login cookie</a>, validate the body.</li>
+        <li>A service saves the task in the <a href="../../Backend/handbook_codex/Backend_Handbook.html#db">database</a>.</li>
+        <li>The server replies <code>201 Created</code> with the saved task.</li>
+        <li>Back in the browser, the new task goes into state and React re-renders the list.</li>
+      </ol>
+      <p>With <a href="#nextjs">Next.js</a>, steps 2 to 6 can shrink into one <a href="../../Backend/handbook_codex/Backend_Handbook.html#next-actions">server action</a>, but the same things still happen underneath.</p>
+    </article>
+    <article class="topic wide" id="finish-check">
+      <h3>Can you say these out loud?</h3>
+      <label class="check"><input type="checkbox" data-k="c1"><span>What happens between typing a URL and seeing a page.</span></label>
+      <label class="check"><input type="checkbox" data-k="c2"><span>HTML is structure, CSS is style, JavaScript is behavior.</span></label>
+      <label class="check"><input type="checkbox" data-k="c3"><span>The box model, flexbox versus grid, and what a media query does.</span></label>
+      <label class="check"><input type="checkbox" data-k="c4"><span>What transform, transition and keyframes each do.</span></label>
+      <label class="check"><input type="checkbox" data-k="c5"><span>What the DOM is, how events bubble, and when to debounce.</span></label>
+      <label class="check"><input type="checkbox" data-k="c6"><span>Promises, async/await, Promise.all, and how fetch works.</span></label>
+      <label class="check"><input type="checkbox" data-k="c7"><span>What Git, npm and a .env file are for.</span></label>
+      <label class="check"><input type="checkbox" data-k="c8"><span>Components, props, state, and when useEffect runs.</span></label>
+      <label class="check"><input type="checkbox" data-k="c9"><span>How TSX differs from JSX.</span></label>
+      <label class="check"><input type="checkbox" data-k="c10"><span>What Next.js adds over React, and the difference between SSR and SSG.</span></label>
+    </article>
+  </div>
+  <p class="foot">Made for the DineshXEswar learning repo. Source is one HTML file, edit the text directly. Progress ticks are saved in your own browser only.</p>
+</section>
+
+</main>
+</div>
+
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+/* theme */
+const root=document.documentElement, tbtn=$("#theme");
+function setTheme(t){root.dataset.theme=t;tbtn.textContent=t==="dark"?"Light mode":"Dark mode";store.set("hb-codex-theme",t)}
+setTheme(root.dataset.theme==="light"?"light":"dark");
+tbtn.addEventListener("click",()=>setTheme(root.dataset.theme==="dark"?"light":"dark"));
+
+/* stages: numbers, counts */
+const stages=$$(".stage");
+stages.forEach((s,i)=>{s.dataset.n=String(i+1).padStart(2,"0");$(".stage-num",s).textContent=s.dataset.n});
+const learnable=stages.filter(s=>!("plain" in s.dataset));
+$("#n-stages").textContent=learnable.length;
+$("#n-topics").textContent=$$(".topic",$("main")).filter(t=>!t.closest("[data-plain]")).length;
+
+/* learned state */
+const LKEY="hb-codex-fe-learned";
+let learned=new Set(store.get(LKEY,[]));
+function paintLearned(){
+  stages.forEach(s=>{
+    const on=learned.has(s.id), b=$(".learned",s);
+    if(b){b.setAttribute("aria-pressed",on);b.textContent=on?"Learned":"Mark learned"}
+    const n=$('.node.stage[data-stage="'+s.id+'"]'); if(n)n.classList.toggle("done",on);
+    const t=$('#toc a[href="#'+s.id+'"]'); if(t)t.classList.toggle("done",on);
+  });
+}
+$$(".learned").forEach(b=>b.addEventListener("click",()=>{
+  const id=b.closest(".stage").id;
+  learned.has(id)?learned.delete(id):learned.add(id);
+  store.set(LKEY,[...learned]);paintLearned();
+}));
+
+/* toc */
+$("#toc").innerHTML='<p class="label" style="padding-left:12px">Stages</p>'+stages.map(s=>`<a href="#${s.id}" data-id="${s.id}">${s.dataset.n} ${s.dataset.title}</a>`).join("");
+
+/* roadmap */
+const rows=$("#rows");
+learnable.forEach(s=>{
+  const li=document.createElement("li");li.className="row";
+  const left=document.createElement("div");left.className="branches left";
+  const mid=document.createElement("div");
+  const right=document.createElement("div");right.className="branches right";
+  const a=document.createElement("a");a.className="node stage";a.href="#"+s.id;a.dataset.stage=s.id;
+  a.innerHTML=`<small>${s.dataset.n}</small>`;a.append(s.dataset.title);
+  mid.append(a);
+  $$(".topic[data-node]",s).forEach((t,i)=>{
+    const side=i%2===0?"l":"r";
+    const n=document.createElement("a");n.className="node branch";n.href="#"+t.id;
+    n.dataset.stage=s.id;n.dataset.side=side;n.textContent=t.dataset.label||$("h3",t).textContent;
+    (side==="l"?left:right).append(n);
+  });
+  li.append(left,mid,right);rows.append(li);
+});
+
+const box=$("#roadmap"), svg=$("svg",box), mq=matchMedia("(max-width:760px)");
+function draw(){
+  const c=box.getBoundingClientRect();
+  if(!c.width)return;
+  svg.setAttribute("width",c.width);svg.setAttribute("height",c.height);
+  const P=el=>{const r=el.getBoundingClientRect();return{l:r.left-c.left,r:r.right-c.left,t:r.top-c.top,b:r.bottom-c.top,cx:(r.left+r.right)/2-c.left,cy:(r.top+r.bottom)/2-c.top}};
+  const nodes=$$(".node.stage",box);
+  let paths="";
+  nodes.forEach((n,i)=>{
+    const a=P(n);
+    if(i<nodes.length-1){const b=P(nodes[i+1]);paths+=`<path class="spine" marker-end="url(#arr)" d="M${a.cx} ${a.b}L${b.cx} ${b.t-3}"/>`}
+    if(!mq.matches)$$('.node.branch[data-stage="'+n.dataset.stage+'"]',box).forEach(bn=>{
+      const b=P(bn),isL=bn.dataset.side==="l",x1=isL?a.l:a.r,x2=isL?b.r:b.l,dx=(x2-x1)/2;
+      paths+=`<path class="branch" d="M${x1} ${a.cy}C${x1+dx} ${a.cy} ${x2-dx} ${b.cy} ${x2} ${b.cy}"/>`;
+    });
+  });
+  svg.innerHTML='<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M0 0L10 5L0 10z"/></marker></defs>'+paths;
+}
+new ResizeObserver(draw).observe(box);
+addEventListener("load",draw);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+draw();paintLearned();
+
+/* pagers */
+stages.forEach((s,i)=>{
+  const p=stages[i-1],n=stages[i+1];
+  const nav=document.createElement("nav");nav.className="pager";nav.setAttribute("aria-label","Stage navigation");
+  nav.innerHTML=(p?`<a href="#${p.id}">&larr; ${p.dataset.title}</a>`:"<span></span>")+(n?`<a href="#${n.id}">${n.dataset.title} &rarr;</a>`:"<span></span>");
+  s.append(nav);
+});
+
+/* search */
+const q=$("#q");
+q.addEventListener("input",()=>{
+  const t=q.value.trim().toLowerCase();
+  $$(".topic").forEach(a=>{a.hidden=!!t&&!a.textContent.toLowerCase().includes(t)});
+  stages.forEach(s=>s.classList.toggle("empty",!$$(".topic",s).some(a=>!a.hidden)));
+  $("#map").hidden=!!t;
+  if(!t)draw();
+});
+addEventListener("keydown",e=>{
+  if(e.key==="/"&&!/input|textarea|select/i.test(document.activeElement.tagName)){e.preventDefault();q.focus()}
+  if(e.key==="Escape"&&document.activeElement===q){q.value="";q.dispatchEvent(new Event("input"));q.blur()}
+});
+
+/* checklist */
+const CKEY="hb-codex-fe-check";
+const checked=new Set(store.get(CKEY,[]));
+$$("input[data-k]").forEach(i=>{
+  i.checked=checked.has(i.dataset.k);
+  i.addEventListener("change",()=>{i.checked?checked.add(i.dataset.k):checked.delete(i.dataset.k);store.set(CKEY,[...checked])});
+});
+
+/* demo: box model */
+(()=>{
+  const d=$("#demo-box"),out=$(".out",d);
+  const upd=()=>{
+    const v={};
+    $$("input[data-p]",d).forEach(i=>{v[i.dataset.p]=i.value;i.previousElementSibling.textContent=i.value+"px";d.style.setProperty("--"+i.dataset.p,i.value+"px")});
+    out.textContent=`margin: ${v.m}px;\nborder: ${v.b}px solid;\npadding: ${v.p}px;`;
+  };
+  d.addEventListener("input",upd);upd();
+})();
+
+/* demo: flexbox */
+(()=>{
+  const d=$("#demo-flex"),fx=$(".fx",d),out=$(".out",d);
+  const upd=()=>{
+    const css=[];
+    $$("[data-p]",d).forEach(i=>{
+      const val=i.type==="range"?i.value+"px":i.value;
+      fx.style[i.dataset.p]=val;
+      if(i.type==="range")i.previousElementSibling.textContent=val;
+      css.push(i.dataset.p.replace(/[A-Z]/g,m=>"-"+m.toLowerCase())+": "+val+";");
+    });
+    out.textContent=".container {\n  display: flex;\n  "+css.join("\n  ")+"\n}";
+  };
+  d.addEventListener("input",upd);d.addEventListener("change",upd);upd();
+})();
+
+/* demo: transform */
+(()=>{
+  const d=$("#demo-tf"),box=$(".tf-box",d),out=$(".out",d);
+  const upd=()=>{
+    const g=k=>$('[data-p="'+k+'"]',d);
+    const x=g("x").value,r=g("r").value,s=g("s").value,swap=g("swap").checked;
+    g("x").previousElementSibling.textContent=x+"px";
+    g("r").previousElementSibling.textContent=r+"deg";
+    g("s").previousElementSibling.textContent=s;
+    const tf=swap?`rotate(${r}deg) translateX(${x}px) scale(${s})`:`translateX(${x}px) rotate(${r}deg) scale(${s})`;
+    box.style.transform=tf;
+    out.textContent="transform: "+tf+";";
+  };
+  d.addEventListener("input",upd);upd();
+})();
+
+/* demo: bubbling */
+(()=>{
+  const d=$("#demo-bub"),out=$(".out",d),first="Click a box to see the order.";
+  let n=0;
+  $$(".bub",d).forEach(b=>b.addEventListener("click",e=>{
+    if(out.textContent===first)out.textContent="";
+    out.textContent+=(++n)+". click handler on "+b.dataset.name+"\n";
+    if(b.dataset.name==="inner"&&$('[data-p="stop"]',d).checked){e.stopPropagation();out.textContent+="   stopPropagation() called, bubbling ends here\n"}
+  }));
+  $('[data-p="clear"]',d).addEventListener("click",()=>{n=0;out.textContent=first});
+})();
+})();
+</script>
+<script id="codex-interface">
+/* Interface enhancements. Lesson markup and the original demos are retained. */
+(() => {
+  'use strict';
+  const $ = (s, parent = document) => parent.querySelector(s);
+  const $$ = (s, parent = document) => [...parent.querySelectorAll(s)];
+  const root = document.documentElement;
+  const track = root.dataset.handbook;
+  const project = track === 'project';
+  const backend = track === 'backend';
+  const name = project ? 'Project' : backend ? 'Backend' : 'Frontend';
+  const main = $('main');
+  const hero = $('.hero');
+  const toc = $('#toc');
+  const stages = $$('section.stage');
+  const learnable = stages.filter(s => !s.hasAttribute('data-plain'));
+  const topicText = new Map($$('.topic').map(t => [t, t.textContent.toLowerCase()]));
+  const mobile = matchMedia('(max-width:1079px)');
+  const reduced = matchMedia('(prefers-reduced-motion:reduce)');
+  const svg = (paths, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${paths}</svg>`;
+  const icons = {
+    frontend: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/>'),
+    backend: svg('<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 7h5M12 18h5"/>'),
+    map: svg('<rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="15" width="6" height="6" rx="1.5"/><path d="M9 6h7a2 2 0 0 1 2 2v7M6 9v9h9"/>'),
+    book: svg('<path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15"/>'),
+    menu: svg('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+    database: svg('<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/>')
+  };
+
+  // Give the top bar a compact identity and a consistently placed search field.
+  $('.brand').innerHTML = `<div class="brand-copy">DineshXEswar<span>Developer handbooks</span></div>`;
+  const context = document.createElement('div');
+  context.className = 'header-context';
+  context.innerHTML = '<i></i> A little progress, every day';
+  const divider = document.createElement('span');
+  divider.className = 'header-divider';
+  $('.brand').after(divider, context);
+  $('#q').placeholder = 'Search this handbook…';
+  $('.search').insertAdjacentHTML('beforeend', '<kbd aria-hidden="true">/</kbd>');
+  $('#theme').setAttribute('aria-label', 'Switch color theme');
+  const menu = document.createElement('button');
+  menu.className = 'menu-toggle';
+  menu.type = 'button';
+  menu.setAttribute('aria-label', 'Open chapter navigation');
+  menu.setAttribute('aria-expanded', 'false');
+  menu.setAttribute('aria-controls', 'toc');
+  menu.innerHTML = icons.menu;
+  $('.brand').before(menu);
+  $('.top').insertAdjacentHTML('beforeend', '<div class="reading-progress" aria-hidden="true"><span></span></div>');
+
+  const workspace = document.createElement('div');
+  workspace.className = 'workspace-bar';
+  workspace.innerHTML = `<span>${icons.book} Learning library <span aria-hidden="true">/</span> <strong>${name}</strong></span><span class="edition">CODEX EDITION</span>`;
+  main.prepend(workspace);
+
+  const copy = document.createElement('div');
+  copy.className = 'hero-copy';
+  [...hero.children].filter(el => !el.classList.contains('stats')).forEach(el => copy.append(el));
+  hero.prepend(copy);
+  const h1 = $('h1', copy);
+  h1.innerHTML = project ? '<span>Issue tracker</span>from scratch' : `<span>${name}</span>handbook`;
+  const actions = document.createElement('div');
+  actions.className = 'hero-actions';
+  actions.innerHTML = `<a class="btn btn-primary" id="continue-learning" href="#${learnable[0].id}">Start learning</a><a class="btn btn-secondary" id="explore-roadmap" href="#map">Explore roadmap ↗</a>`;
+  copy.append(actions);
+
+  const art = document.createElement('aside');
+  art.className = 'hero-art';
+  art.setAttribute('aria-hidden', 'true');
+  art.innerHTML = project
+    ? '<div class="art-label">ONE FEATURE. EVERY LAYER.</div><div class="art-window"><div class="art-window-bar"><i></i><i></i><i></i><span>traceboard / issues</span></div><div class="art-ticket"><small>ISSUE #42 · WEB APP</small><strong>Fix the mobile navbar</strong><span>OPEN</span></div></div><div class="art-tags"><span>UI</span><span>API</span><span>Permissions</span><span>Database</span></div><div class="art-caption"><b>Follow the decision, then the code.</b><span>↗</span></div>'
+    : backend
+    ? `<div class="art-label">BEHIND EVERY INTERACTION</div><div class="art-server"><span>${icons.frontend}Client</span><i>→</i><span>${icons.backend}Server</span><i>→</i><span>${icons.database}Data</span></div><div class="art-response"><span>200 OK</span> &nbsp; application/json<br>{ "ready": true }</div><div class="art-tags"><span>Node.js</span><span>Express</span><span>Next.js</span></div><div class="art-caption"><b>One request. A whole world.</b><span>↗</span></div>`
+    : '<div class="art-label">FROM IDEA TO INTERFACE</div><div class="art-window"><div class="art-window-bar"><i></i><i></i><i></i><span>hello-world.jsx</span></div><div class="art-code"><em>function</em> HelloWorld() {\n  <em>return</em> (\n    &lt;<b>h1</b>&gt;Hello, world.&lt;/<b>h1</b>&gt;\n  );\n}</div></div><div class="art-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>React</span></div><div class="art-caption"><b>Small pieces. Endless possibilities.</b><span>↗</span></div>';
+  copy.after(art);
+
+  const journey = document.createElement('div');
+  journey.className = 'journey';
+  journey.innerHTML = '<div class="journey-copy"><strong>Your learning journey</strong><small id="journey-count"></small></div><progress id="journey-progress" value="0" aria-label="Stages learned"></progress><span class="journey-pct" aria-hidden="true">0%</span>';
+  hero.after(journey);
+
+  // The full original roadmap remains available on demand.
+  const details = document.createElement('details');
+  details.className = 'roadmap-panel';
+  const summary = document.createElement('summary');
+  summary.innerHTML = `<span class="roadmap-icon">${icons.map}</span><span><strong>View the complete learning roadmap</strong><small>${learnable.length} stages · connected topics · follow your own pace</small></span>`;
+  details.append(summary);
+  $('#roadmap').before(details);
+  details.append($('#roadmap'));
+  details.addEventListener('toggle', () => {
+    if (details.open) window.dispatchEvent(new Event('resize'));
+  });
+  $('#explore-roadmap').addEventListener('click', () => { details.open = true; });
+  const kicker = document.createElement('div');
+  kicker.className = 'section-kicker';
+  kicker.textContent = 'THE CURRICULUM';
+  stages[0].before(kicker);
+
+  // Numbered chapter navigation, with a persistent route to both editions.
+  $$('#toc a[data-id]').forEach(a => {
+    const stage = stages.find(s => s.id === a.dataset.id);
+    a.replaceChildren();
+    const n = document.createElement('span');
+    n.className = 'toc-number';
+    n.textContent = stage.dataset.n;
+    n.setAttribute('aria-hidden', 'true');
+    const label = document.createElement('span');
+    label.textContent = stage.dataset.title;
+    a.append(n, label);
+  });
+  const switcher = document.createElement('div');
+  switcher.className = 'track-switcher';
+  switcher.setAttribute('aria-label', 'Choose handbook');
+  switcher.innerHTML = [
+    ['frontend', 'Frontend', '../../Frontend/handbook_codex/Frontend_Handbook.html', icons.frontend],
+    ['backend', 'Backend', '../../Backend/handbook_codex/Backend_Handbook.html', icons.backend],
+    ['project', 'Build', '../../Projects/handbook_codex/Project_Handbook.html', icons.map]
+  ].map(([id, label, href, icon]) => `<a href="${href}" ${track === id ? 'aria-current="page"' : ''} ${id === 'project' ? 'aria-label="Build an issue tracker from scratch"' : ''}>${icon}${label}</a>`).join('');
+  toc.prepend(switcher);
+  switcher.insertAdjacentHTML('afterend', `<a href="#top" class="toc-overview active">${icons.book}Handbook overview</a>`);
+  const sidebarProgress = document.createElement('div');
+  sidebarProgress.className = 'sidebar-progress';
+  sidebarProgress.innerHTML = '<p>Your progress <span id="sidebar-count"></span></p><progress id="sidebar-meter" value="0" aria-label="Stages learned"></progress><small>Saved in this browser. Keep going.</small>';
+  toc.append(sidebarProgress);
+  const closeMenu = document.createElement('button');
+  closeMenu.type = 'button';
+  closeMenu.className = 'menu-close';
+  closeMenu.textContent = 'Chapter navigation';
+  closeMenu.setAttribute('aria-label', 'Close chapter navigation');
+  toc.prepend(closeMenu);
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.hidden = true;
+  document.body.append(toast);
+  let toastTimer;
+  function announce(message) {
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.hidden = false;
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 2400);
+  }
+  function updateProgress() {
+    const done = learnable.filter(s => $('.learned', s)?.getAttribute('aria-pressed') === 'true').length;
+    const total = learnable.length;
+    const pct = Math.round(done / total * 100);
+    $('#journey-count').textContent = `${done} of ${total} stages learned`;
+    $('#sidebar-count').textContent = `${done} / ${total}`;
+    $('.journey-pct').textContent = pct + '%';
+    [$('#journey-progress'), $('#sidebar-meter')].forEach(p => { p.max = total; p.value = done; });
+    const next = learnable.find(s => $('.learned', s)?.getAttribute('aria-pressed') !== 'true') || learnable[0];
+    $('#continue-learning').href = '#' + next.id;
+    $('#continue-learning').textContent = done === total ? 'Review handbook' : done ? 'Continue learning' : 'Start learning';
+  }
+  $$('.learned').forEach(b => b.addEventListener('click', () => {
+    updateProgress();
+    announce(b.getAttribute('aria-pressed') === 'true' ? 'Stage marked as learned. Nice progress.' : 'Stage marked for another look.');
+  }));
+  updateProgress();
+
+  // Keep output text separate from controls, so copy never changes a lesson or demo.
+  $$('pre').forEach((pre, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    const toolbar = document.createElement('div');
+    toolbar.className = 'code-toolbar';
+    const label = document.createElement('span');
+    label.textContent = pre.closest('.demo, .story-player') ? 'Live output' : 'Code example';
+    const button = document.createElement('button');
+    button.className = 'copy-code';
+    button.type = 'button';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-label', `Copy ${label.textContent.toLowerCase()} ${index + 1}`);
+    toolbar.append(label, button);
+    pre.before(wrapper);
+    wrapper.append(toolbar, pre);
+    button.addEventListener('click', async () => {
+      const text = pre.textContent;
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch (_) { /* Local-file and browser clipboard permissions vary. */ }
+      if (!copied) {
+        const field = document.createElement('textarea');
+        field.value = text;
+        field.style.cssText = 'position:fixed;left:-9999px;top:0';
+        document.body.append(field);
+        field.select();
+        try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+        field.remove();
+        button.focus({preventScroll:true});
+      }
+      if (copied) {
+        button.textContent = 'Copied ✓';
+        announce('Copied to clipboard.');
+        setTimeout(() => { button.textContent = 'Copy'; }, 1800);
+      } else announce('Select the code and use your browser’s copy command.');
+    });
+  });
+
+  // Add useful result and empty states to the original topic filtering.
+  const feedback = document.createElement('section');
+  feedback.className = 'search-feedback';
+  feedback.hidden = true;
+  feedback.setAttribute('aria-label', 'Search results');
+  feedback.innerHTML = '<h2>Search results</h2><p role="status" aria-live="polite" id="search-count"></p><button class="btn" id="clear-search" type="button">Clear search</button>';
+  journey.after(feedback);
+  const q = $('#q');
+  let wasSearching = false;
+  q.addEventListener('input', () => {
+    const term = q.value.trim().toLowerCase();
+    const searching = !!term;
+    let matches = 0;
+    stages.forEach(stage => {
+      const stageMatch = stage.dataset.title.toLowerCase().includes(term);
+      $$('.topic', stage).forEach(topic => {
+        topic.hidden = searching && !stageMatch && !topicText.get(topic).includes(term);
+        if (!topic.hidden) matches++;
+      });
+      stage.classList.toggle('empty', !$$('.topic', stage).some(t => !t.hidden));
+    });
+    document.body.classList.toggle('searching', searching);
+    feedback.hidden = !searching;
+    $('#search-count').textContent = matches
+      ? `${matches} ${matches === 1 ? 'topic' : 'topics'} matching “${q.value.trim()}”`
+      : `No topics found for “${q.value.trim()}”. Try a shorter phrase, a technology, or a stage name.`;
+    $('h2', feedback).textContent = matches ? 'Search results' : 'A different search might help';
+    if (searching && !wasSearching) window.scrollTo({top:0, behavior:'instant'});
+    wasSearching = searching;
+  });
+  $('#clear-search').addEventListener('click', () => {
+    q.value = '';
+    q.dispatchEvent(new Event('input'));
+    q.focus();
+  });
+  // Anchors from the navigation should remain useful while a search is active.
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (link && q.value && !link.closest('.topic')) {
+      q.value = '';
+      q.dispatchEvent(new Event('input'));
+    }
+  });
+
+  // Mobile chapter drawer: focus stays inside; Escape and the backdrop close it.
+  const backdrop = document.createElement('button');
+  backdrop.className = 'nav-backdrop';
+  backdrop.hidden = true;
+  backdrop.type = 'button';
+  backdrop.tabIndex = -1;
+  backdrop.setAttribute('aria-label', 'Close chapter navigation');
+  document.body.append(backdrop);
+  let returnFocus = null;
+  function setMenu(open, restore = true) {
+    open = open && mobile.matches;
+    if (open) returnFocus = document.activeElement;
+    document.body.classList.toggle('nav-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    backdrop.hidden = !open;
+    menu.setAttribute('aria-expanded', String(open));
+    main.inert = open;
+    $('.top').inert = open;
+    if (open) {
+      toc.setAttribute('role', 'dialog');
+      toc.setAttribute('aria-modal', 'true');
+      closeMenu.focus({preventScroll:true});
+    } else {
+      toc.removeAttribute('role');
+      toc.removeAttribute('aria-modal');
+      if (restore && returnFocus) returnFocus.focus({preventScroll:true});
+      returnFocus = null;
+    }
+  }
+  menu.addEventListener('click', () => setMenu(true));
+  closeMenu.addEventListener('click', () => setMenu(false));
+  backdrop.addEventListener('click', () => setMenu(false));
+  toc.addEventListener('click', e => {
+    if (e.target.closest('a') && mobile.matches) setMenu(false);
+  });
+  mobile.addEventListener('change', () => setMenu(false, false));
+  document.addEventListener('keydown', e => {
+    if (document.body.classList.contains('nav-open')) {
+      if (e.key === 'Escape') { e.preventDefault(); setMenu(false); }
+      if (e.key === 'Tab') {
+        const focusable = $$('button,a[href]', toc).filter(el => el.getClientRects().length);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault(); q.focus();
+    }
+  });
+
+  const backTop = document.createElement('button');
+  backTop.className = 'back-top';
+  backTop.type = 'button';
+  backTop.textContent = '↑';
+  backTop.hidden = true;
+  backTop.setAttribute('aria-label', 'Back to top');
+  document.body.append(backTop);
+  backTop.addEventListener('click', () => {
+    window.scrollTo({top:0, behavior:reduced.matches ? 'instant' : 'smooth'});
+    $('.brand').focus({preventScroll:true});
+  });
+  let frame = false;
+  function paintScroll() {
+    const available = root.scrollHeight - root.clientHeight;
+    $('.reading-progress span').style.width = (available > 0 ? window.scrollY / available * 100 : 0) + '%';
+    backTop.hidden = window.scrollY < 800;
+    const line = $('.top').getBoundingClientRect().height + 65;
+    const current = stages.filter(s => !s.classList.contains('empty') && s.getBoundingClientRect().top <= line).at(-1);
+    $$('#toc a[data-id]').forEach(a => {
+      const active = a.dataset.id === current?.id;
+      a.classList.toggle('active', active);
+      if (active) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+    $('.toc-overview').classList.toggle('active', !current);
+    $$('.node.stage').forEach(a => a.classList.toggle('active', a.dataset.stage === current?.id));
+    frame = false;
+  }
+  addEventListener('scroll', () => {
+    if (!frame) { frame = true; requestAnimationFrame(paintScroll); }
+  }, {passive:true});
+  addEventListener('resize', paintScroll);
+  paintScroll();
+
+  let printOpen;
+  addEventListener('beforeprint', () => { printOpen = details.open; details.open = true; });
+  addEventListener('afterprint', () => { details.open = printOpen; });
+})();
+
+</script>
+</body>
+</html>
