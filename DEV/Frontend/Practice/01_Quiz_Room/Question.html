@@ -1,0 +1,1892 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-guide="01_Quiz_Room">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz room · Frontend practice</title>
+    <meta
+      name="description"
+      content="A five-question quiz with remembered choices, a result, and answer review."
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: #1a1a1a;
+        --surface-2: #1f1f1f;
+        --line: #1f1f1f;
+        --line-strong: #3a3a3a;
+        --text: #fffaf0;
+        --body: #e5e5e5;
+        --muted: #9a9a9a;
+        --faint: #6a6a6a;
+        --primary: #fffaf0;
+        --on-primary: #0a0a0a;
+        --r: 12px;
+        --r-sm: 8px;
+        --r-pill: 999px;
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 64px;
+        --font: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+        --mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+        color-scheme: dark;
+      }
+      :root[data-theme="light"] {
+        --bg: #fffaf0;
+        --surface: #faf5e8;
+        --surface-2: #ebe6d6;
+        --line: #ebe6d6;
+        --line-strong: #9a9a9a;
+        --text: #0a0a0a;
+        --body: #1a1a1a;
+        --muted: #6a6a6a;
+        --faint: #9a9a9a;
+        --primary: #0a0a0a;
+        --on-primary: #fffaf0;
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 80px;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--body);
+        font: 15px/1.7 var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      a {
+        color: var(--text);
+        text-underline-offset: 4px;
+      }
+      a:hover {
+        color: var(--muted);
+      }
+      :focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 3px;
+      }
+      h1,
+      h2,
+      h3 {
+        color: var(--text);
+        margin: 0;
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 var(--s3);
+      }
+      ul,
+      ol {
+        margin: 0 0 var(--s3);
+        padding-left: var(--s5);
+      }
+      li {
+        margin-bottom: var(--s1);
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 0.88em;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 1px 6px;
+      }
+      pre {
+        margin: var(--s3) 0;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: var(--s4);
+        overflow: auto;
+        font: 13px/1.6 var(--mono);
+        color: var(--body);
+      }
+      pre code {
+        background: none;
+        border: 0;
+        padding: 0;
+        font-size: inherit;
+      }
+      .label {
+        font-size: 12px;
+        line-height: 1.4;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: var(--muted);
+        margin: 0 0 var(--s2);
+      }
+      .skip {
+        position: absolute;
+        left: -999px;
+        top: 8px;
+        background: var(--primary);
+        color: var(--on-primary);
+        padding: 8px 16px;
+        border-radius: var(--r-pill);
+        z-index: 100;
+      }
+      .skip:focus {
+        left: 16px;
+      }
+
+      /* top bar */
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        height: 56px;
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+      }
+      .top-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        height: 100%;
+        padding: 0 var(--s5);
+        display: flex;
+        align-items: center;
+        gap: var(--s4);
+      }
+      .brand {
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .brand span {
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: var(--s2);
+      }
+      .search {
+        flex: 1;
+        max-width: 420px;
+        margin-left: auto;
+      }
+      .search input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r-pill);
+        color: var(--text);
+        font: inherit;
+        font-size: 14px;
+        padding: 6px 16px;
+      }
+      .search input::placeholder {
+        color: var(--muted);
+      }
+      .search {
+        min-width: 0;
+      }
+      a.btn {
+        text-decoration: none;
+        display: inline-block;
+      }
+      a.btn:hover {
+        color: var(--text);
+      }
+      @media (max-width: 640px) {
+        .brand span,
+        .top .xlink {
+          display: none;
+        }
+        .top-inner {
+          padding: 0 var(--s4);
+          gap: var(--s2);
+        }
+        .search input {
+          padding: 6px 12px;
+        }
+      }
+      .btn {
+        border: 1px solid var(--line-strong);
+        background: transparent;
+        color: var(--text);
+        border-radius: var(--r-pill);
+        padding: 6px 16px;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        border-color: var(--primary);
+      }
+      .btn[aria-pressed="true"] {
+        background: var(--primary);
+        color: var(--on-primary);
+        border-color: var(--primary);
+      }
+
+      /* layout */
+      .layout {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 var(--s5);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--s7);
+      }
+      .toc {
+        display: none;
+      }
+      @media (min-width: 1100px) {
+        .layout {
+          grid-template-columns: 200px minmax(0, 1fr);
+        }
+        .toc {
+          display: block;
+          position: sticky;
+          top: 80px;
+          align-self: start;
+          max-height: calc(100vh - 100px);
+          overflow: auto;
+          padding: var(--s6) 0;
+        }
+      }
+      .toc a {
+        display: block;
+        padding: 6px 12px;
+        border-left: 2px solid var(--line);
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .toc a:hover {
+        color: var(--text);
+      }
+      .toc a.active {
+        color: var(--text);
+        border-left-color: var(--primary);
+      }
+      .toc a.done::after {
+        content: " \2713";
+        color: var(--faint);
+      }
+      main {
+        padding-bottom: var(--s8);
+        min-width: 0;
+      }
+
+      /* hero */
+      .hero {
+        padding: var(--s8) 0 var(--s6);
+      }
+      .hero h1 {
+        font-size: clamp(32px, 5vw, 48px);
+        line-height: 1.1;
+        margin-bottom: var(--s4);
+      }
+      .lead {
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--muted);
+        max-width: 68ch;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--line-strong);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r);
+        overflow: hidden;
+        margin-top: var(--s6);
+      }
+      .stats > div {
+        background: var(--bg);
+        padding: var(--s5);
+      }
+      .stats b {
+        display: block;
+        font-size: 28px;
+        line-height: 1.1;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .stats span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      @media (max-width: 640px) {
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      /* roadmap */
+      .map-head {
+        margin-top: var(--s7);
+      }
+      .map-head h2 {
+        font-size: 28px;
+        line-height: 1.2;
+        margin-bottom: var(--s2);
+      }
+      .roadmap {
+        position: relative;
+        padding: var(--s5) 0;
+      }
+      .roadmap svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        pointer-events: none;
+        overflow: visible;
+      }
+      .edges path {
+        fill: none;
+        stroke: var(--faint);
+        stroke-width: 1.5;
+      }
+      .edges .spine {
+        stroke: var(--muted);
+        stroke-width: 2;
+      }
+      .edges .branch {
+        stroke-dasharray: 4 4;
+      }
+      .edges .arrow {
+        fill: var(--muted);
+        stroke: none;
+      }
+      .rows {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr minmax(200px, 240px) 1fr;
+        gap: var(--s7);
+        align-items: center;
+        padding: var(--s5) 0;
+        margin: 0;
+      }
+      .branches {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+      }
+      .branches.left {
+        align-items: flex-end;
+      }
+      .branches.right {
+        align-items: flex-start;
+      }
+      .node {
+        display: block;
+        text-decoration: none;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r-sm);
+        padding: 6px 12px;
+        font-size: 13px;
+        line-height: 1.4;
+        color: var(--muted);
+        background: var(--bg);
+      }
+      .node:hover {
+        border-color: var(--primary);
+        color: var(--text);
+      }
+      .node.stage {
+        text-align: center;
+        border-radius: var(--r);
+        padding: 12px 16px;
+        background: var(--surface);
+        color: var(--text);
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .node.stage small {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        font-weight: 500;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+      .node.stage.active {
+        border-color: var(--primary);
+      }
+      .node.stage.done {
+        background: var(--primary);
+        color: var(--on-primary);
+        border-color: var(--primary);
+      }
+      .node.stage.done small {
+        color: inherit;
+        opacity: 0.7;
+      }
+      @media (max-width: 760px) {
+        .row {
+          grid-template-columns: 1fr;
+          justify-items: center;
+          padding: var(--s4) 0;
+        }
+        .branches {
+          display: none;
+        }
+      }
+
+      /* stages */
+      .stage {
+        margin-top: var(--s8);
+        padding-top: var(--s6);
+        border-top: 1px solid var(--line);
+      }
+      .stage.empty {
+        display: none;
+      }
+      .stage-head {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: var(--s5);
+        align-items: start;
+        margin-bottom: var(--s5);
+      }
+      .stage-num {
+        font-size: 48px;
+        line-height: 1;
+        font-weight: 600;
+        color: var(--faint);
+      }
+      .stage-head h2 {
+        font-size: 28px;
+        line-height: 1.2;
+        margin-bottom: var(--s2);
+      }
+      .stage-head h2 small {
+        font-size: 13px;
+        font-weight: 400;
+        color: var(--muted);
+        margin-left: var(--s2);
+      }
+      .stage-head .lead {
+        margin: 0;
+      }
+      @media (max-width: 640px) {
+        .stage-head {
+          grid-template-columns: auto 1fr;
+        }
+        .stage-head .btn {
+          grid-column: 1/-1;
+          justify-self: start;
+        }
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+        gap: var(--s4);
+      }
+      .topic {
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: var(--s5);
+        min-width: 0;
+      }
+      .topic:hover {
+        border-color: var(--line-strong);
+      }
+      .topic:target {
+        border-color: var(--primary);
+      }
+      .topic.wide {
+        grid-column: 1/-1;
+      }
+      .topic h3 {
+        font-size: 17px;
+        line-height: 1.35;
+        margin-bottom: var(--s2);
+      }
+      .topic > :last-child {
+        margin-bottom: 0;
+      }
+      .deeper {
+        margin: var(--s5) 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .deeper .label {
+        display: inline;
+        margin-right: var(--s2);
+      }
+      .pager {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        margin-top: var(--s5);
+        font-size: 14px;
+      }
+      .pager a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .pager a:hover {
+        color: var(--text);
+      }
+      .callout {
+        border-left: 3px solid var(--primary);
+        background: var(--surface);
+        border-radius: 0 var(--r-sm) var(--r-sm) 0;
+        padding: var(--s3) var(--s4);
+        margin: var(--s3) 0;
+      }
+      .callout p:last-child {
+        margin: 0;
+      }
+      .tw {
+        overflow-x: auto;
+        margin: var(--s3) 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 14px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: var(--muted);
+        border-bottom-color: var(--line-strong);
+      }
+      .cols {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+        gap: var(--s4);
+      }
+      .cols pre {
+        margin: 0;
+      }
+
+      /* demos */
+      .demo {
+        background: var(--surface);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r);
+        padding: var(--s5);
+        margin-top: var(--s3);
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s4) var(--s5);
+        margin-bottom: var(--s4);
+      }
+      .controls label {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s1);
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .controls label.inline {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--s2);
+      }
+      .controls output {
+        color: var(--text);
+        font-family: var(--mono);
+        margin-left: var(--s2);
+      }
+      .controls input[type="range"] {
+        width: 150px;
+        accent-color: var(--primary);
+      }
+      .controls input[type="checkbox"] {
+        accent-color: var(--primary);
+      }
+      .controls select {
+        background: var(--surface-2);
+        color: var(--text);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r-sm);
+        font: inherit;
+        font-size: 13px;
+        padding: 4px 8px;
+      }
+      .stagebox {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        padding: var(--s4);
+        overflow: auto;
+      }
+      .demo pre {
+        margin: var(--s3) 0 0;
+        background: var(--bg);
+      }
+      .bm-margin {
+        display: inline-block;
+        padding: var(--m, 16px);
+        outline: 1px dashed var(--faint);
+      }
+      .bm-box {
+        border: var(--b, 4px) solid var(--text);
+        padding: var(--p, 24px);
+        background: var(--surface-2);
+      }
+      .bm-content {
+        background: var(--primary);
+        color: var(--on-primary);
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .fx {
+        display: flex;
+        height: 200px;
+        border: 1px dashed var(--faint);
+        border-radius: var(--r-sm);
+      }
+      .fx div {
+        background: var(--primary);
+        color: var(--on-primary);
+        border-radius: 6px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+      }
+      .fx div:nth-child(1) {
+        min-width: 48px;
+        min-height: 40px;
+      }
+      .fx div:nth-child(2) {
+        min-width: 64px;
+        min-height: 72px;
+        opacity: 0.8;
+      }
+      .fx div:nth-child(3) {
+        min-width: 48px;
+        min-height: 32px;
+        opacity: 0.6;
+      }
+      .tf {
+        display: grid;
+        place-items: center;
+        height: 240px;
+      }
+      .tf > div {
+        grid-area: 1/1;
+        width: 80px;
+        height: 80px;
+        border-radius: var(--r-sm);
+      }
+      .tf-ghost {
+        border: 1px dashed var(--faint);
+      }
+      .tf-box {
+        background: var(--primary);
+        color: var(--on-primary);
+        display: grid;
+        place-items: center;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .bub {
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r-sm);
+        padding: var(--s3) var(--s4);
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .bub .bub {
+        margin-top: var(--s2);
+      }
+      .bub:hover {
+        border-color: var(--primary);
+      }
+      .log {
+        min-height: 96px;
+        white-space: pre-wrap;
+      }
+
+      /* checklist */
+      .check {
+        display: flex;
+        gap: var(--s3);
+        align-items: flex-start;
+        padding: var(--s2) 0;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+      }
+      .check input {
+        margin-top: 6px;
+        accent-color: var(--primary);
+      }
+      .foot {
+        margin-top: var(--s8);
+        padding-top: var(--s5);
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        * {
+          transition: none !important;
+        }
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 24px 0;
+      }
+      .actions .btn {
+        white-space: normal;
+        text-decoration: none;
+      }
+      .js-only {
+        display: none !important;
+      }
+      .js .js-only {
+        display: flex !important;
+      }
+      .js .js-block {
+        display: block !important;
+      }
+      .status {
+        color: var(--muted);
+        font-size: 13px;
+        min-height: 24px;
+      }
+      .target {
+        margin: 16px 0 0;
+      }
+      .target img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        background: #0a0a0a;
+      }
+      .target figcaption {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 8px 0 16px;
+      }
+      .targets-secondary {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        gap: 24px;
+        align-items: start;
+      }
+      .target.mobile {
+        max-width: 390px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      summary {
+        cursor: pointer;
+        color: var(--text);
+        font-weight: 500;
+      }
+      details {
+        margin: 16px 0;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+      details[open] > summary {
+        margin-bottom: 12px;
+      }
+      .callout strong {
+        color: var(--text);
+      }
+      .check input {
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+        margin-top: 4px;
+      }
+      .check span {
+        min-width: 0;
+      }
+      .check:has(input:checked) span {
+        color: var(--muted);
+        text-decoration: line-through;
+      }
+      textarea {
+        display: block;
+        width: 100%;
+        min-height: 120px;
+        margin: 12px 0;
+        background: var(--surface);
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        color: var(--text);
+        font: inherit;
+        padding: 12px;
+        resize: vertical;
+      }
+      .roadmap-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(180px, 260px) minmax(
+            0,
+            1fr
+          );
+        gap: 24px;
+        position: relative;
+        align-items: center;
+        padding: 16px 0;
+      }
+      .roadmap-row:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--muted);
+        z-index: -1;
+      }
+      .roadmap-row:not(:last-child):after {
+        content: "";
+        position: absolute;
+        left: calc(50% - 4px);
+        bottom: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 8px solid var(--muted);
+      }
+      .map-branch {
+        font-size: 13px;
+        color: var(--muted);
+        border-bottom: 1px dashed var(--line-strong);
+        padding: 8px;
+      }
+      .map-node {
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        background: var(--surface);
+        padding: 16px;
+        text-align: center;
+        color: var(--text);
+        text-decoration: none;
+        line-height: 1.4;
+      }
+      .map-node small {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      .map-frame {
+        isolation: isolate;
+      }
+      .topic h4 {
+        margin: 24px 0 8px;
+        font-size: 15px;
+        color: var(--text);
+      }
+      .topic ol,
+      .topic ul {
+        padding-left: 24px;
+      }
+      .topic li {
+        margin-bottom: 8px;
+      }
+      th,
+      td {
+        min-width: 120px;
+      }
+      .pill {
+        display: inline-block;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        padding: 4px 12px;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .empty-search {
+        padding: 24px;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+      }
+      @media (max-width: 760px) {
+        .targets-secondary {
+          grid-template-columns: 1fr;
+        }
+        .roadmap-row {
+          grid-template-columns: 1fr;
+        }
+        .map-branch {
+          display: none;
+        }
+        .map-node {
+          max-width: 280px;
+          justify-self: center;
+        }
+      }
+      @media (max-width: 640px) {
+        .layout {
+          padding: 0 16px;
+        }
+        .hero {
+          padding-top: 32px;
+        }
+        .topic {
+          padding: 16px;
+        }
+        .top-inner {
+          padding: 0 16px;
+          gap: 8px;
+        }
+        .brand {
+          font-size: 13px;
+        }
+        .top .btn {
+          padding: 8px;
+        }
+        .search input {
+          font-size: 13px;
+        }
+        .stats > div {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="top-inner">
+        <a class="brand" href="../Practice_Guide.html">Frontend practice</a>
+        <div class="search js-only">
+          <input
+            id="q"
+            type="search"
+            placeholder="Search ( / )"
+            aria-label="Search instructions"
+          />
+        </div>
+        <button class="btn js-only" id="theme" type="button">Light mode</button>
+      </div>
+    </header>
+    <div class="layout" id="top">
+      <nav class="toc" id="toc" aria-label="Guide sections"></nav>
+      <main id="main">
+        <section class="hero">
+          <p class="label">
+            Eswar’s independent practice · DOM events · state · conditional
+            rendering
+          </p>
+          <h1>Quiz room</h1>
+          <p class="lead">
+            A five-question quiz with remembered choices, a result, and answer
+            review.
+          </p>
+          <div class="stats">
+            <div><b id="stage-count">—</b><span>Guide stages</span></div>
+            <div><b id="total-checks">—</b><span>Manual checks</span></div>
+            <div><b>4–6</b><span>Hours, approximate</span></div>
+            <div><b>Vanilla</b><span>HTML + CSS + JavaScript</span></div>
+          </div>
+          <div class="actions">
+            <a class="btn" href="../Practice_Guide.html">All four questions</a
+            ><a class="btn" href="#targets">View output targets</a
+            ><a class="btn" href="#features">Required behavior</a>
+          </div>
+          <p class="callout">
+            <strong>Eswar writes the application.</strong> These are
+            requirements, visual targets, and hints. Create your own
+            <code>solution/index.html</code>, <code>solution/style.css</code>,
+            and <code>solution/script.js</code> in the chosen question folder.
+            Recreate the interface with HTML and CSS; a screenshot or SVG
+            embedded as the whole page does not satisfy the exercise.
+          </p>
+          <div class="js-only js-block">
+            <p>
+              Checked: <strong id="completed"></strong>. These are your own
+              manual checks, not an automatic grader.
+            </p>
+            <div class="actions">
+              <button class="btn" id="export" type="button">
+                Export checks</button
+              ><button class="btn" id="import" type="button">
+                Import checks</button
+              ><button class="btn" id="reset" type="button">
+                Reset this page</button
+              ><input
+                id="import-file"
+                type="file"
+                accept=".json,application/json"
+                hidden
+              />
+            </div>
+            <p
+              class="status"
+              id="save-status"
+              role="status"
+              aria-live="polite"
+            ></p>
+            <p class="small">
+              Progress is local to this page and browser. Export it before
+              moving or renaming files. Each question has its own progress; it
+              does not synchronize with the other guides or people.
+            </p>
+            <details>
+              <summary>Explore this guide’s roadmap</summary>
+              <div class="map-frame" id="roadmap"></div>
+            </details>
+          </div>
+          <noscript
+            ><p class="callout">
+              All questions, images, and hints are readable without JavaScript.
+              Saved checks, notes, search, and theme controls need it.
+            </p></noscript
+          >
+        </section>
+        <p id="empty-search" class="empty-search" hidden>
+          No matching instructions. Clear the search to show everything.
+        </p>
+        <section class="stage" id="brief" data-title="Understand the question">
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Understand the question</h2>
+              <p class="lead">
+                Build a quiz Eswar can take from start to finish. Show one
+                question at a time, retain choices when navigating, and
+                calculate the result from the answers actually selected.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic"
+              id="scope"
+              data-node
+              data-label="Your deliverable"
+            >
+              <h3>Your deliverable</h3>
+              <p>
+                <strong>Practice focus:</strong> DOM events · state ·
+                conditional rendering.
+              </p>
+              <p>
+                Budget about 4–6 focused hours, including debugging and manual
+                checks. If you are new to the concepts, allow more time. Build a
+                static layout first, add behavior next, then test the failure
+                and empty states.
+              </p>
+            </article>
+            <article
+              class="topic"
+              id="rules"
+              data-node
+              data-label="Rules for your attempt"
+            >
+              <h3>Rules for your attempt</h3>
+              <ul>
+                <li>
+                  Write the app using only HTML, CSS, and plain JavaScript. No
+                  React, Tailwind, Bootstrap, UI kits, copied templates, or
+                  AI-generated implementation.
+                </li>
+                <li>
+                  Use actual forms, buttons, labels, and appropriate semantic
+                  elements. A placeholder is not a label. Use addEventListener
+                  rather than inline event attributes.
+                </li>
+                <li>
+                  Make it work at 1200px desktop and 390px phone width without
+                  horizontal page overflow. Match layout, hierarchy, spacing,
+                  and states; system-font differences are acceptable.
+                </li>
+                <li>
+                  Use visible keyboard focus, logical tab order, and text for
+                  success/errors. Render user-entered text as text, so markup
+                  typed into a field is displayed literally.
+                </li>
+                <li>
+                  Make every core control work. Extra decoration does not
+                  replace missing behavior. Keep the browser console free of app
+                  errors.
+                </li>
+                <li>
+                  AI is allowed for concepts, syntax, decisions, or a small hint
+                  about your own attempt. Eswar writes the HTML, CSS,
+                  JavaScript, and fixes himself.
+                </li>
+              </ul>
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a href="../Practice_Guide.html#approach"
+              >the shared working method</a
+            >.
+          </p>
+        </section>
+        <section class="stage" id="targets" data-title="Recreate the output">
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Recreate the output</h2>
+              <p class="lead">
+                Use the desktop, phone, and alternate-state SVGs as visual
+                references. The captions tell you exactly which actions produce
+                each picture.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic wide"
+              id="screens"
+              data-node
+              data-label="Three visual targets"
+            >
+              <h3>Three visual targets</h3>
+              <figure class="target">
+                <img
+                  src="target-desktop.svg"
+                  alt="Desktop target for Quiz room: Question 2 of 5, with B selected. Question 1 has already been answered, so the header says 2 of 5 answered. The progress bar represents answered questions."
+                  width="1200"
+                />
+                <figcaption>
+                  Desktop · Question 2 of 5, with B selected. Question 1 has
+                  already been answered, so the header says 2 of 5 answered. The
+                  progress bar represents answered questions.
+                  <a href="target-desktop.svg">Open full-size SVG</a>.
+                </figcaption>
+              </figure>
+              <div class="targets-secondary">
+                <figure class="target mobile">
+                  <img
+                    src="target-mobile.svg"
+                    alt="Phone target: The same question and selection at 390px. Options and navigation fit without sideways scrolling."
+                    loading="lazy"
+                  />
+                  <figcaption>
+                    Phone · The same question and selection at 390px. Options
+                    and navigation fit without sideways scrolling.
+                    <a href="target-mobile.svg">Open full-size SVG</a>.
+                  </figcaption>
+                </figure>
+                <figure class="target">
+                  <img
+                    src="target-state.svg"
+                    alt="Alternate target: After answering A/B/C/B/A, show 4/5 and 80%. Q4 is wrong; its correct answer is D, JSON.parse()."
+                    loading="lazy"
+                  />
+                  <figcaption>
+                    Another state · After answering A/B/C/B/A, show 4/5 and 80%.
+                    Q4 is wrong; its correct answer is D, JSON.parse().
+                    <a href="target-state.svg">Open full-size SVG</a>.
+                  </figcaption>
+                </figure>
+              </div>
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a href="target-desktop.svg">the desktop SVG at its original size</a
+            >.
+          </p>
+        </section>
+        <section class="stage" id="data" data-title="Use the fixed sample data">
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Use the fixed sample data</h2>
+              <p class="lead">
+                Use this dataset so Dinesh and Eswar can reproduce and compare
+                the same cases. Represent it in your own JavaScript; no external
+                API is needed.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic wide"
+              id="fixtures"
+              data-node
+              data-label="The records and rules"
+            >
+              <h3>The records and rules</h3>
+              <div class="tw">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID / question</th>
+                      <th>Choices in order</th>
+                      <th>Correct / explanation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        q1 · Which element is meant for a clickable action?
+                      </td>
+                      <td>
+                        A: &lt;button&gt;<br />B: &lt;div&gt;<br />C:
+                        &lt;span&gt;<br />D: &lt;p&gt;
+                      </td>
+                      <td>
+                        A · A button gives the action semantic and keyboard
+                        behavior.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>q2 · Which declaration creates a flex container?</td>
+                      <td>
+                        A: display: block<br />B: display: flex<br />C:
+                        position: flex<br />D: align: flex
+                      </td>
+                      <td>B · display: flex enables a flex layout.</td>
+                    </tr>
+                    <tr>
+                      <td>q3 · Which method attaches a click listener?</td>
+                      <td>
+                        A: querySelector()<br />B: setAttribute()<br />C:
+                        addEventListener()<br />D: JSON.parse()
+                      </td>
+                      <td>C · addEventListener registers an event handler.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        q4 · Which method converts a JSON string to a JavaScript
+                        value?
+                      </td>
+                      <td>
+                        A: JSON.read()<br />B: JSON.stringify()<br />C:
+                        JSON.value()<br />D: JSON.parse()
+                      </td>
+                      <td>
+                        D · JSON.parse reads JSON text; stringify produces JSON
+                        text.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        q5 · Which keyword declares a binding you cannot
+                        reassign?
+                      </td>
+                      <td>A: const<br />B: let<br />C: var<br />D: new</td>
+                      <td>
+                        A · const prevents reassignment of the binding; it does
+                        not freeze an object.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a href="../../Frontend_Handbook.html">the frontend handbook</a> for
+            arrays, objects, and DOM rendering.
+          </p>
+        </section>
+        <section
+          class="stage"
+          id="features"
+          data-title="Make the JavaScript work"
+        >
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Make the JavaScript work</h2>
+              <p class="lead">
+                These are core requirements, not optional decoration. Read them
+                before choosing your state and DOM structure.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic wide"
+              id="requirements"
+              data-node
+              data-label="Functional checklist"
+            >
+              <h3>Functional checklist</h3>
+              <label class="check"
+                ><input type="checkbox" data-check="feature-1" /><span
+                  >Render the five questions from data in the fixed order above.
+                  Each question has exactly one answer, selected using a labeled
+                  radio group.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-2" /><span
+                  >Show question position and answered count separately.
+                  Progress = answered / 5. Visiting a question without choosing
+                  does not count as answering it.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-3" /><span
+                  >Next and Previous change the current question and preserve
+                  previous choices. Previous is disabled on q1; q5 replaces Next
+                  with Submit quiz.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-4" /><span
+                  >Allow moving forward with unanswered questions, but block
+                  submission until all five have answers. Show how many are
+                  missing and move focus to the first unanswered question.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-5" /><span
+                  >After a valid submission, show score out of 5 and percentage.
+                  Review all five questions, the chosen answer, the correct
+                  answer, and a short explanation. Use text such as “Correct” /
+                  “Review”, not color alone.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-6" /><span
+                  >Retry starts a fresh attempt on q1 with no choices, zero
+                  answered count, and hidden results. Changing an answer before
+                  submission replaces it without counting it twice.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-7" /><span
+                  >Match the target hierarchy and selected/focus states. Support
+                  keyboard choices, visible focus, and layouts from 390px to
+                  1200px.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="feature-8" /><span
+                  >Persistence is not required for this question. Refreshing may
+                  start a fresh attempt. Keep timer, shuffled questions, and
+                  backend login outside the core scope.</span
+                ></label
+              >
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events"
+              >MDN’s introduction to events</a
+            >.
+          </p>
+        </section>
+        <section class="stage" id="verify" data-title="Test real behavior">
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Test real behavior</h2>
+              <p class="lead">
+                Reset to the initial fixtures before each independent row unless
+                the row explicitly continues a previous action. Use a separate
+                test storage key when you need a clean first visit.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic wide"
+              id="examples"
+              data-node
+              data-label="Exact manual test cases"
+            >
+              <h3>Exact manual test cases</h3>
+              <div class="tw">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Action / setup</th>
+                      <th>Expected result</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Select A/B/C/D/A and submit</td>
+                      <td>5/5 and 100%; every review row says Correct.</td>
+                    </tr>
+                    <tr>
+                      <td>Select B/A/A/A/B and submit</td>
+                      <td>
+                        0/5 and 0%; all five review rows show the correct
+                        choice.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Select A/B/C/B/A</td>
+                      <td>4/5 and 80%; only q4 needs review.</td>
+                    </tr>
+                    <tr>
+                      <td>Skip q2; answer the other four; submit</td>
+                      <td>
+                        Submission blocked; 1 missing; q2 becomes current and
+                        receives focus.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Answer q1, Next, Previous, replace q1 answer</td>
+                      <td>
+                        Previous choice is displayed; answered count remains 1.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Retry after viewing a result</td>
+                      <td>
+                        q1, no selected options, 0/5 answered; no stale score or
+                        review.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <article
+              class="topic wide"
+              id="quality"
+              data-node
+              data-label="Finish checks"
+            >
+              <h3>Finish checks</h3>
+              <label class="check"
+                ><input type="checkbox" data-check="quality-1" /><span
+                  >Perform every case in the table and record any failing case
+                  in your notes.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="quality-2" /><span
+                  >Recreate all three SVG states using your real implementation,
+                  including the described input data.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="quality-3" /><span
+                  >Check the layout at 390px and 1200px, with no horizontal page
+                  overflow.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="quality-4" /><span
+                  >Complete the main flow with keyboard only and confirm that
+                  errors are understandable.</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="quality-5" /><span
+                  >Enter text such as <code>&lt;b&gt;test&lt;/b&gt;</code> in a
+                  free-text field and verify it appears literally rather than
+                  becoming markup (where this app has text input).</span
+                ></label
+              ><label class="check"
+                ><input type="checkbox" data-check="quality-6" /><span
+                  >Explain your state, one event handler, and one derived value
+                  to Dinesh; implement one small requested change without AI
+                  writing it.</span
+                ></label
+              >
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a href="https://www.w3.org/WAI/tutorials/forms/labels/"
+              >W3C’s guidance on labeled controls</a
+            >.
+          </p>
+        </section>
+        <section
+          class="stage"
+          id="hints"
+          data-title="Reveal hints only when needed"
+        >
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Reveal hints only when needed</h2>
+              <p class="lead">
+                Try a small version first. Open one hint, work on your own
+                attempt, and come back for the next hint if needed.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic wide"
+              id="progressive-hints"
+              data-node
+              data-label="Progressive hints"
+            >
+              <h3>Progressive hints</h3>
+              <details>
+                <summary>
+                  Hint 1 · What state would survive a re-render?
+                </summary>
+                <p>
+                  Think about the current question index and a separate answer
+                  choice for each question ID. The DOM is a view of that state.
+                </p>
+                <details>
+                  <summary>
+                    Hint 2 · How do you separate position from completion?
+                  </summary>
+                  <p>
+                    Derive answered count from stored answers. Next changes
+                    position; selecting a radio changes one answer. Score is
+                    derived only from a completed attempt.
+                  </p>
+                  <details>
+                    <summary>Hint 3 · Where should rendering stop?</summary>
+                    <p>
+                      Keep quiz view and result view distinct. A retry should
+                      reset all attempt state before rendering q1 again.
+                    </p>
+                  </details>
+                </details>
+              </details>
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation"
+              >MDN’s form-validation guide</a
+            >.
+          </p>
+        </section>
+        <section class="stage" id="review" data-title="Explain and extend">
+          <div class="stage-head">
+            <span class="stage-num" aria-hidden="true"></span>
+            <div>
+              <h2>Explain and extend</h2>
+              <p class="lead">
+                Understanding the implementation is part of finishing it.
+              </p>
+            </div>
+          </div>
+          <div class="grid">
+            <article
+              class="topic"
+              id="teach-back"
+              data-node
+              data-label="Questions for your Google Meet"
+            >
+              <h3>Questions for your Google Meet</h3>
+              <ul>
+                <li>Why is question position different from answered count?</li>
+                <li>
+                  How would you add a sixth question without rewriting the
+                  navigation?
+                </li>
+                <li>
+                  What would break if selecting a new option always incremented
+                  the count?
+                </li>
+              </ul>
+            </article>
+            <article
+              class="topic"
+              id="optional"
+              data-node
+              data-label="Optional extension"
+            >
+              <h3>Optional extension</h3>
+              <p>
+                Add a question navigator that jumps to answered or unanswered
+                questions. Keep required-answer validation unchanged.
+              </p>
+              <p>
+                Complete the core requirements first. Write a small acceptance
+                checklist before adding the extension.
+              </p>
+            </article>
+          </div>
+          <p class="deeper">
+            Go deeper:
+            <a href="../Practice_Guide.html#readiness"
+              >the frontend-readiness review</a
+            >.
+          </p>
+        </section>
+        <section id="notes-section" class="js-only js-block">
+          <h2>Your review notes</h2>
+          <label for="notes">Decisions, doubts, and the next thing to try</label
+          ><textarea
+            id="notes"
+            maxlength="12000"
+            placeholder="Write what you learned and one thing to explain to Dinesh."
+          ></textarea>
+        </section>
+        <footer class="foot">
+          <p>
+            For Eswar and Dinesh. Open the SVGs at full size to inspect layout.
+            Targets are static illustrations; implement the behavior described
+            in the question.
+          </p>
+          <div class="actions">
+            <a class="btn" href="../Practice_Guide.html">All four questions</a
+            ><a class="btn" href="#targets">View output targets</a
+            ><a class="btn" href="#features">Required behavior</a
+            ><a href="#top">Back to top</a>
+          </div>
+        </footer>
+      </main>
+    </div>
+    <script>
+      (() => {
+        const $ = (s, r = document) => r.querySelector(s);
+        const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+        const stages = $$("section.stage"),
+          checks = $$("[data-check]");
+        const id = document.documentElement.dataset.guide;
+        const key = "frontend-practice-" + id + "-v1";
+        let saved = { version: 1, id, checks: {}, notes: "" };
+        const message = (text) => {
+          $("#save-status").textContent = text;
+        };
+        function valid(raw) {
+          if (
+            !raw ||
+            raw.version !== 1 ||
+            raw.id !== id ||
+            !raw.checks ||
+            typeof raw.checks !== "object"
+          )
+            throw Error("Choose a backup exported from this page.");
+          return {
+            version: 1,
+            id,
+            checks: Object.fromEntries(
+              checks.map((c) => [
+                c.dataset.check,
+                raw.checks[c.dataset.check] === true,
+              ]),
+            ),
+            notes:
+              typeof raw.notes === "string" ? raw.notes.slice(0, 12000) : "",
+          };
+        }
+        try {
+          const value = localStorage.getItem(key);
+          if (value) saved = valid(JSON.parse(value));
+        } catch (_) {
+          message(
+            "Saved checks could not be loaded. Export a backup before changing them if you need to recover progress.",
+          );
+        }
+        try {
+          const theme = localStorage.getItem("frontend-practice-theme");
+          if (["light", "dark"].includes(theme))
+            document.documentElement.dataset.theme = theme;
+        } catch (_) {}
+        function save() {
+          try {
+            localStorage.setItem(key, JSON.stringify(saved));
+            message("Saved in this browser for this page.");
+          } catch (_) {
+            message(
+              "Storage is unavailable. Export your checks and notes to keep them.",
+            );
+          }
+        }
+        function update() {
+          const n = checks.filter((c) => c.checked).length;
+          $("#completed").textContent = n + " / " + checks.length;
+          $("#total-checks").textContent = checks.length;
+        }
+        function restore() {
+          checks.forEach((c) => {
+            c.checked = saved.checks[c.dataset.check] === true;
+          });
+          $("#notes").value = saved.notes;
+          update();
+        }
+        checks.forEach((c) =>
+          c.addEventListener("change", () => {
+            saved.checks[c.dataset.check] = c.checked;
+            update();
+            save();
+          }),
+        );
+        $("#notes").addEventListener("input", (event) => {
+          saved.notes = event.target.value;
+          save();
+        });
+        function themeLabel() {
+          $("#theme").textContent =
+            document.documentElement.dataset.theme === "dark"
+              ? "Light mode"
+              : "Dark mode";
+        }
+        $("#theme").addEventListener("click", () => {
+          document.documentElement.dataset.theme =
+            document.documentElement.dataset.theme === "dark"
+              ? "light"
+              : "dark";
+          themeLabel();
+          try {
+            localStorage.setItem(
+              "frontend-practice-theme",
+              document.documentElement.dataset.theme,
+            );
+          } catch (_) {}
+        });
+        $("#reset").addEventListener("click", () => {
+          if (confirm("Clear this page’s saved checks and notes?")) {
+            saved = { version: 1, id, checks: {}, notes: "" };
+            restore();
+            save();
+          }
+        });
+        $("#export").addEventListener("click", () => {
+          const blob = new Blob([JSON.stringify(saved, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "frontend-" + id + "-progress.json";
+          document.body.append(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          message(
+            "Export requested. The file contains this page’s checks and notes.",
+          );
+        });
+        $("#import").addEventListener("click", () => $("#import-file").click());
+        $("#import-file").addEventListener("change", async (event) => {
+          try {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 200000) throw Error("This backup is too large.");
+            const imported = valid(JSON.parse(await file.text()));
+            if (
+              !confirm("Replace this page’s checks and notes with the backup?")
+            )
+              return;
+            saved = imported;
+            restore();
+            save();
+          } catch (error) {
+            message("Import failed: " + error.message);
+          } finally {
+            event.target.value = "";
+          }
+        });
+        function link(target, text, className) {
+          const a = document.createElement("a");
+          a.href = "#" + target;
+          a.textContent = text;
+          if (className) a.className = className;
+          return a;
+        }
+        stages.forEach((stage, i) => {
+          $(".stage-num", stage).textContent = String(i + 1).padStart(2, "0");
+          $("#toc").append(link(stage.id, stage.dataset.title));
+          const row = document.createElement("div");
+          row.className = "roadmap-row";
+          const topics = $$("[data-node]", stage);
+          for (const [side, topic] of [
+            [0, topics[0]],
+            [1, topics[1]],
+          ]) {
+            const b = document.createElement("span");
+            b.className = "map-branch";
+            b.textContent = topic?.dataset.label || "";
+            if (side === 0) row.append(b);
+            else {
+              const a = link(stage.id, "", "map-node");
+              const small = document.createElement("small");
+              small.textContent = "Stage " + (i + 1);
+              a.append(small, document.createTextNode(stage.dataset.title));
+              row.append(a, b);
+            }
+          }
+          $("#roadmap").append(row);
+          const pager = document.createElement("nav");
+          pager.className = "pager";
+          pager.setAttribute("aria-label", stage.dataset.title + " navigation");
+          pager.append(
+            i
+              ? link(stages[i - 1].id, "← Previous section")
+              : link("top", "Back to start ↑"),
+          );
+          pager.append(
+            i + 1 < stages.length
+              ? link(stages[i + 1].id, "Next section →")
+              : link("notes-section", "Your review notes →"),
+          );
+          stage.append(pager);
+        });
+        $("#stage-count").textContent = stages.length;
+        function filter() {
+          const query = $("#q").value.trim().toLowerCase();
+          let total = 0;
+          stages.forEach((stage) => {
+            let n = 0;
+            $$(".topic", stage).forEach((card) => {
+              card.hidden =
+                !!query &&
+                !(stage.dataset.title + " " + card.textContent)
+                  .toLowerCase()
+                  .includes(query);
+              if (!card.hidden) n++;
+            });
+            stage.hidden = n === 0;
+            total += n;
+          });
+          $("#empty-search").hidden = total !== 0;
+        }
+        $("#q").addEventListener("input", filter);
+        document.addEventListener("click", (event) => {
+          if (event.target.closest('a[href^="#"]') && $("#q").value) {
+            $("#q").value = "";
+            filter();
+          }
+        });
+        document.addEventListener("keydown", (event) => {
+          const editing = /^(INPUT|TEXTAREA|SELECT)$/.test(
+            document.activeElement.tagName,
+          );
+          if (
+            event.key === "/" &&
+            !editing &&
+            !event.ctrlKey &&
+            !event.metaKey
+          ) {
+            event.preventDefault();
+            $("#q").focus();
+          }
+          if (event.key === "Escape" && document.activeElement === $("#q")) {
+            $("#q").value = "";
+            filter();
+          }
+        });
+        document.body.classList.add("js");
+        restore();
+        themeLabel();
+      })();
+    </script>
+  </body>
+</html>
