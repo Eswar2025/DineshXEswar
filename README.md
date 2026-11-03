@@ -24,6 +24,7 @@ DineshXEswar/
 │   │           └── AI/          # Reference code on ai/split-expenses only
 │   └── Web_Development_Roadmap.md
 ├── Accenture/                   # Assessment and internship preparation
+├── Eswar_December_Plan.md       # Eswar's 5-30 Dec 2026 study plan
 ├── design.md                    # Visual rules for HTML learning guides
 ├── CLAUDE.md                    # Context and working instructions for assistants
 └── README.md
@@ -45,10 +46,13 @@ Useful starting points:
 - [Frontend handbook](DEV/Frontend/Frontend_Handbook.html)
 - [Independent frontend practice](DEV/Frontend/Practice/Practice_Guide.html): Quiz room, Task planner, Expense tracker, and Study shop. Each question has desktop/phone/alternate SVG targets, required JavaScript behavior, hints, and an empty solution folder. Allow roughly 25–35 hours across the set, including polish and review.
 - [Backend handbook](DEV/Backend/Backend_Handbook.html)
+- [Eswar's December plan](Eswar_December_Plan.md): 21 study days, trees and graphs DSA, handbook, Scrimba, and frontend practice projects
 
-## Split Expenses: December 2026 project
+## Split Expenses: full-stack project
 
 We will each build an expense-sharing application **independently, from scratch**. The goal is to become confident enough to explain and implement the complete frontend, backend, database, authentication, and deployment flow.
+
+**Timing:** Dinesh builds it in December 2026. Eswar's December is DSA (trees and graphs) plus frontend foundations, so his build starts afterward (date to be decided). See [Eswar's December plan](Eswar_December_Plan.md).
 
 The project begins with groups of friends splitting expenses equally. Later stages add exact custom shares, balances, safe edits/deletion, and recorded settlements. It records repayments made elsewhere; it does not transfer money.
 
@@ -73,7 +77,7 @@ Workbook checks and notes are stored in the browser, separately for Dinesh and E
 - Each person may choose any stack. The reference implementation's tools are not required for either personal build.
 - Compare behavior and explain decisions during Google Meet. Keep implementation attempts independent and save reference-code comparisons until both personal builds are complete.
 
-Budget approximately **80–120 focused hours per person**, including learning, coding, debugging, tests, and deployment. Allow an additional **20–40 hours** if the foundations are new. At 3 hours a day, December provides about 93 hours; at 4 hours a day, about 124 hours. These are planning estimates, not deadlines. The personal READMEs contain the detailed breakdown.
+Budget approximately **80–120 focused hours per person**, including learning, coding, debugging, tests, and deployment. Allow an additional **20–40 hours** if the foundations are new. At 3 hours a day, a 31-day month provides about 93 hours; at 4 hours a day, about 124 hours. These are planning estimates, not deadlines. The personal READMEs contain the detailed breakdown.
 
 ## Branches and reference implementation
 

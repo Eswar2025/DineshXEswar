@@ -1,6 +1,8 @@
 # Eswar's independent Split Expenses build
 
-This folder is your implementation workspace for December 2026. Build the application from scratch here. Choose your own language, frameworks, database, and libraries, and keep your setup and run instructions in this README as the app grows.
+This folder is your implementation workspace. Build the application from scratch here. Choose your own language, frameworks, database, and libraries, and keep your setup and run instructions in this README as the app grows.
+
+> **Timing:** your December 2026 is for DSA (trees and graphs) and frontend foundations, see [Eswar_December_Plan.md](../../../../../Eswar_December_Plan.md). Dinesh builds this project in December. You start it after your December plan; the date is still to be decided. Everything below is ready for you when you begin.
 
 ## Start with the HTML guides
 
@@ -12,7 +14,7 @@ This folder is your implementation workspace for December 2026. Build the applic
 
 The HTML files are offline guides. If GitHub shows their source, pull or download the repo, find the files in `DEV/Projects/Split_Expenses/`, and open them locally with Edge, Chrome, or another browser. External reference links need internet access. Importing a workbook backup replaces both locally saved learner profiles, so export your own backup first.
 
-## Your December agreement
+## Your agreement
 
 - Write the application code yourself, including setup, features, fixes, and tests.
 - Use AI only to understand a concept, clarify syntax, compare decisions, or ask for a small hint. Ask questions around your own attempt and explain what you learned afterward.
@@ -38,7 +40,7 @@ Budget **80–120 focused hours per person** for the complete workbook, includin
 | Deployment, run instructions, and demo | 4–6 |
 | **Total of these ranges** | **80–116** |
 
-For December's 31 days, **3 hours a day gives about 93 hours; 4 gives about 124 hours**. Leave room for missed days and difficult bugs. At 2 hours a day, expect to continue into January if you aim to finish every core stage.
+Over 31 days, **3 hours a day gives about 93 hours; 4 gives about 124 hours**. Leave room for missed days and difficult bugs. At 2 hours a day, expect it to take longer than a month if you aim to finish every core stage.
 
 ## A practical work session
 

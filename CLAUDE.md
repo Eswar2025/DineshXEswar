@@ -15,6 +15,7 @@ So content here is written to be **explained out loud to a peer**: simple langua
 
 ## Layout
 ```
+Eswar_December_Plan.md                       # Eswar's 5-30 Dec 2026 plan (DSA trees/graphs + frontend)
 DSA/<NN_Topic>/{Notes,Questions,Solutions}   # numbered topics; solutions are C++ (Dinesh_*, Eswar_*)
 DBMS/                                        # SQL practice (e.g. "SQL Practice/L6_.../Dinesh_Answers.sql")
 DEV/Frontend/                                # HTML/CSS/JS/DOM notes + Practice_N / bonus_N mini projects
@@ -40,11 +41,15 @@ Accenture/                                   # Accenture assessment/internship p
 
 ## Frontend preparation for Eswar
 
-`DEV/Frontend/Practice/` contains four questions for Eswar to implement independently using pure HTML, CSS, and JavaScript: `01_Quiz_Room`, `02_Task_Planner`, `03_Expense_Tracker`, and `04_Study_Shop`. Start with `Practice_Guide.html`; each question folder has `Question.html`, three original SVG targets (desktop, phone, alternate state), and an empty `solution/` folder. Eswar creates his own code files there. The guides include fixed data, required JavaScript behavior, exact manual tests, saved manual checklists, progressively revealed hints, and teach-back questions. No completed solution or starter app is provided. Allow roughly 25–35 focused hours across all four, including polish and peer review; new concepts can take longer. Keep assistance to understanding, syntax, decisions, and small hints. These build frontend readiness; HTTP, APIs, databases, authentication, and deployment remain part of the full-stack learning path.
+`DEV/Frontend/Practice/` contains four questions for Eswar to implement independently using pure HTML, CSS, and JavaScript: `01_Quiz_Room`, `02_Task_Planner`, `03_Expense_Tracker`, and `04_Study_Shop`. Start with `Practice_Guide.html`; each question folder has `Question.html`, three original SVG targets (desktop, phone, alternate state), and an empty `solution/` folder. Eswar creates his own code files there. The guides include fixed data, required JavaScript behavior, exact manual tests, saved manual checklists, progressively revealed hints, and teach-back questions. No completed solution or starter app is provided. Allow roughly 25–35 focused hours across all four, including polish and peer review; new concepts can take longer. Keep assistance to understanding, syntax, decisions, and small hints. These build frontend readiness; HTTP, APIs, databases, authentication, and deployment remain part of the full-stack learning path. In December 2026 Eswar plans `01_Quiz_Room` and `02_Task_Planner` (see `Eswar_December_Plan.md`).
 
-## Split Expenses: December 2026 learning agreement
+## Eswar's December 2026 plan
 
-Dinesh and Eswar chose **Split Expenses** as their full-stack project. In December 2026, they will each build the complete application **independently, from scratch**, to gain confidence with frontend, backend, databases, authentication, and deployment.
+Eswar's December is **DSA (trees and graphs) plus frontend foundations**, not the full-stack project. The plan is in `Eswar_December_Plan.md` (repo root): 5 Dec to 30 Dec, 21 study days and 5 family days, about 80 DSA problems, 6 LeetCode contests, the frontend handbook, the Scrimba course, and frontend practice projects `01_Quiz_Room` and `02_Task_Planner` (`03_Expense_Tracker` and `04_Study_Shop` are stretch goals). The family days are fixed: Dec 9, 14, 19, 24, 29. Dinesh decided a full-stack build on top of that would be overwhelming for Eswar, so **Eswar's Split Expenses build is postponed** until after December (start date to be decided). When helping Eswar in December, keep to the same boundaries: no AI-written code, only concepts, syntax, and small hints.
+
+## Split Expenses: full-stack learning agreement
+
+Dinesh and Eswar chose **Split Expenses** as their full-stack project. They each build the complete application **independently, from scratch**, to gain confidence with frontend, backend, databases, authentication, and deployment. **Dinesh builds it in December 2026. Eswar starts after his December plan (date to be decided).** Everything below applies to both builds.
 
 ### Assistance boundaries
 
@@ -61,7 +66,7 @@ Dinesh and Eswar chose **Split Expenses** as their full-stack project. In Decemb
 - `Project_Guide.html` is the full workbook. It contains a clickable roadmap, behavior requirements, checklists, progressively revealed hints, data/API design exercises, exact balance examples, and a small balance explorer.
 - Open both files locally in a browser. GitHub may display HTML source. The pages are self-contained and work offline, apart from external reading links.
 - The learner selector keeps Dinesh's and Eswar's progress/notes separate in browser storage. Git does not save or synchronize that progress. Export for backup or transfer; importing replaces both locally stored profiles.
-- Each personal README explains the workflow and effort estimate. Budget roughly **80–120 focused hours per person**, plus **20–40 hours** if foundations are new. This includes understanding, coding, debugging, tests, and deployment. At 3–4 hours per day, December provides about 93–124 hours. These are estimates, not deadlines.
+- Each personal README explains the workflow and effort estimate. Budget roughly **80–120 focused hours per person**, plus **20–40 hours** if foundations are new. This includes understanding, coding, debugging, tests, and deployment. At 3–4 hours per day, a 31-day month provides about 93–124 hours. These are estimates, not deadlines.
 - Follow requirements -> attempt -> hint if needed -> verify behavior -> explain to peer -> mark the check. Avoid giving the full solution when a hint is enough.
 
 ### Project behavior to preserve
