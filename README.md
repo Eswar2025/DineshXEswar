@@ -15,6 +15,7 @@ DineshXEswar/
 │   │   └── Practice/            # Four independent HTML/CSS/JS projects with SVG targets
 │   ├── Backend/                 # Backend handbook and Python assessment practice
 │   ├── Projects/
+│   │   ├── Project_Handbook.html  # "Courtside" build diary: how a real site is built
 │   │   └── Split_Expenses/
 │   │       ├── Guidance.html    # How to start and proceed
 │   │       ├── Project_Guide.html
@@ -25,7 +26,7 @@ DineshXEswar/
 │   └── Web_Development_Roadmap.md
 ├── Accenture/                   # Assessment and internship preparation
 ├── Eswar_December_Plan.md       # Eswar's 5-30 Dec 2026 study plan
-├── design.md                    # Visual rules for HTML learning guides
+├── design.md                    # Older layout rules for HTML guides (colors superseded)
 ├── CLAUDE.md                    # Context and working instructions for assistants
 └── README.md
 ```
@@ -46,6 +47,7 @@ Useful starting points:
 - [Frontend handbook](DEV/Frontend/Frontend_Handbook.html)
 - [Independent frontend practice](DEV/Frontend/Practice/Practice_Guide.html): Quiz room, Task planner, Expense tracker, and Study shop. Each question has desktop/phone/alternate SVG targets, required JavaScript behavior, hints, and an empty solution folder. Allow roughly 25–35 hours across the set, including polish and review.
 - [Backend handbook](DEV/Backend/Backend_Handbook.html)
+- [Build diary (Courtside)](DEV/Projects/Project_Handbook.html): a senior developer builds a court booking site step by step (schema, API, frontend, connecting them, deploy), linking back to the frontend and backend handbooks
 - [Eswar's December plan](Eswar_December_Plan.md): 21 study days, trees and graphs DSA, handbook, Scrimba, and frontend practice projects
 
 ## Split Expenses: full-stack project
@@ -129,6 +131,6 @@ git push origin master
 - Use short topic-prefixed commit messages, such as `DSA: add coin change` or `DEV: add expense form`.
 - Review changes before committing. Keep secrets, `.env` files, `node_modules`, local databases, and large binaries out of Git.
 - Explain the big picture first, use simple language, and bring a concrete example or failing case when discussing a doubt.
-- Larger learning guides are self-contained offline HTML files following [design.md](design.md).
+- Larger learning guides are self-contained offline HTML files. Follow the look of the three handbooks: true-black dark mode, flat pastel accents, pill-shaped controls, and no gradients.
 
 Assistant-specific context and Git rules are in [CLAUDE.md](CLAUDE.md). Assistants should commit, push, or merge only within the actions explicitly requested by Dinesh.

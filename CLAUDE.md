@@ -105,6 +105,7 @@ Editing the existing handbooks:
 - Write in plain American English, sentence-case headings, no em dashes. Every stage ends with a "Go deeper" line that links to a real page.
 - The handbooks cross-link (`../Backend/Backend_Handbook.html#id` and back), and the Build diary, practice questions, and Split Expenses guides link into them. Keep those anchors valid when renaming ids.
 - Don't reuse the class name `skip`. It belongs to the "Skip to content" link and hides anything else that uses it.
+- Each handbook ends with an inline copy of the Kitsu pet widget (between `<!-- KITSU PET` and `<!-- /KITSU PET -->`): a draggable chibi fox that reacts to clicks and saves its position in localStorage. Its master copy, `Chibi_Pet_Widget.html`, lives outside the repo, in the folder that contains `DineshXEswar`. To change Kitsu, edit that file and copy the widget block into all three handbooks.
 - To verify, render with headless Edge (`msedge --headless --screenshot`). Headless Edge won't lay out narrower than about 500px, so check phone width by loading the page in a 390px-wide iframe.
 
 ## Git and commits
@@ -114,7 +115,7 @@ Editing the existing handbooks:
 - Check the active branch and working tree before editing. A request to explain switching, pushing, or merging is not by itself an instruction to perform a merge. Commit, push, or merge only within the user's authorized scope; never force-push or mix the reference implementation into the independent builds as a routine sync step.
 
 ## Conventions
-- Notes are Markdown; larger self-contained guides are single offline HTML files styled per `design.md`.
+- Notes are Markdown; larger self-contained guides are single offline HTML files styled like the three handbooks (see the visual style section above).
 - Existing small practice folders hold `Question.md`, `Hints.md`, and the code files together. For full-stack projects under `DEV/Projects/`, put requirements, hints, checklists, and review guidance in offline HTML, as requested for Split Expenses; keep code in the separate implementation folders.
 - Keep explanations beginner-friendly. When asked for "notes", give general understanding and the map of the topic, not exhaustive tutorials.
 - Do not commit secrets, `.env`, `node_modules`, local databases, or large binaries (see `.gitignore`).
