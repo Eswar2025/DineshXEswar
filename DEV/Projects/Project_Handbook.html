@@ -1,0 +1,2268 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-handbook="project">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A senior developer's build diary: a court booking website built step by step, from the first client call to database, API, frontend, deployment and the bugs found along the way.">
+<title>Courtside Build Diary</title>
+<script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("hb-codex-theme"))||"light"}catch(e){}</script>
+<style>
+:root{
+  --bg:#0a0a0a;--surface:#1a1a1a;--surface-2:#1f1f1f;
+  --line:#1f1f1f;--line-strong:#3a3a3a;
+  --text:#fffaf0;--body:#e5e5e5;--muted:#9a9a9a;--faint:#6a6a6a;
+  --primary:#fffaf0;--on-primary:#0a0a0a;
+  --r:12px;--r-sm:8px;--r-pill:999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+  --font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#fffaf0;--surface:#faf5e8;--surface-2:#ebe6d6;
+  --line:#ebe6d6;--line-strong:#9a9a9a;
+  --text:#0a0a0a;--body:#1a1a1a;--muted:#6a6a6a;--faint:#9a9a9a;
+  --primary:#0a0a0a;--on-primary:#fffaf0;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--body);font:15px/1.7 var(--font);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+a{color:var(--text);text-underline-offset:4px}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+h1,h2,h3{color:var(--text);margin:0;font-weight:600}
+p{margin:0 0 var(--s3)}
+ul,ol{margin:0 0 var(--s3);padding-left:var(--s5)}
+li{margin-bottom:var(--s1)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+pre{margin:var(--s3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);overflow:auto;font:13px/1.6 var(--mono);color:var(--body)}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.label{font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin:0 0 var(--s2)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary);color:var(--on-primary);padding:8px 16px;border-radius:var(--r-pill);z-index:100}
+.skip:focus{left:16px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:50;height:56px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1280px;margin:0 auto;height:100%;padding:0 var(--s5);display:flex;align-items:center;gap:var(--s4)}
+.brand{font-weight:600;text-decoration:none;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:400;margin-left:var(--s2)}
+.search{flex:1;max-width:420px;margin-left:auto}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-pill);color:var(--text);font:inherit;font-size:14px;padding:6px 16px}
+.search input::placeholder{color:var(--muted)}
+.search{min-width:0}
+a.btn{text-decoration:none;display:inline-block}a.btn:hover{color:var(--text)}
+@media(max-width:640px){.brand span,.top .xlink{display:none}.top-inner{padding:0 var(--s4);gap:var(--s2)}.search input{padding:6px 12px}}
+.btn{border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:var(--r-pill);padding:6px 16px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+/* layout */
+.layout{max-width:1280px;margin:0 auto;padding:0 var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s7)}
+.toc{display:none}
+@media(min-width:1100px){
+  .layout{grid-template-columns:200px minmax(0,1fr)}
+  .toc{display:block;position:sticky;top:80px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;padding:var(--s6) 0}
+}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;font-size:13px;line-height:1.4}
+.toc a:hover{color:var(--text)}
+.toc a.active{color:var(--text);border-left-color:var(--primary)}
+.toc a.done::after{content:" \2713";color:var(--faint)}
+main{padding-bottom:var(--s8);min-width:0}
+
+/* hero */
+.hero{padding:var(--s8) 0 var(--s6)}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:var(--s4)}
+.lead{font-size:17px;line-height:1.6;color:var(--muted);max-width:68ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;margin-top:var(--s6)}
+.stats>div{background:var(--bg);padding:var(--s5)}
+.stats b{display:block;font-size:28px;line-height:1.1;font-weight:600;color:var(--text)}
+.stats span{font-size:13px;color:var(--muted)}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* roadmap */
+.map-head{margin-top:var(--s7)}
+.map-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.roadmap{position:relative;padding:var(--s5) 0}
+.roadmap svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--faint);stroke-width:1.5}
+.edges .spine{stroke:var(--muted);stroke-width:2}
+.edges .branch{stroke-dasharray:4 4}
+.edges .arrow{fill:var(--muted);stroke:none}
+.rows{position:relative;z-index:1;margin:0;padding:0;list-style:none}
+.row{display:grid;grid-template-columns:1fr minmax(200px,240px) 1fr;gap:var(--s7);align-items:center;padding:var(--s5) 0;margin:0}
+.branches{display:flex;flex-direction:column;gap:var(--s2)}
+.branches.left{align-items:flex-end}
+.branches.right{align-items:flex-start}
+.node{display:block;text-decoration:none;border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:6px 12px;font-size:13px;line-height:1.4;color:var(--muted);background:var(--bg)}
+.node:hover{border-color:var(--primary);color:var(--text)}
+.node.stage{text-align:center;border-radius:var(--r);padding:12px 16px;background:var(--surface);color:var(--text);font-weight:600;font-size:15px}
+.node.stage small{display:block;font-size:11px;letter-spacing:.08em;font-weight:500;color:var(--muted);text-transform:uppercase}
+.node.stage.active{border-color:var(--primary)}
+.node.stage.done{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.node.stage.done small{color:inherit;opacity:.7}
+@media(max-width:760px){
+  .row{grid-template-columns:1fr;justify-items:center;padding:var(--s4) 0}
+  .branches{display:none}
+}
+
+/* stages */
+.stage{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--line)}
+.stage.empty{display:none}
+.stage-head{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:start;margin-bottom:var(--s5)}
+.stage-num{font-size:48px;line-height:1;font-weight:600;color:var(--faint)}
+.stage-head h2{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.stage-head h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:var(--s2)}
+.stage-head .lead{margin:0}
+@media(max-width:640px){.stage-head{grid-template-columns:auto 1fr}.stage-head .btn{grid-column:1/-1;justify-self:start}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:var(--s4)}
+.topic{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);min-width:0}
+.topic:hover{border-color:var(--line-strong)}
+.topic:target{border-color:var(--primary)}
+.topic.wide{grid-column:1/-1}
+.topic h3{font-size:17px;line-height:1.35;margin-bottom:var(--s2)}
+.topic>:last-child{margin-bottom:0}
+.deeper{margin:var(--s5) 0 0;color:var(--muted);font-size:14px}
+.deeper .label{display:inline;margin-right:var(--s2)}
+.pager{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s5);font-size:14px}
+.pager a{color:var(--muted);text-decoration:none}
+.pager a:hover{color:var(--text)}
+.callout{border-left:3px solid var(--primary);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:var(--s3) var(--s4);margin:var(--s3) 0}
+.callout p:last-child{margin:0}
+.tw{overflow-x:auto;margin:var(--s3) 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);border-bottom-color:var(--line-strong)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s4)}
+.cols pre{margin:0}
+
+/* demos */
+.demo{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:var(--s5);margin-top:var(--s3)}
+.controls{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.controls label{display:flex;flex-direction:column;gap:var(--s1);font-size:13px;color:var(--muted)}
+.controls label.inline{flex-direction:row;align-items:center;gap:var(--s2)}
+.controls output{color:var(--text);font-family:var(--mono);margin-left:var(--s2)}
+.controls input[type=range]{width:150px;accent-color:var(--primary)}
+.controls input[type=checkbox]{accent-color:var(--primary)}
+.controls select{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-sm);font:inherit;font-size:13px;padding:4px 8px}
+.stagebox{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4);overflow:auto}
+.demo pre{margin:var(--s3) 0 0;background:var(--bg)}
+.bm-margin{display:inline-block;padding:var(--m,16px);outline:1px dashed var(--faint)}
+.bm-box{border:var(--b,4px) solid var(--text);padding:var(--p,24px);background:var(--surface-2)}
+.bm-content{background:var(--primary);color:var(--on-primary);padding:8px 16px;font-size:13px;font-weight:500}
+.fx{display:flex;height:200px;border:1px dashed var(--faint);border-radius:var(--r-sm)}
+.fx div{background:var(--primary);color:var(--on-primary);border-radius:6px;font-weight:600;display:grid;place-items:center}
+.fx div:nth-child(1){min-width:48px;min-height:40px}
+.fx div:nth-child(2){min-width:64px;min-height:72px;opacity:.8}
+.fx div:nth-child(3){min-width:48px;min-height:32px;opacity:.6}
+.tf{display:grid;place-items:center;height:240px}
+.tf>div{grid-area:1/1;width:80px;height:80px;border-radius:var(--r-sm)}
+.tf-ghost{border:1px dashed var(--faint)}
+.tf-box{background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:600;font-size:13px}
+.bub{border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:var(--s3) var(--s4);cursor:pointer;color:var(--muted);font-size:13px}
+.bub .bub{margin-top:var(--s2)}
+.bub:hover{border-color:var(--primary)}
+.log{min-height:96px;white-space:pre-wrap}
+
+/* checklist */
+.check{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--primary)}
+.foot{margin-top:var(--s8);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+<style id="codex-design">
+/* Codex edition: a quiet workspace for a long learning journey. */
+:root, :root[data-theme="light"] {
+  --bg:#f6f7f9; --surface:#fff; --surface-2:#eef2f5;
+  --line:#e2e7eb; --line-strong:#cbd5dd; --text:#182b37; --body:#415461;
+  --muted:#617380; --faint:#728592; --primary:#087c72; --on-primary:#fff;
+  --accent-soft:#e7f4ef; --accent-line:#bbddd2; --accent-ink:#06685f;
+  --hero-bg:#eaf3ef; --hero-dot:#c4d8d0; --warm:#a86525; --warm-soft:#fff3df;
+  --code-bg:#172b35; --code-text:#e1ecee; --shadow:0 3px 14px #243b4b05;
+  --r:16px; --r-sm:9px; --font:"Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+:root[data-handbook="backend"] {
+  --primary:#4258a6; --accent-soft:#e9eef9; --accent-line:#c6d1e7;
+  --accent-ink:#334786; --hero-bg:#edf1f8; --hero-dot:#cbd6e7;
+}
+:root[data-theme="dark"] {
+  --bg:#101c24; --surface:#172731; --surface-2:#203440;
+  --line:#2a3e49; --line-strong:#3c5461; --text:#e9f1f3; --body:#bdcdd4;
+  --muted:#9cafb9; --faint:#91a5b0; --primary:#72ceba; --on-primary:#102b27;
+  --accent-soft:#1a3a37; --accent-line:#30594e; --accent-ink:#8bdfcb;
+  --hero-bg:#19332f; --hero-dot:#2d5148; --warm:#ebc185; --warm-soft:#3b3023;
+  --code-bg:#0c1820; --code-text:#dce9ec; --shadow:0 3px 14px #00000010;
+  color-scheme:dark;
+}
+:root[data-handbook="backend"][data-theme="dark"] {
+  --primary:#9eb7ff; --on-primary:#142445; --accent-soft:#20324b;
+  --accent-line:#405878; --accent-ink:#b7caff; --hero-bg:#1b2d40; --hero-dot:#354e68;
+}
+html { scroll-padding-top:100px; }
+body { font-size:15px; line-height:1.75; }
+button, a, input, select, textarea, summary { -webkit-tap-highlight-color:transparent; }
+button, .btn { touch-action:manipulation; }
+button, input, select, textarea { font-family:var(--font); }
+::selection { background:var(--accent-line); color:var(--text); }
+a { color:var(--accent-ink); }
+a:hover { color:var(--primary); }
+:focus-visible { outline:3px solid var(--primary); outline-offset:4px; }
+.top { height:76px; background:color-mix(in srgb,var(--surface) 94%,transparent); backdrop-filter:blur(18px); }
+.top-inner { max-width:1536px; padding:0 36px; gap:24px; }
+.brand { display:flex; align-items:center; gap:12px; color:var(--text); font-size:15px; letter-spacing:-.35px; }
+.brand::before { content:""; display:block; width:36px; height:40px; flex:none; border-radius:10px; background:var(--primary); mask:none; }
+.brand { position:relative; }
+.brand::after { content:"</>"; position:absolute; left:5px; top:7px; font:700 16px/26px var(--mono); color:var(--on-primary); }
+.brand span { display:block; margin:1px 0 0; font-size:10px; line-height:1.3; font-weight:500; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); }
+.brand-copy { display:block; }
+.header-divider { width:1px; height:25px; background:var(--line); }
+.header-context { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); white-space:nowrap; }
+.header-context i { height:6px; width:6px; border-radius:50%; background:var(--primary); }
+.search { position:relative; max-width:320px; margin-left:auto; }
+.search::before { content:""; position:absolute; width:12px; height:12px; border:1.5px solid var(--muted); border-radius:50%; left:15px; top:13px; pointer-events:none; }
+.search::after { content:""; position:absolute; width:6px; height:1.5px; background:var(--muted); left:26px; top:26px; transform:rotate(45deg); pointer-events:none; }
+.search input { height:42px; padding:8px 38px 8px 40px; border-radius:9px; background:var(--bg); border:1px solid var(--line); font-size:12px; }
+.search kbd { position:absolute; right:12px; top:10px; padding:0 5px; border:1px solid var(--line-strong); border-radius:4px; font:11px/20px var(--mono); color:var(--muted); pointer-events:none; }
+.btn { border-radius:8px; min-height:38px; padding:7px 13px; font-size:12px; font-weight:600; line-height:1.6; transition:background .16s,border-color .16s,box-shadow .16s; }
+.btn:hover { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.xlink { border:0; color:var(--muted); }
+.xlink::after { content:" ↗"; margin-left:5px; }
+#theme { background:var(--surface); border-color:var(--line); }
+.reading-progress { position:absolute; left:0; bottom:-1px; height:2px; width:100%; pointer-events:none; }
+.reading-progress span { display:block; height:100%; width:0; background:var(--primary); }
+.layout { max-width:1536px; padding:0 36px; grid-template-columns:228px minmax(0,1fr); gap:48px; }
+.toc { display:block; position:sticky; top:76px; align-self:start; max-height:calc(100dvh - 76px); overflow:auto; padding:30px 0 24px; scrollbar-width:thin; scrollbar-color:var(--line-strong) transparent; }
+.toc .label { font-size:10px; font-weight:700; letter-spacing:1.6px; padding:0!important; margin:26px 12px 12px; }
+.toc a { border-left:0; border-radius:7px; margin:3px 0; padding:8px 11px; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; line-height:1.6; }
+.toc a:hover { background:var(--surface-2); color:var(--text); }
+.toc a.active { background:var(--accent-soft); color:var(--accent-ink); font-weight:600; }
+.toc-number { font:10px/21px var(--mono); opacity:.8; width:20px; flex:none; }
+.toc a.done::after { content:"✓"; margin-left:auto; color:var(--primary); font-size:12px; }
+.toc a.active .toc-number { color:var(--primary); opacity:1; }
+.track-switcher { border:1px solid var(--line); border-radius:10px; padding:4px; background:var(--surface); display:flex; gap:3px; }
+.track-switcher a { margin:0; flex:1; justify-content:center; font-size:11px; padding:8px 4px; gap:6px; }
+.track-switcher a[aria-current="page"] { background:var(--accent-soft); color:var(--accent-ink); font-weight:700; }
+.track-switcher svg { width:14px; height:14px; }
+.toc .toc-overview { margin-bottom:15px; color:var(--text); }
+.toc-overview svg { width:15px; height:15px; color:var(--primary); }
+.sidebar-progress { margin:25px 2px 0; padding:16px; border:1px solid var(--accent-line); background:var(--accent-soft); border-radius:12px; }
+.sidebar-progress p { font-size:11px; color:var(--accent-ink); font-weight:600; margin:0 0 10px; display:flex; justify-content:space-between; gap:8px; }
+.sidebar-progress small { color:var(--muted); font-size:10px; display:block; margin-top:8px; }
+progress { appearance:none; width:100%; height:5px; display:block; border:0; border-radius:10px; overflow:hidden; background:var(--line); accent-color:var(--primary); }
+progress::-webkit-progress-bar { background:var(--line); border-radius:10px; }
+progress::-webkit-progress-value { background:var(--primary); border-radius:10px; }
+progress::-moz-progress-bar { background:var(--primary); border-radius:10px; }
+main { padding-bottom:70px; }
+.workspace-bar { display:flex; align-items:center; justify-content:space-between; padding:25px 0; gap:12px; border-bottom:1px solid var(--line); font-size:11px; color:var(--muted); }
+.workspace-bar span { display:flex; align-items:center; gap:9px; }
+.workspace-bar svg { width:14px; height:14px; }
+.workspace-bar .edition { border:1px solid var(--line); border-radius:5px; padding:2px 8px; font:9px/20px var(--mono); letter-spacing:.8px; white-space:nowrap; }
+.workspace-bar strong { color:var(--text); font-weight:500; }
+.hero { display:grid; grid-template-columns:minmax(0,1fr) 300px; column-gap:32px; align-items:center; padding:44px 0 0; }
+.hero .label { color:var(--accent-ink); font-size:10px; font-weight:700; letter-spacing:1.5px; margin-bottom:18px; }
+.hero .label::before { content:""; width:6px; height:6px; display:inline-block; background:var(--primary); margin-right:8px; vertical-align:2px; border-radius:50%; }
+.hero h1 { font-size:clamp(46px,4.5vw,68px); letter-spacing:-3px; line-height:1.06; font-weight:650; margin-bottom:20px; }
+.hero h1 span { display:block; color:var(--primary); }
+.hero .lead { font-size:14px; line-height:1.85; max-width:62ch; color:var(--muted); }
+.hero-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:25px; }
+.hero-actions .btn { padding:11px 17px; font-size:12px; }
+.btn-primary { background:var(--primary); color:var(--on-primary); border-color:var(--primary); box-shadow:0 3px 8px color-mix(in srgb,var(--primary) 15%,transparent); }
+.btn-primary:hover { background:var(--accent-ink); color:var(--on-primary); border-color:var(--accent-ink); }
+.hero-actions .btn-primary::after { content:" →"; margin-left:20px; }
+.hero-actions .btn-secondary { border-color:var(--line-strong); color:var(--body); background:var(--surface); }
+.hero-art { min-height:298px; position:relative; display:flex; flex-direction:column; padding:22px; border:1px solid var(--accent-line); border-radius:20px; background-color:var(--hero-bg); background-image:radial-gradient(var(--hero-dot) .8px,transparent .8px); background-size:14px 14px; overflow:hidden; }
+.art-label { font:9px/1.5 var(--mono); letter-spacing:1.5px; color:var(--accent-ink); display:flex; align-items:center; gap:7px; }
+.art-label::before { content:""; display:inline-block; width:6px; height:6px; border:1px solid var(--primary); border-radius:50%; }
+.art-window { margin-top:20px; padding:0 0 16px; border:1px solid var(--accent-line); border-radius:11px; background:var(--surface); box-shadow:0 10px 25px #102c2910; transform:rotate(-3deg); }
+.art-window-bar { display:flex; align-items:center; gap:4px; padding:10px; border-bottom:1px solid var(--line); }
+.art-window-bar i { width:5px; height:5px; background:var(--accent-line); border-radius:50%; }
+.art-window-bar span { margin-left:auto; color:var(--muted); font:8px/1 var(--mono); }
+.art-code { padding:15px 19px 4px; font:11px/1.85 var(--mono); color:var(--muted); white-space:pre; }
+.art-code em { color:var(--primary); font-style:normal; }
+.art-code b { color:var(--warm); font-weight:400; }
+.art-tags { display:flex; gap:6px; margin-top:23px; flex-wrap:wrap; }
+.art-tags span { font:9px/1.5 var(--mono); padding:5px 10px; border:1px solid var(--accent-line); color:var(--accent-ink); border-radius:6px; background:var(--surface); }
+.art-caption { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:18px; font-size:9px; color:var(--accent-ink); }
+.art-caption b { font-weight:500; }
+.art-server { display:flex; align-items:center; justify-content:space-between; margin-top:28px; gap:8px; }
+.art-server span { display:flex; flex-direction:column; align-items:center; gap:8px; border:1px solid var(--accent-line); border-radius:10px; padding:13px 10px; flex:1; background:var(--surface); font:9px/1.4 var(--mono); color:var(--accent-ink); }
+.art-server svg { width:24px; height:24px; }
+.art-server i { color:var(--primary); font-style:normal; }
+.art-response { background:var(--surface); padding:12px; margin-top:15px; border-radius:8px; border:1px solid var(--accent-line); font:10px/1.6 var(--mono); color:var(--muted); }
+.art-response span { color:var(--primary); }
+.stats { grid-column:1/-1; gap:12px; background:none; border:0; border-radius:0; overflow:visible; margin-top:34px; }
+.stats>div { background:var(--surface); padding:18px 20px 16px; border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); position:relative; }
+.stats b { font-size:27px; letter-spacing:-1px; margin-bottom:5px; font-weight:600; }
+.stats span { font-size:11px; }
+.stats>div::after { position:absolute; right:16px; top:17px; width:26px; height:26px; border-radius:7px; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent-ink); font:12px/1 var(--mono); }
+.stats>div:nth-child(1)::after { content:"↗"; }
+.stats>div:nth-child(2)::after { content:"≡"; }
+.stats>div:nth-child(3)::after { content:"▷"; background:var(--warm-soft); color:var(--warm); }
+.stats>div:nth-child(4)::after { content:"{}"; }
+.journey { display:flex; align-items:center; gap:24px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:17px 20px; margin-top:16px; }
+.journey-copy { flex:none; }
+.journey-copy strong { display:block; color:var(--text); font-size:12px; font-weight:600; }
+.journey-copy small { color:var(--muted); font-size:11px; }
+.journey progress { flex:1; }
+.journey-pct { font:11px/1.5 var(--mono); color:var(--primary); }
+.map-head { margin-top:40px; }
+.map-head .label { color:var(--accent-ink); font-size:10px; letter-spacing:1.4px; font-weight:600; }
+.map-head h2 { font-size:24px; letter-spacing:-.6px; font-weight:600; }
+.map-head .lead { font-size:12px; max-width:none; line-height:1.8; }
+.roadmap-panel { margin-top:18px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.roadmap-panel summary { list-style:none; display:flex; align-items:center; gap:14px; padding:19px 20px; cursor:pointer; color:var(--text); }
+.roadmap-panel summary::-webkit-details-marker { display:none; }
+.roadmap-panel summary::after { content:"+"; margin-left:auto; font-size:22px; color:var(--primary); font-weight:300; }
+.roadmap-panel[open] summary::after { content:"−"; }
+.roadmap-panel summary:hover { background:var(--accent-soft); border-radius:12px; }
+.roadmap-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:9px; background:var(--accent-soft); color:var(--primary); flex:none; }
+.roadmap-icon svg { width:19px; height:19px; }
+.roadmap-panel summary strong { display:block; font-size:12px; font-weight:600; }
+.roadmap-panel summary small { display:block; font-size:10px; color:var(--muted); margin-top:1px; }
+.roadmap { margin:0 24px; padding:8px 0 24px; }
+.row { grid-template-columns:1fr minmax(180px,210px) 1fr; gap:30px; padding:16px 0; }
+.node { background:var(--surface); font-size:11px; padding:7px 11px; border-color:var(--line); box-shadow:var(--shadow); }
+.node:hover { background:var(--accent-soft); border-color:var(--accent-line); }
+.node.stage { margin-top:0; font-size:13px; padding:13px 12px; border:1px solid var(--accent-line); background:var(--accent-soft); color:var(--accent-ink); }
+.node.stage small { color:var(--accent-ink); font:9px/1.7 var(--mono); }
+.node.stage.done { background:var(--primary); color:var(--on-primary); }
+.edges .spine { stroke:var(--primary); stroke-width:1.3; }
+.edges .branch { stroke:var(--line-strong); }
+.edges .arrow { fill:var(--primary); }
+.section-kicker { display:flex; align-items:center; gap:14px; color:var(--muted); font-size:10px; letter-spacing:1.6px; margin-top:42px; font-weight:600; }
+.section-kicker::after { content:""; flex:1; height:1px; background:var(--line); }
+section.stage { margin-top:34px; padding-top:34px; }
+.section-kicker + section.stage { margin-top:0; border-top:0; padding-top:26px; }
+.stage-head { grid-template-columns:54px 1fr auto; gap:18px; align-items:start; margin-bottom:25px; }
+.stage-num { display:grid; place-items:center; height:54px; border:1px solid var(--accent-line); border-radius:13px; background:var(--accent-soft); color:var(--primary); font:500 19px/1 var(--mono); }
+.stage-head h2 { font-size:26px; letter-spacing:-.7px; line-height:1.25; margin:0 0 10px; }
+.stage-head h2 small { display:block; font-size:11px; color:var(--primary); margin:6px 0 0; letter-spacing:0; font-weight:500; }
+.stage-head .lead { font-size:13px; line-height:1.8; }
+.stage-head .btn { background:var(--surface); margin-top:3px; font-size:11px; }
+.stage-head .btn[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent-line); }
+.stage-head .btn[aria-pressed="true"]::before { content:"✓ "; }
+.grid { gap:16px; grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr)); }
+.topic { background:var(--surface); border-color:var(--line); padding:25px; border-radius:13px; box-shadow:var(--shadow); scroll-margin-top:100px; }
+.topic:hover { border-color:var(--accent-line); }
+.topic:target { border-color:var(--primary); box-shadow:0 0 0 3px var(--accent-soft); }
+.topic h3 { font-size:17px; letter-spacing:-.3px; margin-bottom:12px; color:var(--text); font-weight:600; }
+.topic h4 { color:var(--text); font-size:13px; }
+.topic p, .topic li { font-size:14px; line-height:1.85; }
+.topic b { color:var(--text); font-weight:600; }
+.topic ul, .topic ol { padding-left:20px; }
+.topic li::marker { color:var(--primary); }
+code { background:var(--accent-soft); color:var(--accent-ink); border-color:transparent; border-radius:4px; font-size:.86em; padding:2px 5px; overflow-wrap:anywhere; }
+pre { color:var(--code-text); background:var(--code-bg); border:0; border-radius:0 0 9px 9px; font:12px/1.85 var(--mono); padding:17px 18px; tab-size:2; margin:0; }
+pre code { color:inherit; white-space:pre; overflow-wrap:normal; }
+.wrap code { white-space:pre-wrap; overflow-wrap:anywhere; }
+.jwt .p1 { color:#a7bdc6; }
+.jwt .p2 { color:#e9f2ef; }
+.jwt .p3 { color:#a7bdc6; }
+.code-block { margin:16px 0; border:1px solid var(--line); border-radius:10px; overflow:hidden; min-width:0; }
+.code-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 12px; background:var(--code-bg); border-bottom:1px solid #ffffff16; color:#a7bdc6; font:9px/1.5 var(--mono); letter-spacing:.3px; }
+.code-toolbar>span::before { content:"● ● ●"; color:#7f9aa5; font-size:7px; letter-spacing:2px; margin-right:12px; }
+.copy-code { background:transparent; border:1px solid #ffffff2b; color:#d4e1e6; border-radius:4px; font-size:9px; line-height:1.5; padding:3px 7px; cursor:pointer; min-width:49px; }
+.copy-code:hover { background:#ffffff18; }
+.callout { background:var(--accent-soft); border-color:var(--primary); padding:15px 18px; color:var(--body); border-radius:0 9px 9px 0; }
+.deeper { border:1px solid var(--accent-line); background:var(--accent-soft); border-radius:10px; padding:16px 20px; font-size:12px; line-height:1.9; color:var(--body); }
+.deeper .label { color:var(--accent-ink); font-size:9px; font-weight:700; }
+.pager { margin-top:20px; font-size:11px; }
+.pager a { padding:7px 0; color:var(--accent-ink); max-width:48%; }
+.tw { border:1px solid var(--line); border-radius:9px; }
+table { font-size:12px; }
+th,td { padding:11px 14px; }
+th { background:var(--surface-2); font-size:9px; letter-spacing:1px; color:var(--text); font-weight:600; }
+tr:last-child td { border-bottom:0; }
+tbody tr:nth-child(even) { background:color-mix(in srgb,var(--bg) 55%,var(--surface)); }
+.demo { border-color:var(--accent-line); background:var(--bg); padding:22px; margin-top:20px; border-radius:11px; }
+.demo::before { content:"INTERACTIVE LAB"; display:block; font:600 9px/1.6 var(--mono); color:var(--primary); letter-spacing:1.5px; margin-bottom:19px; }
+.demo pre { background:var(--code-bg); margin:0; }
+.demo .code-block:last-child { margin-bottom:0; }
+.demo .note { font-size:12px; }
+.controls { min-width:0; }
+.controls label { font-size:11px; min-width:0; max-width:100%; }
+.controls input.field { min-width:0!important; width:min(100%,300px); }
+.controls select, .field { background:var(--surface); border-color:var(--line-strong); font-size:12px; min-height:36px; max-width:100%; }
+.controls input[type=range] { accent-color:var(--primary); }
+.stagebox { background:var(--surface); border-style:dashed; border-color:var(--line-strong); padding:20px; }
+.bm-margin { background:var(--warm-soft); outline-color:var(--warm); }
+.bm-box { border-color:var(--primary); background:var(--accent-soft); }
+.bub { color:var(--accent-ink); background:var(--accent-soft); border-color:var(--accent-line); }
+.bub .bub { background:var(--surface); }
+.bub .bub .bub { background:var(--accent-soft); }
+.pipe .step.ok { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.pipe .step.fail { background:var(--warm-soft); border-color:var(--warm); color:var(--warm); }
+.cols .code-block { margin:0; }
+.check { font-size:13px; padding:13px 4px; gap:13px; }
+.check input { width:16px; height:16px; flex:none; accent-color:var(--primary); }
+.check:has(input:checked) { color:var(--accent-ink); background:var(--accent-soft); border-radius:5px; }
+.check:has(input:checked) span { text-decoration:line-through; text-decoration-color:var(--accent-line); }
+.foot { font-size:11px; margin-top:36px; line-height:1.9; }
+.search-feedback { padding:28px 0 12px; }
+.search-feedback h2 { font-size:26px; letter-spacing:-.6px; margin-bottom:8px; }
+.search-feedback p { font-size:13px; color:var(--muted); }
+.search-feedback .btn { margin-top:8px; background:var(--surface); }
+body.searching .hero,body.searching .journey,body.searching .section-kicker { display:none; }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--accent-line); background:var(--surface); color:var(--primary); box-shadow:0 4px 18px #122c3210; border-radius:10px; width:42px; height:42px; font-size:18px; cursor:pointer; z-index:20; }
+.menu-toggle,.menu-close,.nav-backdrop { display:none; }
+.toast { position:fixed; bottom:26px; left:50%; transform:translateX(-50%); padding:10px 18px; background:var(--text); color:var(--bg); border-radius:9px; font-size:12px; z-index:100; box-shadow:0 4px 24px #0002; max-width:calc(100% - 40px); }
+@media(min-width:1440px) { .layout { gap:64px; grid-template-columns:240px minmax(0,1fr); } .hero { grid-template-columns:minmax(0,1fr) 330px; column-gap:44px; row-gap:0; } .hero-art { min-height:315px; } }
+@media(min-width:1080px) and (max-width:1250px) { .header-context,.header-divider { display:none; } .top-inner,.layout { padding-left:24px; padding-right:24px; } .layout { gap:32px; grid-template-columns:205px minmax(0,1fr); } .hero { grid-template-columns:minmax(0,1fr) 250px; gap:20px; } .hero-art { padding:17px; } .hero h1 { font-size:54px; } .art-code { font-size:10px; padding-left:14px; } .hero-actions .btn { padding:10px 12px; } }
+@media(max-width:1079px) {
+  .layout { grid-template-columns:minmax(0,1fr); padding:0 28px; gap:0; }
+  .top-inner { padding:0 28px; gap:16px; }
+  .header-context,.header-divider { display:none; }
+  .menu-toggle { display:grid; place-items:center; width:38px; height:38px; padding:0; flex:none; background:var(--surface); border:1px solid var(--line); border-radius:8px; color:var(--text); cursor:pointer; }
+  .menu-toggle svg { width:18px; height:18px; }
+  .toc { position:fixed; top:0; left:0; bottom:0; width:290px; max-width:calc(100vw - 40px); max-height:100dvh; padding:22px; background:var(--bg); border-right:1px solid var(--line); z-index:81; visibility:hidden; transform:translateX(-100%); transition:transform .2s,visibility .2s; }
+  body.nav-open .toc { visibility:visible; transform:translateX(0); }
+  .nav-backdrop { display:block; position:fixed; inset:0; background:#081b2d70; backdrop-filter:blur(3px); z-index:80; border:0; cursor:pointer; }
+  .menu-close { display:block; position:sticky; top:0; z-index:2; width:100%; margin-bottom:20px; text-align:left; border:0; background:var(--bg); color:var(--muted); font:600 12px/1.5 var(--font); cursor:pointer; padding:12px 6px; }
+  .menu-close::after { content:"×"; float:right; font-size:20px; line-height:18px; }
+  .hero { grid-template-columns:minmax(0,1fr) 290px; gap:28px; }
+  .hero h1 { font-size:58px; }
+}
+@media(max-width:760px) {
+  .top { height:116px; }
+  .top-inner { gap:10px; padding:12px 20px; flex-wrap:wrap; align-content:center; }
+  .brand { margin-right:auto; font-size:14px; gap:9px; }
+  .brand::before { width:31px; height:35px; border-radius:8px; }
+  .brand::after { font-size:13px; left:5px; top:5px; }
+  .brand span { display:block; font-size:9px; letter-spacing:.8px; }
+  .top .xlink { display:none; }
+  #theme { font-size:10px; padding:7px 9px; min-height:35px; }
+  .menu-toggle { width:35px; height:35px; }
+  .search { order:5; flex-basis:100%; flex-grow:1; max-width:none; margin:0; }
+  .search input { height:37px; font-size:12px; padding-left:37px; }
+  .search::before { top:10px; }
+  .search::after { top:23px; }
+  .search kbd { top:8px; line-height:18px; }
+  html { scroll-padding-top:140px; }
+  .topic { scroll-margin-top:140px; }
+  .layout { padding:0 20px; }
+  .workspace-bar { padding:19px 0; font-size:10px; }
+  .workspace-bar .edition { font-size:8px; padding:0 6px; }
+  .hero { display:block; padding-top:30px; }
+  .hero h1 { font-size:55px; letter-spacing:-2.8px; }
+  .hero .label { font-size:9px; letter-spacing:1px; margin-bottom:16px; }
+  .hero .lead { font-size:13px; }
+  .hero-art { display:none; }
+  .hero-actions { margin-top:22px; }
+  .hero-actions .btn { font-size:11px; padding:11px 13px; }
+  .hero-actions .btn-primary::after { margin-left:12px; }
+  .stats { margin-top:28px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .stats>div { padding:16px; }
+  .stats b { font-size:25px; }
+  .stats span { font-size:10px; }
+  .stats>div::after { right:13px; top:15px; width:23px; height:23px; }
+  .journey { padding:15px; gap:14px; flex-wrap:wrap; }
+  .journey-copy { flex:1; }
+  .journey progress { order:3; flex-basis:100%; }
+  .journey-pct { margin-left:auto; }
+  .map-head { margin-top:32px; }
+  .map-head h2 { font-size:22px; }
+  .map-head .lead { font-size:12px; }
+  .roadmap-panel summary { padding:16px; gap:11px; }
+  .roadmap-panel summary strong { font-size:11px; }
+  .roadmap-panel summary small { font-size:9px; }
+  .roadmap { margin:0 12px; }
+  .row { grid-template-columns:1fr; justify-items:center; padding:16px 0; }
+  .row>div:nth-child(2) { width:min(100%,250px); }
+  .branches { display:none; }
+  .stage-head { grid-template-columns:42px minmax(0,1fr); gap:14px; margin-bottom:20px; }
+  .stage-num { height:42px; font-size:15px; border-radius:10px; }
+  .stage-head h2 { font-size:24px; letter-spacing:-.6px; }
+  .stage-head h2 small { font-size:10px; }
+  .stage-head .lead { font-size:12px; }
+  .stage-head .btn { grid-column:2; justify-self:start; font-size:10px; margin-top:0; }
+  .grid { grid-template-columns:minmax(0,1fr); gap:14px; }
+  .topic { padding:21px; }
+  .topic h3 { font-size:17px; }
+  .topic p,.topic li { font-size:13px; }
+  .demo { padding:16px; }
+  .controls { gap:14px; }
+  .controls input[type=range] { width:130px; }
+  .code-toolbar>span::before { margin-right:7px; }
+  pre { font-size:10.5px; padding:14px; }
+  .deeper { padding:15px; font-size:12px; }
+  .back-top { width:38px; height:38px; right:16px; bottom:16px; }
+}
+@media(max-width:360px) { .top-inner,.layout { padding-left:14px; padding-right:14px; } .brand { font-size:12px; } .brand span { font-size:8px; } #theme { font-size:9px; padding:6px; } .hero h1 { font-size:48px; } .hero-actions { gap:8px; } .hero-actions .btn { padding:10px; } .workspace-bar { font-size:9px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+@media print {
+  :root,:root[data-theme="dark"] { --bg:#fff; --surface:#fff; --surface-2:#f4f4f4; --text:#111; --body:#222; --muted:#555; --primary:#14665a; --line:#ddd; --accent-soft:#f3f6f4; --accent-line:#ddd; --accent-ink:#14665a; --code-bg:#f4f4f4; --code-text:#111; }
+  .top,.toc,.nav-backdrop,.hero-art,.hero-actions,.journey,.back-top,.toast,.copy-code,.learned,.pager,.workspace-bar,.reading-progress { display:none!important; }
+  .layout { display:block; max-width:none; padding:0; }
+  .hero { display:block!important; padding-top:0; }
+  .hero h1 { font-size:40px; }
+  .hero h1 span { display:inline; }
+  .hero h1 span::after { content:" "; }
+  .grid { display:block; }
+  .topic { margin:12px 0; break-inside:avoid; box-shadow:none; }
+  .code-toolbar { background:#eee; color:#333; }
+  pre,pre code { white-space:pre-wrap; overflow-wrap:anywhere; }
+  .roadmap { break-inside:avoid; }
+  a { color:inherit; }
+}
+
+
+/* The third handbook follows one product from its first decision to release. */
+:root[data-handbook="project"] { --primary:#276a5a; --accent-soft:#e9f2ed; --accent-line:#c2d9cc; --accent-ink:#1e594b; --hero-bg:#ebf2ee; --hero-dot:#c8d9ce; }
+:root[data-handbook="project"][data-theme="dark"] { --primary:#8bd3b9; --on-primary:#103027; --accent-soft:#203a33; --accent-line:#3b5e50; --accent-ink:#ace0cb; --hero-bg:#1c322c; --hero-dot:#345247; }
+.track-switcher a { font-size:10px; gap:4px; padding:8px 3px; }
+.next-handbook { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px; margin-top:25px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:13px; text-decoration:none; }
+.next-handbook strong { display:block; color:var(--accent-ink); font-size:16px; letter-spacing:-.3px; }
+.next-handbook small { display:block; color:var(--muted); font-size:12px; margin-top:5px; }
+.next-handbook>span:last-child { font-size:22px; color:var(--primary); }
+.art-ticket { padding:17px; }
+.art-ticket small { color:var(--muted); font:9px/1.5 var(--mono); }
+.art-ticket strong { display:block; font-size:15px; line-height:1.5; color:var(--text); margin:8px 0 14px; }
+.art-ticket span { font:9px/1.5 var(--mono); background:var(--accent-soft); color:var(--accent-ink); border:1px solid var(--accent-line); padding:4px 8px; border-radius:5px; }
+.story-player { margin-top:28px; padding:26px; border:1px solid var(--accent-line); background:var(--surface); border-radius:16px; }
+.story-player>.label { color:var(--primary); font-size:10px; letter-spacing:1.5px; }
+.story-player h2 { font-size:25px; letter-spacing:-.7px; margin-bottom:8px; }
+.story-intro { font-size:13px; color:var(--muted); max-width:75ch; }
+.story-controls { display:flex; align-items:end; flex-wrap:wrap; gap:10px; margin:20px 0; }
+.story-controls label { display:flex; flex-direction:column; gap:5px; font-size:11px; color:var(--muted); margin-right:auto; min-width:200px; }
+.story-controls select { background:var(--bg); border:1px solid var(--line-strong); border-radius:8px; color:var(--text); font:12px/1.5 var(--font); padding:9px 10px; }
+.story-controls button { min-height:38px; }
+.btn:disabled { opacity:.45; cursor:default; box-shadow:none; }
+.story-track { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; padding:0; margin:20px 0; list-style:none; }
+.story-track li { padding:10px 3px; text-align:center; border:1px solid var(--line); border-radius:8px; font-size:10px; color:var(--muted); background:var(--bg); margin:0; }
+.story-track li b { font:10px/1.5 var(--mono); display:block; margin-bottom:4px; }
+.story-track li[data-state="done"] { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.story-track li[aria-current="step"] { background:var(--primary); border-color:var(--primary); color:var(--on-primary); }
+.story-track li[data-state="blocked"] { background:var(--warm-soft); border-color:var(--warm); color:var(--warm); }
+.story-scene { padding:19px; background:var(--bg); border:1px solid var(--line); border-radius:11px; }
+.story-scene .label { font:10px/1.7 var(--mono); letter-spacing:0; color:var(--primary); }
+.story-scene h3 { font-size:18px; letter-spacing:-.4px; margin-bottom:8px; }
+.story-scene p { font-size:13px; margin-bottom:8px; }
+.story-scene a { font-size:11px; }
+.story-player .code-block { margin-bottom:0; }
+.story-player progress { margin-top:20px; }
+.story-beat { display:flex; gap:9px; align-items:center; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--primary); margin-bottom:11px; }
+.story-beat::before { content:""; display:block; width:5px; height:5px; background:var(--primary); border-radius:50%; }
+body.searching .story-player { display:none; }
+@media(max-width:760px) { .story-player { padding:18px; } .story-player h2 { font-size:22px; } .story-track { grid-template-columns:repeat(4,minmax(0,1fr)); } .story-controls { gap:8px; } .story-controls label { flex-basis:100%; min-width:0; } .story-controls .btn { flex:1; padding:8px; font-size:10px; } .next-handbook { padding:18px; } .next-handbook strong { font-size:15px; } }
+@media print { .story-controls { display:none; } .story-player { break-inside:avoid; } }
+</style>
+<style id="codex-refresh">
+/* Refresh: true black, flat pastel accents, pill controls, the DineshXEswar logo and a collapsible sidebar. No gradients. */
+:root {
+  --lime:#e3f58a; --lavender:#c9b8ff; --sky:#97e6f2; --peach:#ffc2a8; --ink:#111113;
+  --r:22px; --r-sm:12px;
+}
+:root, :root[data-theme="light"] {
+  --bg:#f2f2ee; --surface:#ffffff; --surface-2:#ebebe6;
+  --line:#e2e2dc; --line-strong:#cbcbc4; --text:#111113; --body:#3a3a40;
+  --muted:#63636b; --faint:#717179; --on-primary:#ffffff;
+  --warm:#a2431c; --warm-soft:#fde9df;
+  --code-bg:#161618; --code-text:#ececf0; --shadow:none;
+  /* Frontend: lavender */
+  --pastel:var(--lavender); --primary:#5a3fc8; --accent-soft:#efeaff; --accent-line:#d9cdfc;
+  --accent-ink:#4a32ad; --hero-bg:#efeaff; --hero-dot:#d9cdfc;
+}
+:root[data-theme="dark"] {
+  --bg:#0b0b0c; --surface:#18181b; --surface-2:#222226;
+  --line:#26262b; --line-strong:#38383f; --text:#f6f6f4; --body:#cfcfd4;
+  --muted:#9e9ea7; --faint:#8e8e97; --on-primary:#111113;
+  --warm:#ffb999; --warm-soft:#2d211c;
+  --code-bg:#121214; --code-text:#e8e8ec; --shadow:none;
+  --pastel:var(--lavender); --primary:#c9b8ff; --accent-soft:#24212f; --accent-line:#3d3657;
+  --accent-ink:#d6caff; --hero-bg:#1d1b24; --hero-dot:#34304a;
+}
+/* Backend: sky */
+:root[data-handbook="backend"] {
+  --pastel:var(--sky); --primary:#0b6878; --accent-soft:#e2f6f9; --accent-line:#b5e6ee;
+  --accent-ink:#0a5a68; --hero-bg:#e2f6f9; --hero-dot:#b5e6ee;
+}
+:root[data-handbook="backend"][data-theme="dark"] {
+  --pastel:var(--sky); --primary:#97e6f2; --accent-soft:#17262a; --accent-line:#2b4a50;
+  --accent-ink:#b0eef7; --hero-bg:#161f22; --hero-dot:#28393d;
+}
+/* Project: lime */
+:root[data-handbook="project"] {
+  --pastel:var(--lime); --primary:#566508; --accent-soft:#f2f8d3; --accent-line:#dbea98;
+  --accent-ink:#4a5707; --hero-bg:#f2f8d3; --hero-dot:#dbea98;
+}
+:root[data-handbook="project"][data-theme="dark"] {
+  --pastel:var(--lime); --primary:#e3f58a; --accent-soft:#22261a; --accent-line:#434b27;
+  --accent-ink:#ebf8a8; --hero-bg:#1c1f16; --hero-dot:#353c22;
+}
+
+/* brand */
+.brand::before, .brand::after { content:none; display:none; }
+.brand { gap:12px; }
+.brand-logo { width:40px; height:40px; flex:none; display:block; transition:transform .25s ease; }
+.brand:hover .brand-logo { transform:rotate(-6deg); }
+.brand-logo .spark { transform-origin:24px 24px; transition:transform .45s ease; }
+.brand:hover .brand-logo .spark { transform:rotate(90deg) scale(1.2); }
+.brand-copy em { font-style:normal; font-weight:800; color:var(--primary); padding:0 1px; }
+
+/* shape language from the reference: soft big cards, pill controls, flat pastel fills */
+.top { background:color-mix(in srgb,var(--bg) 92%,transparent); border-bottom-color:var(--line); }
+.btn { border-radius:999px; }
+.menu-toggle, #theme { border-radius:999px; }
+.search input { border-radius:999px; background:var(--surface); border-color:var(--line); }
+.search kbd { border-radius:999px; padding:0 7px; }
+.btn-primary, .btn-primary:hover { background:var(--pastel); border-color:var(--pastel); color:var(--ink); box-shadow:none; }
+.btn-primary:hover { filter:brightness(.95); }
+.hero h1 span { color:var(--primary); }
+.hero .label::before, .header-context i { background:var(--pastel); }
+.hero-art { background-color:var(--hero-bg); border-radius:var(--r); border-color:var(--accent-line); }
+.art-window { box-shadow:none; border-radius:16px; }
+.art-tags span { border-radius:999px; }
+.art-ticket span { border-radius:999px; background:var(--pastel); color:var(--ink); border-color:var(--pastel); }
+.art-code b { color:var(--warm); }
+.workspace-bar .edition { border-radius:999px; background:var(--pastel); color:var(--ink); border-color:var(--pastel); padding:1px 10px; font-weight:600; }
+
+.stats { gap:12px; }
+.stats>div { border:0; border-radius:var(--r); padding:20px 20px 18px; color:var(--ink); box-shadow:none; }
+.stats>div:nth-child(1) { background:var(--lime); }
+.stats>div:nth-child(2) { background:var(--lavender); }
+.stats>div:nth-child(3) { background:var(--sky); }
+.stats>div:nth-child(4) { background:var(--surface); border:1px solid var(--line); color:var(--text); }
+.stats>div b { color:inherit; }
+.stats>div span { color:inherit; opacity:.78; }
+.stats>div:nth-child(4) span { color:var(--muted); opacity:1; }
+.stats>div::after, .stats>div:nth-child(3)::after { width:34px; height:34px; border-radius:50%; background:var(--ink); color:#fff; top:16px; right:16px; }
+.stats>div:nth-child(4)::after { background:var(--surface-2); color:var(--text); }
+
+.journey, .roadmap-panel, .topic, .story-player, .next-handbook { border-radius:var(--r); }
+.journey { border-color:var(--line); }
+.roadmap-icon { border-radius:50%; background:var(--pastel); color:var(--ink); }
+.roadmap-panel summary:hover { border-radius:var(--r); }
+.reading-progress span { background:var(--pastel); }
+progress::-webkit-progress-value { background:var(--pastel); }
+progress::-moz-progress-bar { background:var(--pastel); }
+:root[data-theme="light"] progress::-webkit-progress-value { background:var(--primary); }
+:root[data-theme="light"] progress::-moz-progress-bar { background:var(--primary); }
+:root[data-theme="light"] .reading-progress span { background:var(--primary); }
+
+.track-switcher { border-radius:999px; padding:4px; }
+.track-switcher a { border-radius:999px; }
+.track-switcher a[aria-current="page"] { background:var(--text); color:var(--bg); }
+.toc a { border-radius:999px; }
+.toc a.active, .toc .toc-overview.active { background:var(--surface-2); color:var(--text); }
+.toc a.active .toc-number { color:var(--primary); }
+.sidebar-progress { border-radius:18px; background:var(--surface); border-color:var(--line); }
+.sidebar-progress p { color:var(--text); }
+
+.stage-num { background:var(--pastel); color:var(--ink); border:0; border-radius:50%; }
+.stage-head .btn[aria-pressed="true"] { background:var(--pastel); color:var(--ink); border-color:var(--pastel); }
+.node { border-radius:999px; }
+.node.stage { border-radius:18px; }
+.node.stage.done { background:var(--pastel); border-color:var(--pastel); color:var(--ink); }
+.node.stage.done small { color:var(--ink); }
+.topic { border-color:var(--line); }
+.topic:hover { border-color:var(--line-strong); box-shadow:none; }
+.callout { border-color:var(--pastel); background:var(--surface-2); border-radius:0 14px 14px 0; }
+.deeper { border-radius:18px; background:var(--surface); border-color:var(--line); }
+.code-block { border-radius:16px; border-color:var(--line); }
+.code-toolbar { color:#a9a9b3; border-bottom-color:#ffffff12; }
+.code-toolbar>span::before { color:#6d6d76; }
+.copy-code { border-radius:999px; padding:3px 10px; }
+.demo { border-radius:18px; }
+.tw { border-radius:16px; }
+.story-track li { border-radius:14px; }
+.story-track li[aria-current="step"] { background:var(--pastel); border-color:var(--pastel); color:var(--ink); }
+.story-track li[data-state="done"] { background:var(--surface-2); border-color:var(--line); color:var(--text); }
+.story-track li[data-state="blocked"] { background:var(--peach); border-color:var(--peach); color:var(--ink); }
+.story-scene { border-radius:18px; }
+.story-controls select { border-radius:999px; padding:9px 14px; }
+.journey-pct { color:var(--primary); font-weight:600; }
+.back-top { border-radius:50%; background:var(--pastel); color:var(--ink); border:0; box-shadow:none; }
+.toast { border-radius:999px; }
+.nav-backdrop { background:#00000099; }
+.jwt .p1, .jwt .p3 { color:#a9a9b3; }
+.jwt .p2 { color:#f0f0f3; }
+
+/* build diary pieces */
+.when { font:500 11px/1.5 var(--mono); color:var(--muted); letter-spacing:.4px; margin:0 0 6px; }
+.say { background:var(--surface-2); border-radius:16px; padding:14px 16px; margin:4px 0 14px; }
+.say b { display:block; font-size:11px; font-weight:600; color:var(--primary); margin-bottom:4px; letter-spacing:.3px; }
+.note { background:var(--surface-2); border-radius:16px; padding:14px 16px; margin:14px 0; }
+.note>b { display:inline-block; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:3px 10px; border-radius:999px; color:var(--ink); background:var(--lime); margin-bottom:8px; }
+.note.tradeoff>b { background:var(--sky); }
+.note.mistake>b { background:var(--peach); }
+.note.decision>b { background:var(--lavender); }
+.note p { margin:0; }
+.from-hb { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0 0!important; }
+.from-hb span { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-right:4px; }
+.from-hb a { font-size:11.5px; line-height:1.5; padding:4px 12px; border-radius:999px; text-decoration:none; background:var(--surface-2); color:var(--text); border:1px solid var(--line); }
+.from-hb a:hover { background:var(--pastel); border-color:var(--pastel); color:var(--ink); }
+.story-beat { color:var(--primary); }
+
+/* sidebar: header button collapses it on desktop and opens the drawer on small screens */
+.menu-toggle { display:grid; place-items:center; width:38px; height:38px; padding:0; flex:none; background:var(--surface); border:1px solid var(--line); border-radius:9px; color:var(--text); cursor:pointer; transition:background .16s,border-color .16s,color .16s; }
+.menu-toggle:hover { background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink); }
+.menu-toggle svg { width:18px; height:18px; }
+.toc-item { position:relative; }
+.toc-item>a { padding-right:34px!important; }
+.toc-item>a.done::after { position:absolute; right:30px; }
+.toc-caret { position:absolute; right:4px; top:6px; width:26px; height:26px; display:grid; place-items:center; border:0; border-radius:6px; background:transparent; color:var(--faint); cursor:pointer; padding:0; }
+.toc-caret:hover { background:var(--surface-2); color:var(--text); }
+.toc-caret svg { width:14px; height:14px; transition:transform .2s ease; }
+.toc-caret[aria-expanded="true"] svg { transform:rotate(90deg); color:var(--primary); }
+.toc-topics { margin:2px 0 8px 21px; padding-left:10px; border-left:1px solid var(--accent-line); display:grid; grid-template-rows:1fr; transition:grid-template-rows .22s ease; }
+.toc-topics[hidden] { display:none!important; }
+.toc-topics a { font-size:11.5px!important; padding:5px 9px!important; margin:1px 0!important; line-height:1.45!important; color:var(--muted); }
+.toc-topics a:hover { color:var(--text); }
+.toc-topics a.here { color:var(--accent-ink); font-weight:600; background:transparent; }
+.toc-topics a.here::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--primary); flex:none; }
+.toc-collapse { display:none; }
+@media(min-width:1080px) {
+  .layout { transition:grid-template-columns .25s ease, gap .25s ease; }
+  .toc-collapse { display:flex; align-items:center; gap:10px; width:100%; margin:16px 0 0; padding:9px 11px; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:var(--muted); font:600 11px/1.5 var(--font); cursor:pointer; }
+  .toc-collapse:hover { color:var(--accent-ink); background:var(--accent-soft); border-color:var(--accent-line); }
+  .toc-collapse svg { width:15px; height:15px; flex:none; transition:transform .25s ease; }
+  body.sidebar-collapsed .layout { grid-template-columns:60px minmax(0,1fr)!important; gap:36px!important; }
+  body.sidebar-collapsed .toc { overflow-x:hidden; }
+  body.sidebar-collapsed .toc .nav-text,
+  body.sidebar-collapsed .toc .label,
+  body.sidebar-collapsed .toc-caret,
+  body.sidebar-collapsed .toc-topics,
+  body.sidebar-collapsed .sidebar-progress p,
+  body.sidebar-collapsed .sidebar-progress small { display:none!important; }
+  body.sidebar-collapsed .track-switcher { flex-direction:column; }
+  body.sidebar-collapsed .toc a { justify-content:center; padding:9px 0!important; gap:0; }
+  body.sidebar-collapsed .toc-item>a { padding-right:0!important; }
+  body.sidebar-collapsed .toc a.done::after { display:none; }
+  body.sidebar-collapsed .toc-number { width:auto; font-size:11px; }
+  body.sidebar-collapsed .toc a.done .toc-number { color:var(--primary); font-weight:700; opacity:1; }
+  body.sidebar-collapsed .sidebar-progress { display:none; }
+  body.sidebar-collapsed .toc-collapse { justify-content:center; padding:9px 0; }
+  body.sidebar-collapsed .toc-collapse svg { transform:rotate(180deg); }
+}
+@media(max-width:1079px) { .toc-collapse { display:none!important; } }
+@media(max-width:760px) { .brand-logo { width:34px; height:34px; } }
+@media print { .brand-logo { filter:none; } .hero h1 span { color:var(--primary); background:none; } }
+</style>
+</head>
+<body><a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="top-inner"><a class="brand" href="#top">DineshXEswar<span>Project</span></a><div class="search"><input id="q" type="search" placeholder="Search this handbook" aria-label="Search topics" autocomplete="off"></div><button class="btn" id="theme" type="button">Dark mode</button></div></header>
+<div class="layout" id="top"><nav class="toc" id="toc" aria-label="Stages"></nav><main id="main">
+<section class="hero"><p class="label">Dinesh and Eswar · A senior developer's build diary</p><h1>Courtside, a build diary</h1><p class="lead">A first-person story of building a real booking website without letting AI write the code. You sit beside a senior developer from the first phone call to two weeks after launch: what they asked, what they drew on paper, why the database came first, where the plan broke, and how each bug was found and fixed. About half of every chapter points back to a Frontend or Backend handbook topic, so you can see where each idea gets used.</p><div class="stats"><div><b id="n-stages">0</b><span>Chapters in order</span></div><div><b id="n-topics">0</b><span>Diary entries</span></div><div><b>11</b><span>Real bugs, found and fixed</span></div><div><b>1</b><span>Website, idea to launch</span></div></div></section>
+
+<section class="story-player" aria-labelledby="story-heading">
+<p class="label">Interactive request story</p><h2 id="story-heading">Follow one booking</h2>
+<p class="story-intro">Pick a scenario and step through the files a booking passes through. It is a local simulation of the finished app from the diary. Nothing is sent to a server.</p>
+<div class="story-controls"><label>Scenario<select id="story-scenario"><option value="success">Member books a free slot</option><option value="taken">Slot taken a moment earlier</option><option value="limit">Member already has 2 upcoming bookings</option><option value="invalid">Time outside opening hours</option><option value="signed-out">Signed out, no session</option></select></label>
+<button class="btn" id="story-prev" type="button">← Previous</button><button class="btn btn-primary" id="story-next" type="button">Next step →</button><button class="btn" id="story-play" type="button">Play flow</button><button class="btn" id="story-reset" type="button">Restart</button></div>
+<ol class="story-track" id="story-track"><li><b>01</b>Click</li><li><b>02</b>Request</li><li><b>03</b>Session</li><li><b>04</b>Validation</li><li><b>05</b>Rules</li><li><b>06</b>Database</li><li><b>07</b>Response</li><li><b>08</b>Screen</li></ol>
+<div class="story-scene" role="status" aria-live="polite" aria-atomic="true"><p class="label" id="story-file"></p><h3 id="story-title"></h3><p id="story-description"></p><a id="story-chapter" href="#api">Read the diary entry →</a></div>
+<pre class="wrap"><code id="story-output"></code></pre><progress id="story-progress" max="8" value="1" aria-label="Request story progress"></progress></section>
+
+<section id="map"><div class="map-head"><p class="label">The project roadmap</p><h2>Follow the build, day by day</h2><p class="lead">Each big box is a chapter in the order it happened. Small boxes are diary entries. Expand the roadmap to jump anywhere.</p></div><div class="roadmap" id="roadmap"><svg class="edges" aria-hidden="true"></svg><ol class="rows" id="rows"></ol></div></section>
+
+<!-- ============ 1 CALL ============ -->
+<section class="stage" id="call" data-title="The phone call">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 1 · Monday</div><h2>The phone call <small>understand the problem before any code</small></h2><p class="lead">Every project starts with a person who has a problem. My first job is to understand it well enough to explain it back. No editor is open yet.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="call-problem" data-node data-label="The WhatsApp chaos"><p class="when">Monday, 10:30 AM</p><h3>The WhatsApp chaos</h3>
+<p class="say"><b>Meera, club secretary</b>“We have four badminton courts and about 120 members. People book by messaging the club WhatsApp group. Twice last month two families turned up for the same court at 7 AM. Can you make us a website?”</p>
+<p>I didn't say yes or no yet. “Make a website” isn't a requirement. The real problem is in that message: <b>bookings collide, and nobody can see what is free.</b> If the site solves that, it is a success, even if it looks plain.</p>
+<div class="note habit"><b>Senior habit</b><p>Write the problem in one sentence, in the client's words, before thinking about technology. Mine was: “Members need to see free courts and book one without colliding with someone else.”</p></div>
+</article>
+<article class="topic" id="call-questions" data-node data-label="The questions I asked"><p class="when">Monday, 10:45 AM</p><h3>The questions I asked</h3>
+<p>Most bugs I have shipped came from a question I didn't ask. So I asked these on the call and wrote down the answers:</p>
+<ul>
+<li><b>How long is a booking?</b> Always one hour, starting on the hour.</li>
+<li><b>Opening hours?</b> 6 AM to 10 PM, every day. So 16 slots per court per day.</li>
+<li><b>How far ahead can people book?</b> Up to 7 days. New days open at 7 PM each evening.</li>
+<li><b>Limits?</b> At most 2 upcoming bookings per member, so nobody hoards Saturday mornings.</li>
+<li><b>Who manages things?</b> Meera and one other person can block courts for maintenance and cancel any booking.</li>
+<li><b>Payments?</b> Members pay a monthly fee at the desk. No online payment.</li>
+</ul>
+<p>That last answer saved weeks. Online payment would have meant a payment gateway, refunds, and failed-payment states. Asking was free.</p>
+</article>
+<article class="topic" id="call-brief" data-node data-label="A one-page brief"><p class="when">Monday, 2:00 PM</p><h3>A one-page brief</h3>
+<p>I turned the notes into one page with three lists and sent it to Meera to confirm. Getting “yes, that's right” in writing prevents arguments later.</p>
+<div class="tw"><table><thead><tr><th>Must have (version 1)</th><th>Later</th><th>Not doing</th></tr></thead><tbody>
+<tr><td>Sign up and log in</td><td>Waitlist for full slots</td><td>Online payments</td></tr>
+<tr><td>See a day's grid: 4 courts × 16 hours</td><td>Email reminders</td><td>Mobile app</td></tr>
+<tr><td>Book a free slot, cancel my own</td><td>Usage reports for the committee</td><td>Chat between members</td></tr>
+<tr><td>Admin: block a court, cancel any booking</td><td></td><td></td></tr>
+</tbody></table></div>
+<p>The “Not doing” list matters as much as the first. It is what I point to when a new idea shows up in week 3.</p>
+</article>
+<article class="topic" id="call-success" data-node data-label="Success I can test"><p class="when">Monday, 3:00 PM</p><h3>Success I can test</h3>
+<p>“It works” is not a test. I wrote these sentences so I can check each one later:</p>
+<ul>
+<li>Two people trying to book the same court and hour: exactly one gets it, the other sees a clear message.</li>
+<li>A member can't cancel someone else's booking, even by editing the request by hand.</li>
+<li>A member with 2 upcoming bookings can't make a third.</li>
+<li>Times show in Indian time for everyone, wherever the server runs.</li>
+</ul>
+<p>The first and fourth lines turned into the two hardest bugs of the project. I didn't know that yet.</p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read the first chapters of <a href="https://basecamp.com/shapeup" target="_blank" rel="noopener">Shape Up</a> for a calm way to shape a problem and set boundaries before building.</p>
+</section>
+
+<!-- ============ 2 PAPER ============ -->
+<section class="stage" id="paper" data-title="Paper before code">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 1 · Tuesday</div><h2>Paper before code <small>screens, flows and the first slice</small></h2><p class="lead">Drawing is cheaper than coding. A sketch shows missing screens and missing data before they cost anything.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="paper-screens" data-node data-label="Five screens on paper"><p class="when">Tuesday, 9:30 AM</p><h3>Five screens on paper</h3>
+<p>I drew boxes on paper, not in a design tool. Five screens covered the whole brief:</p>
+<ol><li><b>Log in / sign up</b></li><li><b>Day grid:</b> date picker on top, courts as columns, hours as rows, free slots clickable.</li><li><b>Confirm booking:</b> a small dialog, “Court 2, Sat 7 AM. Book?”</li><li><b>My bookings:</b> upcoming list with Cancel buttons.</li><li><b>Admin:</b> the same grid, plus “block” and “cancel anyone” actions.</li></ol>
+<p>While drawing the grid I noticed the screen needs to show <b>who</b> booked a slot only to admins. Members just see “taken”. That one note became a rule in the API later.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#html-semantic">Semantic HTML</a><a href="../Frontend/Frontend_Handbook.html#layout-grid">CSS grid</a><a href="../Frontend/Frontend_Handbook.html#react-components">Thinking in components</a></p>
+</article>
+<article class="topic" id="paper-flow" data-node data-label="Walk the main flow"><p class="when">Tuesday, 11:00 AM</p><h3>Walk the main flow</h3>
+<p>Then I walked one member through the screens and wrote what happens at each arrow:</p>
+<pre><code>open site ─► not logged in? ─► login ─► day grid (today)
+day grid ─► click free slot ─► confirm ─► POST booking
+   ├─ success ─► grid refreshes, slot shows "yours"
+   ├─ slot taken ─► message, grid refreshes
+   └─ limit reached ─► message, link to My bookings</code></pre>
+<p>Every arrow that can fail needs a message on screen. Writing the failures now means the frontend gets error states from day one, not as an afterthought.</p>
+</article>
+<article class="topic" id="paper-slice" data-node data-label="The walking skeleton"><p class="when">Tuesday, 2:00 PM</p><h3>The walking skeleton</h3>
+<p>I don't build the whole frontend, then the whole backend. I build one thin path through <b>every</b> layer first, called a walking skeleton:</p>
+<p class="callout">Log in → see today's grid → book one slot → see it as “yours”.</p>
+<p>It touches the database, the API, login, the UI and the connection between them. If any layer has a wrong assumption, I find out in week 1, not week 4.</p>
+<div class="note tradeoff"><b>Tradeoff</b><p>The skeleton looks ugly for days. That's fine. A pretty screen with no working backend hides problems; an ugly screen that really books a court exposes them.</p></div>
+</article>
+<article class="topic" id="paper-order" data-node data-label="Why the database comes first"><p class="when">Tuesday, 4:00 PM</p><h3>Why the database comes first</h3>
+<p>My build order is <b>data → API contract → API → login → UI → connect them → deploy</b>. The reason is dependency: the UI shows what the API returns, and the API returns what the database stores. If I start with screens, I invent data shapes that the database later can't support.</p>
+<p>It isn't a strict waterfall. Each step takes hours, not weeks, and I loop back when something doesn't fit. The order just means I'm usually building on something that already exists.</p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read about the <a href="https://wiki.c2.com/?WalkingSkeleton" target="_blank" rel="noopener">walking skeleton</a> idea, then sketch the five screens of any app you use daily.</p>
+</section>
+
+<!-- ============ 3 STACK ============ -->
+<section class="stage" id="stack" data-title="Choosing boring tools">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 1 · Wednesday</div><h2>Choosing boring tools <small>every choice has a reason and a cost</small></h2><p class="lead">I pick tools I already know well, which are popular enough that errors are searchable. Exciting new tools are for side projects, not for a club that needs it working.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic wide" id="stack-table" data-node data-label="The decision table"><p class="when">Wednesday, 9:00 AM</p><h3>The decision table</h3>
+<div class="tw"><table><thead><tr><th>Part</th><th>Picked</th><th>Considered</th><th>Why this one, here</th></tr></thead><tbody>
+<tr><td>UI</td><td>React + TypeScript, built with Vite</td><td>Next.js</td><td>A separate API keeps the browser/server boundary visible. Next.js would also work; I map it in the last chapter.</td></tr>
+<tr><td>API</td><td>Node.js + Express 5</td><td>Fastify, NestJS</td><td>Small, well known, enough for ~15 endpoints.</td></tr>
+<tr><td>Database</td><td>PostgreSQL</td><td>MongoDB</td><td>Bookings are relational (user, court, time) and need a uniqueness rule the database can enforce.</td></tr>
+<tr><td>Data access</td><td>Prisma</td><td>Raw SQL with <code>pg</code>, Drizzle</td><td>Fast CRUD with types. I drop to raw SQL in a migration when Prisma can't express something.</td></tr>
+<tr><td>Login</td><td>Sessions in Postgres, bcrypt hashes</td><td>JWT, Auth0/Clerk</td><td>One website on one domain, so cookies are simple, and logout really logs out.</td></tr>
+<tr><td>Validation</td><td>Zod</td><td>Hand-written checks</td><td>One schema checks input and gives TypeScript types.</td></tr>
+</tbody></table></div>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#orm-levels">Driver vs ORM</a><a href="../Backend/Backend_Handbook.html#auth-sessions">Sessions</a><a href="../Backend/Backend_Handbook.html#auth-jwt">JWT</a><a href="../Backend/Backend_Handbook.html#db-types">SQL vs NoSQL</a><a href="../Frontend/Frontend_Handbook.html#tool-vite">Vite</a></p>
+</article>
+<article class="topic" id="stack-not" data-node data-label="What I left out"><p class="when">Wednesday, 10:00 AM</p><h3>What I left out, on purpose</h3>
+<ul><li><b>Redis:</b> no measured need for a cache yet.</li><li><b>WebSockets:</b> the grid can refresh itself; nobody needs millisecond updates for a badminton court.</li><li><b>Microservices:</b> one API, one database, one worker later. That's plenty.</li><li><b>Docker in development:</b> optional; a local Postgres install is enough.</li></ul>
+<div class="note habit"><b>Senior habit</b><p>Every tool you add is something to install, update, monitor and explain. I add one only when I can name the problem it fixes.</p></div>
+</article>
+<article class="topic" id="stack-repo" data-node data-label="Repository layout"><p class="when">Wednesday, 11:30 AM</p><h3>Repository layout</h3>
+<pre><code>courtside/
+  README.md          how to run, decisions, commands
+  api/
+    prisma/schema.prisma
+    prisma/migrations/
+    src/
+      server.ts      starts listening
+      app.ts         middleware + routers
+      config.ts      validated env variables
+      lib/           prisma client, HttpError, time helpers
+      auth/          routes, requireAuth, requireAdmin
+      bookings/      schema.ts, routes.ts, service.ts
+      courts/        routes.ts, service.ts
+    .env.example     names only, never real secrets
+  web/
+    vite.config.ts   dev proxy for /api
+    src/
+      api.ts         one fetch wrapper
+      pages/         Login, Day, MyBookings, Admin
+      components/    DayGrid, SlotButton, Toast</code></pre>
+<p>Folders follow features (bookings, courts, auth), not file types. When I fix a booking bug, everything I need is in one folder.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#arch-layers">Layers</a><a href="../Backend/Backend_Handbook.html#node-env">Environment variables</a></p>
+</article>
+<article class="topic" id="stack-readme" data-node data-label="README on day one"><p class="when">Wednesday, 12:00 PM</p><h3>README on day one</h3>
+<p>Before writing app code, I wrote the README: how to install, which Node version, how to create the database, how to start both halves. I update it whenever a step changes.</p>
+<p>The reason is selfish. In three months I'll have forgotten all of it, and “future me” is the first stranger who reads this repository.</p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read <a href="https://mcfunley.com/choose-boring-technology" target="_blank" rel="noopener">Choose boring technology</a>. Then write your own decision table for a project idea, with a “considered” column.</p>
+</section>
+
+<!-- ============ 4 SCHEMA ============ -->
+<section class="stage" id="schema" data-title="Data first">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 1 · Wednesday to Thursday</div><h2>Data first <small>the schema is a record of the rules</small></h2><p class="lead">The tables decide what the app can remember and what it can refuse. My first schema was wrong, and that's normal.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="schema-nouns" data-node data-label="Nouns become tables"><p class="when">Wednesday, 2:00 PM</p><h3>Nouns become tables</h3>
+<p>I underlined the nouns in the brief: <b>member, court, booking</b>. Then the relationships:</p>
+<ul><li>A member has many bookings. A court has many bookings.</li><li>A booking belongs to exactly one member and one court, at one start time.</li><li>A member is either a normal member or an admin.</li></ul>
+<p>“Booking” is the table that joins the other two. Most real apps have one table like this, and it's where the hard rules live.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#db-keys">Primary and foreign keys</a><a href="../Backend/Backend_Handbook.html#db-normal">Normalization</a></p>
+</article>
+<article class="topic" id="schema-mistake" data-node data-label="My first schema was wrong"><p class="when">Wednesday, 3:30 PM</p><h3>My first schema was wrong</h3>
+<p>Version one had a <code>Slot</code> table with one row per court per hour per day, pre-filled for weeks ahead, and bookings stored a <code>date</code> string plus an <code>hour</code> number.</p>
+<div class="note mistake"><b>Mistake</b><p>Pre-filled slots meant a daily job to create tomorrow's rows, and a broken job meant no bookable slots. Date strings plus hours made comparing times and handling time zones painful.</p></div>
+<p>The fix was simpler: don't store free slots at all. Store only <b>bookings</b>, each with a real timestamp. A slot is free when no confirmed booking exists for it. The API computes the grid from opening hours, which never change per row.</p>
+<div class="note habit"><b>Senior habit</b><p>Store facts that happened (a booking was made), not things you can calculate (which slots are free).</p></div>
+</article>
+<article class="topic wide" id="schema-prisma" data-node data-label="The Prisma schema"><p class="when">Thursday, 10:00 AM</p><h3>The Prisma schema</h3>
+<pre><code>// api/prisma/schema.prisma (Prisma 6 style; match your installed major version)
+enum Role { MEMBER ADMIN }
+enum BookingStatus { CONFIRMED CANCELLED }
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         Role      @default(MEMBER)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  bookings     Booking[]
+}
+
+model Court {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  active   Boolean   @default(true)
+  bookings Booking[]
+}
+
+model Booking {
+  id          Int           @id @default(autoincrement())
+  court       Court         @relation(fields: [courtId], references: [id])
+  courtId     Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  startsAt    DateTime      @db.Timestamptz(3)  // stored in UTC, always on the hour
+  status      BookingStatus @default(CONFIRMED)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+  cancelledAt DateTime?     @db.Timestamptz(3)
+
+  @@index([courtId, startsAt])
+  @@index([userId, startsAt])
+}</code></pre>
+<p>Three decisions are hiding in there:</p>
+<ul><li><b>Cancelled bookings stay</b> with a status, not deleted, so admins can see history when there's a dispute.</li><li><b><code>@db.Timestamptz</code></b>: Prisma's default <code>DateTime</code> column in Postgres has no time zone. I want the database to know these are exact instants.</li><li><b>Indexes</b> match the two questions the app asks most: “bookings for this court around this time” and “bookings of this user”.</li></ul>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#orm-prisma">Prisma</a><a href="../Backend/Backend_Handbook.html#db-index">Indexes</a><a href="../Backend/Backend_Handbook.html#orm-migrations">Migrations</a></p>
+</article>
+<article class="topic" id="schema-todo" data-node data-label="The TODO I skipped"><p class="when">Thursday, 11:30 AM</p><h3>The TODO I skipped</h3>
+<p>I knew the most important rule was “one confirmed booking per court per hour”. I planned to check it in code: look for an existing booking, and insert only if none is found.</p>
+<p>I wrote in my notes: <code>TODO: can two requests pass the check at the same time?</code> Then I moved on, because the skeleton was more urgent.</p>
+<p>That TODO came back on a Friday evening. Chapter 11 is about it.</p>
+</article>
+<article class="topic" id="schema-seed" data-node data-label="Seed data"><p class="when">Thursday, 3:00 PM</p><h3>Seed data</h3>
+<p>I wrote a seed script that creates 4 courts, one admin, three members and a few bookings. Every developer (and every test) starts from the same known state, and I never type fake data by hand twice.</p>
+<pre><code>npx prisma migrate dev --name init   # create tables locally
+npx prisma db seed                    # fill them with known data</code></pre>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read PostgreSQL's <a href="https://www.postgresql.org/docs/current/datatype-datetime.html" target="_blank" rel="noopener">date and time types</a> page, especially the difference between <code>timestamp</code> and <code>timestamptz</code>.</p>
+</section>
+
+<!-- ============ 5 CONTRACT ============ -->
+<section class="stage" id="contract" data-title="Writing the API contract">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 1 · Friday</div><h2>Writing the API contract <small>agree on the boundary before building either side</small></h2><p class="lead">The contract is a short document: which URLs exist, what they accept, what they return, and how they fail. Frontend and backend both build against it.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic wide" id="contract-endpoints" data-node data-label="The endpoint list"><p class="when">Friday, 10:00 AM</p><h3>The endpoint list</h3>
+<div class="tw"><table><thead><tr><th>Method and path</th><th>Who</th><th>Does</th></tr></thead><tbody>
+<tr><td><code>POST /api/auth/signup</code>, <code>/login</code>, <code>/logout</code></td><td>Anyone</td><td>Account and session</td></tr>
+<tr><td><code>GET /api/auth/me</code></td><td>Logged in</td><td>Who am I? The UI calls this on page load</td></tr>
+<tr><td><code>GET /api/availability?date=2026-12-05</code></td><td>Logged in</td><td>The day's grid: courts × hours, free, taken or yours</td></tr>
+<tr><td><code>POST /api/bookings</code></td><td>Member</td><td>Book <code>{ courtId, startsAt }</code></td></tr>
+<tr><td><code>GET /api/bookings/mine</code></td><td>Member</td><td>My upcoming bookings</td></tr>
+<tr><td><code>POST /api/bookings/:id/cancel</code></td><td>Owner or admin</td><td>Cancel one booking</td></tr>
+<tr><td><code>PATCH /api/courts/:id</code></td><td>Admin</td><td>Block or unblock a court</td></tr>
+</tbody></table></div>
+<p>Cancel is a <code>POST</code> to an action URL, not a <code>DELETE</code>, because the booking isn't removed; its status changes. Either choice is defensible. I wrote the reason down so nobody “fixes” it later.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#rest-crud">REST and CRUD</a><a href="../Backend/Backend_Handbook.html#http-methods">HTTP methods</a><a href="../Backend/Backend_Handbook.html#rest-query">Query strings</a></p>
+</article>
+<article class="topic" id="contract-shapes" data-node data-label="Request and response shapes"><p class="when">Friday, 11:00 AM</p><h3>Request and response shapes</h3>
+<pre><code>// POST /api/bookings
+{ "courtId": 2, "startsAt": "2026-12-05T01:30:00.000Z" }
+
+// 201 Created
+{ "data": { "id": 381, "courtId": 2,
+  "startsAt": "2026-12-05T01:30:00.000Z", "status": "CONFIRMED" } }
+
+// 409 Conflict
+{ "error": { "code": "SLOT_TAKEN",
+  "message": "Someone booked this slot a moment ago." } }</code></pre>
+<p>Every success has <code>data</code>; every failure has <code>error.code</code> and <code>error.message</code>. The UI never has to guess the shape. <code>01:30Z</code> is 7:00 AM in India; the API speaks UTC, and the screen converts.</p>
+</article>
+<article class="topic" id="contract-errors" data-node data-label="Failures are part of the contract"><p class="when">Friday, 11:45 AM</p><h3>Failures are part of the contract</h3>
+<div class="tw"><table><thead><tr><th>Status</th><th>Code</th><th>When</th></tr></thead><tbody>
+<tr><td>400</td><td><code>VALIDATION</code></td><td>Bad input: not on the hour, outside 6 AM to 10 PM, in the past, more than 7 days ahead</td></tr>
+<tr><td>401</td><td><code>UNAUTHENTICATED</code></td><td>No session</td></tr>
+<tr><td>403</td><td><code>FORBIDDEN</code></td><td>Logged in, but not allowed (member calling admin routes)</td></tr>
+<tr><td>404</td><td><code>NOT_FOUND</code></td><td>No such booking, or not yours (same answer on purpose)</td></tr>
+<tr><td>409</td><td><code>SLOT_TAKEN</code></td><td>Someone else holds that slot</td></tr>
+<tr><td>422</td><td><code>BOOKING_LIMIT</code></td><td>You already have 2 upcoming bookings</td></tr>
+</tbody></table></div>
+<p>The UI shows a different message for each code. That's only possible because the codes were decided before either side was built.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#http-status">Status codes</a><a href="../Backend/Backend_Handbook.html#rest-errors">Error responses</a></p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Skim the <a href="https://swagger.io/specification/" target="_blank" rel="noopener">OpenAPI specification</a>. Teams often write contracts in this format so tools can check both sides.</p>
+</section>
+
+<!-- ============ 6 API ============ -->
+<section class="stage" id="api" data-title="Building the API, no UI yet">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 2 · Monday to Tuesday</div><h2>Building the API, no UI yet <small>route, validate, decide, store</small></h2><p class="lead">I built and tested the API with plain HTTP requests before writing any React. If a booking works from the terminal, any later bug is in the UI or the connection, which halves the search.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="api-layers" data-node data-label="Three small layers"><p class="when">Monday, 9:30 AM</p><h3>Three small layers</h3>
+<ul><li><b>routes.ts</b> speaks HTTP: reads the request, validates it, calls the service, sends the response.</li><li><b>service.ts</b> holds the rules: opening hours, the 2-booking limit, who may cancel.</li><li><b>Prisma</b> talks to the database.</li></ul>
+<p>Routes never contain rules, and services never touch <code>req</code> or <code>res</code>. That way I can test the rules without HTTP, and change HTTP details without touching the rules.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#express-router">Express routers</a><a href="../Backend/Backend_Handbook.html#orm-layer">Keep queries in one layer</a></p>
+</article>
+<article class="topic" id="api-validate" data-node data-label="Validation with Zod"><p class="when">Monday, 11:00 AM</p><h3>Validation with Zod</h3>
+<pre><code>// api/src/bookings/schema.ts
+import { z } from "zod";
+
+export const CreateBooking = z.object({
+  courtId: z.number().int().positive(),
+  startsAt: z.string().datetime(),   // ISO string in UTC, e.g. ...Z
+});
+export type CreateBookingInput = z.infer&lt;typeof CreateBooking&gt;;</code></pre>
+<p>Zod checks the shape: is it a number, is it a date string. The <b>meaning</b> (on the hour? within opening hours?) is checked in the service, because it needs the club's time zone and today's date. Shape in the route, meaning in the service.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#rest-validation">Validation</a><a href="../Backend/Backend_Handbook.html#basics-trust">Never trust the client</a></p>
+</article>
+<article class="topic wide" id="api-route" data-node data-label="The booking route and service"><p class="when">Monday, 3:00 PM</p><h3>The booking route and service (first version)</h3>
+<pre><code>// api/src/bookings/routes.ts (Express 5 passes async errors to the error handler)
+router.post("/", requireAuth, async (req, res) =&gt; {
+  const input = CreateBooking.parse(req.body);      // throws ZodError -&gt; 400
+  const booking = await createBooking(req.user.id, input);
+  res.status(201).json({ data: booking });
+});
+
+// api/src/bookings/service.ts (first version, with a hidden race; see chapter 11)
+export async function createBooking(userId: number, input: CreateBookingInput) {
+  const startsAt = new Date(input.startsAt);
+  assertBookableTime(startsAt);                     // on the hour, open, future, within 7 days
+
+  const upcoming = await prisma.booking.count({
+    where: { userId, status: "CONFIRMED", startsAt: { gt: new Date() } },
+  });
+  if (upcoming &gt;= 2) throw new HttpError(422, "BOOKING_LIMIT", "You already have 2 upcoming bookings.");
+
+  const existing = await prisma.booking.findFirst({
+    where: { courtId: input.courtId, startsAt, status: "CONFIRMED" },
+  });
+  if (existing) throw new HttpError(409, "SLOT_TAKEN", "That slot is already booked.");
+
+  return prisma.booking.create({ data: { userId, courtId: input.courtId, startsAt } });
+}</code></pre>
+<p>Notice there's no <code>try/catch</code> in the route. In Express 5, a rejected promise from an async handler goes to the error middleware automatically. In Express 4 you had to call <code>next(error)</code> yourself.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#express-version">Express 5 vs 4</a><a href="../Backend/Backend_Handbook.html#express-req">The request object</a></p>
+</article>
+<article class="topic" id="api-errors" data-node data-label="One error handler"><p class="when">Monday, 4:30 PM</p><h3>One error handler</h3>
+<pre><code>// api/src/app.ts (after all routers)
+app.use((err, req, res, next) =&gt; {
+  if (err instanceof ZodError) {
+    return res.status(400).json({ error: { code: "VALIDATION",
+      message: "Check the highlighted fields.", fields: err.flatten().fieldErrors } });
+  }
+  if (err instanceof HttpError) {
+    return res.status(err.status).json({ error: { code: err.code, message: err.message } });
+  }
+  req.log.error(err);                                 // full details stay in the logs
+  res.status(500).json({ error: { code: "INTERNAL", message: "Something went wrong." } });
+});</code></pre>
+<p>Expected failures get their real message. Unexpected ones get a generic message, and the stack trace goes to the logs, never to the browser.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#mw-errors">Error middleware</a><a href="../Backend/Backend_Handbook.html#sec-errors">Don't leak errors</a></p>
+</article>
+<article class="topic" id="api-curl" data-node data-label="Testing from the terminal"><p class="when">Tuesday, 10:00 AM</p><h3>Testing from the terminal</h3>
+<p>I kept a <code>requests.http</code> file (the VS Code REST Client extension runs it) with every endpoint, and clicked through them after each change:</p>
+<pre><code>POST http://localhost:3000/api/bookings
+Content-Type: application/json
+
+{ "courtId": 2, "startsAt": "2026-12-05T01:30:00.000Z" }</code></pre>
+<p>It caught a bug within minutes: <code>"courtId": "2"</code> as a string got a 400. That's correct API behavior, but it told me the UI must send numbers, which I noted for later.</p>
+<div class="note habit"><b>Senior habit</b><p>Test each layer alone before connecting it to the next. A bug found in the terminal costs minutes. The same bug found through the UI costs an hour, because you first have to work out which layer it's in.</p></div>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read Express's <a href="https://expressjs.com/en/guide/error-handling.html" target="_blank" rel="noopener">error handling guide</a>, then build one route plus an error handler for any small resource.</p>
+</section>
+
+<!-- ============ 7 AUTH ============ -->
+<section class="stage" id="auth" data-title="Login and who may do what">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 2 · Wednesday to Thursday</div><h2>Login and who may do what <small>authentication, then authorization</small></h2><p class="lead">Login answers “who are you?”. Permissions answer “may you do this, to this exact thing?”. The second question is where most real security bugs live.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic wide" id="auth-session" data-node data-label="Sessions stored in Postgres"><p class="when">Wednesday, 10:00 AM</p><h3>Sessions stored in Postgres</h3>
+<pre><code>// api/src/app.ts
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+const PgStore = connectPgSimple(session);
+
+app.use(express.json({ limit: "20kb" }));
+app.use(session({
+  store: new PgStore({ pool: sessionPool, createTableIfMissing: true }),
+  secret: config.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,                 // JavaScript in the page can't read it
+    sameSite: "lax",                // not sent on cross-site form posts
+    secure: config.isProduction,    // HTTPS only in production
+    maxAge: 14 * 24 * 60 * 60 * 1000,
+  },
+}));</code></pre>
+<p>The default session store keeps sessions in server memory: every restart logs everyone out, and it leaks memory. Storing them in Postgres needed no new service, because the database already exists.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#auth-sessions">Sessions</a><a href="../Backend/Backend_Handbook.html#http-cookies">Cookies</a><a href="../Backend/Backend_Handbook.html#auth-storage">Where tokens live</a></p>
+</article>
+<article class="topic" id="auth-login" data-node data-label="Signup and login"><p class="when">Wednesday, 2:00 PM</p><h3>Signup and login</h3>
+<pre><code>router.post("/login", async (req, res, next) =&gt; {
+  const { email, password } = Login.parse(req.body);
+  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+  const ok = user &amp;&amp; await bcrypt.compare(password, user.passwordHash);
+  if (!ok) throw new HttpError(401, "BAD_LOGIN", "Email or password is wrong.");
+
+  req.session.regenerate(err =&gt; {      // new session id after login
+    if (err) return next(err);
+    req.session.userId = user.id;
+    res.json({ data: { id: user.id, name: user.name, role: user.role } });
+  });
+});</code></pre>
+<ul><li>Passwords are stored only as bcrypt hashes. Signup hashes, login compares.</li><li>The message doesn't say whether the email exists, so nobody can probe for members.</li><li><code>regenerate</code> issues a fresh session id at login, which blocks an old, stolen id from becoming a logged-in one.</li></ul>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#auth-hash">Password hashing</a><a href="../Backend/Backend_Handbook.html#auth-libs">Auth libraries</a></p>
+</article>
+<article class="topic" id="auth-guards" data-node data-label="Guards: requireAuth, requireAdmin"><p class="when">Wednesday, 4:00 PM</p><h3>Guards: requireAuth, requireAdmin</h3>
+<pre><code>export async function requireAuth(req, res, next) {
+  const id = req.session.userId;
+  if (!id) throw new HttpError(401, "UNAUTHENTICATED", "Please log in.");
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new HttpError(401, "UNAUTHENTICATED", "Please log in.");
+  req.user = { id: user.id, role: user.role };
+  next();
+}
+
+export function requireAdmin(req, res, next) {
+  if (req.user.role !== "ADMIN") throw new HttpError(403, "FORBIDDEN", "Admins only.");
+  next();
+}</code></pre>
+<p>The role is read from the database on each request, not trusted from the browser. If Meera removes someone's admin role, it takes effect on their next click.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#mw-auth">Auth middleware</a><a href="../Backend/Backend_Handbook.html#auth-rbac">Roles</a></p>
+</article>
+<article class="topic" id="auth-idor" data-node data-label="The cancel bug a friend found"><p class="when">Thursday, 11:00 AM</p><h3>The cancel bug a friend found</h3>
+<p>I asked Kiran, a club member who codes a little, to try to break the app. Ten minutes later Kiran messaged: “I just cancelled Meera's booking. I changed the number in the URL.”</p>
+<div class="note mistake"><b>Bug</b><p>Cancel checked that you were logged in, but not that the booking was yours: <code>update({ where: { id } })</code>. Any member could cancel any booking by guessing ids.</p></div>
+<pre><code>// fixed: the owner check is part of the query itself
+const where = req.user.role === "ADMIN"
+  ? { id, status: "CONFIRMED" }
+  : { id, userId: req.user.id, status: "CONFIRMED" };
+const { count } = await prisma.booking.updateMany({
+  where, data: { status: "CANCELLED", cancelledAt: new Date() },
+});
+if (count === 0) throw new HttpError(404, "NOT_FOUND", "No active booking with that id.");</code></pre>
+<p>This bug has a name, IDOR (insecure direct object reference), and it's among the most common real-world security bugs. Hiding the Cancel button on other people's bookings did nothing, because Kiran never used the button.</p>
+<div class="note habit"><b>Senior habit</b><p>For every endpoint that takes an id, ask: “what if I send someone else's id?” Then write a test for it.</p></div>
+</article>
+<article class="topic" id="auth-csrf" data-node data-label="One more lock: Origin check"><p class="when">Thursday, 3:00 PM</p><h3>One more lock: checking Origin</h3>
+<p>Cookies are sent automatically, so another website could try to make a member's browser post to our API (CSRF). <code>sameSite: "lax"</code> already stops the cookie on cross-site posts. I added a second, cheap layer: reject state-changing requests whose <code>Origin</code> header is some other site.</p>
+<pre><code>export function sameOriginOnly(req, res, next) {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+  const origin = req.get("origin");
+  if (origin &amp;&amp; origin !== config.APP_ORIGIN) {
+    throw new HttpError(403, "BAD_ORIGIN", "Request blocked.");
+  }
+  next();
+}</code></pre>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#sec-csrf">CSRF</a><a href="../Backend/Backend_Handbook.html#http-headers">Headers</a></p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read OWASP's <a href="https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html" target="_blank" rel="noopener">IDOR prevention cheat sheet</a>. Then list every endpoint in a project that takes an id and ask the “someone else's id” question.</p>
+</section>
+
+<!-- ============ 8 UI ============ -->
+<section class="stage" id="ui" data-title="The frontend">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 2 · Friday to Week 3 · Tuesday</div><h2>The frontend <small>components, data loading and every state</small></h2><p class="lead">The API was finished and tested, so the frontend had a fixed target. I built the screens from the paper sketches, one component at a time.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="ui-tree" data-node data-label="The component tree"><p class="when">Friday, 10:00 AM</p><h3>The component tree</h3>
+<pre><code>&lt;App&gt;                    loads /auth/me, holds the user
+  &lt;Routes&gt;
+    /login        &lt;LoginPage /&gt;
+    /             &lt;DayPage&gt;          date state, loads the grid
+                     &lt;DatePicker /&gt;
+                     &lt;DayGrid&gt;
+                       &lt;SlotButton /&gt; × 64
+    /mine         &lt;MyBookingsPage /&gt;
+    /admin        &lt;AdminPage /&gt;      only rendered for admins</code></pre>
+<p>State lives in the lowest component that needs it. The date belongs to <code>DayPage</code>, because both the picker and the grid read it. The logged-in user belongs to <code>App</code>, because every page needs it.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#react-props">Props</a><a href="../Frontend/Frontend_Handbook.html#react-flow">Data flow</a><a href="../Frontend/Frontend_Handbook.html#react-routing">Routing</a><a href="../Frontend/Frontend_Handbook.html#hooks-context">Context</a></p>
+</article>
+<article class="topic" id="ui-client" data-node data-label="One fetch wrapper"><p class="when">Friday, 2:00 PM</p><h3>One fetch wrapper</h3>
+<pre><code>// web/src/api.ts
+export class ApiError extends Error {
+  constructor(public status: number, public code: string, message: string) { super(message); }
+}
+
+export async function api&lt;T&gt;(path: string, options: RequestInit = {}): Promise&lt;T&gt; {
+  const res = await fetch(`/api${path}`, {
+    ...options,
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const body = isJson ? await res.json() : null;   // a crashed proxy returns HTML
+  if (!res.ok) {
+    throw new ApiError(res.status, body?.error?.code ?? `HTTP_${res.status}`,
+      body?.error?.message ?? "Something went wrong. Please try again.");
+  }
+  return body?.data as T;
+}</code></pre>
+<p>Every request goes through this one function. When something about requests changes (a header, error handling, a redirect to login on 401), I change one file.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#async-fetch">fetch</a><a href="../Frontend/Frontend_Handbook.html#async-pitfalls">Async pitfalls</a><a href="../Frontend/Frontend_Handbook.html#tsx-basics">TypeScript basics</a></p>
+</article>
+<article class="topic wide" id="ui-grid" data-node data-label="Loading the grid"><p class="when">Monday, 10:00 AM</p><h3>Loading the grid, and the stale-response bug</h3>
+<pre><code>// web/src/pages/DayPage.tsx (excerpt)
+const [date, setDate] = useState(todayInClub());
+const [grid, setGrid] = useState&lt;Grid | null&gt;(null);
+const [error, setError] = useState&lt;string | null&gt;(null);
+const [version, setVersion] = useState(0);            // bump to reload
+
+useEffect(() =&gt; {
+  let ignore = false;
+  setGrid(null);
+  setError(null);
+  api&lt;Grid&gt;(`/availability?date=${date}`)
+    .then(g =&gt; { if (!ignore) setGrid(g); })
+    .catch(e =&gt; { if (!ignore) setError(e.message); });
+  return () =&gt; { ignore = true; };                    // a newer date replaced this one
+}, [date, version]);</code></pre>
+<div class="note mistake"><b>Bug</b><p>Without the <code>ignore</code> flag, clicking quickly from Saturday to Sunday sometimes showed Saturday's grid under Sunday's heading. The Saturday response arrived last and overwrote the newer one. The cleanup function marks old requests as stale.</p></div>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#hooks-effect">useEffect</a><a href="../Frontend/Frontend_Handbook.html#hooks-state">useState</a><a href="../Frontend/Frontend_Handbook.html#hooks-libs">Data-fetching libraries</a></p>
+</article>
+<article class="topic" id="ui-states" data-node data-label="Four states for every screen"><p class="when">Monday, 3:00 PM</p><h3>Four states for every screen</h3>
+<p>Each screen that loads data has four states, and I design all of them, not only the happy one:</p>
+<ul><li><b>Loading:</b> a gray skeleton grid, so the page doesn't jump.</li><li><b>Error:</b> the message plus a “Try again” button.</li><li><b>Empty:</b> “No upcoming bookings. Book a court.”, with a link.</li><li><b>Ready:</b> the real content.</li></ul>
+<p>Beginners usually build only “ready”. Real users on slow phone data see “loading” and “error” every day.</p>
+</article>
+<article class="topic" id="ui-book" data-node data-label="The Book button"><p class="when">Tuesday, 11:00 AM</p><h3>The Book button</h3>
+<pre><code>async function book(courtId: number, startsAt: string) {
+  setPending(`${courtId}|${startsAt}`);              // disables that button
+  try {
+    await api("/bookings", { method: "POST", body: JSON.stringify({ courtId, startsAt }) });
+    toast("Booked. See you on court.");
+  } catch (e) {
+    if (e instanceof ApiError &amp;&amp; e.code === "SLOT_TAKEN") toast("Someone just took that slot.");
+    else if (e instanceof ApiError &amp;&amp; e.code === "BOOKING_LIMIT") toast(e.message);
+    else toast("Booking failed. Check your connection and try again.");
+  } finally {
+    setPending(null);
+    setVersion(v =&gt; v + 1);                          // always refetch the grid
+  }
+}</code></pre>
+<p>The grid refetches whether booking worked or not, because in both cases what's on screen may be out of date. Showing the server's truth is simpler than guessing.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#react-events">Events</a><a href="../Frontend/Frontend_Handbook.html#html-a11y">Accessibility</a></p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read React's <a href="https://react.dev/learn/synchronizing-with-effects" target="_blank" rel="noopener">Synchronizing with Effects</a>, especially the section on fetching data and cleanup.</p>
+</section>
+
+<!-- ============ 9 MERGE ============ -->
+<section class="stage" id="merge" data-title="Connecting both halves">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 3 · Wednesday</div><h2>Connecting both halves <small>where most beginners get stuck</small></h2><p class="lead">The API worked from the terminal. The UI rendered with fake data. Joining them took a day, and almost none of that day was spent on my own code.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="merge-cors" data-node data-label="The CORS wall"><p class="when">Wednesday, 9:30 AM</p><h3>The CORS wall</h3>
+<p>Vite served the UI on <code>localhost:5173</code>, Express ran on <code>localhost:3000</code>. My first <code>fetch("http://localhost:3000/api/auth/me")</code> printed a red CORS error in the console.</p>
+<p>Different port means different origin. The browser blocks the page from reading a response from another origin unless that server says it's allowed. My code was fine; the browser was protecting users.</p>
+<div class="note tradeoff"><b>Two fixes</b><p>(1) Enable CORS on Express with <code>credentials: true</code> and a specific origin, and send <code>credentials: "include"</code> from fetch. (2) Make the browser see only one origin. I chose (2), because production would also be one origin, so development should match.</p></div>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#sec-cors">CORS</a><a href="../Frontend/Frontend_Handbook.html#web-url">URLs and origins</a></p>
+</article>
+<article class="topic" id="merge-proxy" data-node data-label="One origin with the Vite proxy"><p class="when">Wednesday, 10:30 AM</p><h3>One origin with the Vite proxy</h3>
+<pre><code>// web/vite.config.ts
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+    proxy: { "/api": "http://localhost:3000" },
+  },
+});</code></pre>
+<p>Now the page calls <code>/api/...</code> on its own origin, and Vite forwards it to Express. No CORS, and the session cookie flows as a normal same-origin cookie. In production, Express serves the built UI files itself, so it's one origin there too.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#tool-vite">Vite</a><a href="../Backend/Backend_Handbook.html#express-static">Serving static files</a></p>
+</article>
+<article class="topic" id="merge-first" data-node data-label="The first real booking"><p class="when">Wednesday, 2:00 PM</p><h3>The first real booking</h3>
+<p>I logged in, clicked Court 2 at 7 AM, and... the grid showed nothing new. No error either.</p>
+<p>I didn't guess. I went boundary by boundary:</p>
+<ol><li><b>Network tab:</b> the POST returned 201 with the booking. So the API and database were fine.</li><li><b>The following GET</b> for the grid returned the booking as taken. So the server knew.</li><li><b>So the bug was in the UI.</b> The grid compared <code>startsAt</code> strings: the API sent <code>...01:30:00.000Z</code>, the UI built <code>...01:30:00Z</code>. Same instant, different text.</li></ol>
+<p>Fix: compare times as numbers (<code>new Date(a).getTime()</code>), never as strings. Fifteen minutes, because the Network tab told me which side to look at.</p>
+<div class="note habit"><b>Senior habit</b><p>When the frontend and backend disagree, open the Network tab first. It shows exactly what crossed the boundary, so you know which half to debug.</p></div>
+</article>
+<article class="topic" id="merge-me" data-node data-label="Staying logged in on refresh"><p class="when">Wednesday, 4:00 PM</p><h3>Staying logged in on refresh</h3>
+<p>Refreshing the page showed the login screen for a split second, then the grid. <code>App</code> rendered “logged out” before <code>/auth/me</code> answered.</p>
+<p>The fix was a third state. The user is <code>undefined</code> (still checking), <code>null</code> (logged out) or an object (logged in). The app shows a blank shell while it's <code>undefined</code>. Small, but it's the kind of thing users notice immediately.</p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read MDN's <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank" rel="noopener">CORS guide</a>, and Chrome's <a href="https://developer.chrome.com/docs/devtools/network" target="_blank" rel="noopener">Network panel guide</a>.</p>
+</section>
+
+<!-- ============ 10 STAGING ============ -->
+<section class="stage" id="staging" data-title="It worked on my machine">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 3 · Thursday to Friday</div><h2>It worked on my machine <small>the first deploy finds new bugs</small></h2><p class="lead">I deployed to a staging copy early, two weeks before launch. Your laptop and a server differ in ways you can't see until you try.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="staging-setup" data-node data-label="The staging setup"><p class="when">Thursday, 10:00 AM</p><h3>The staging setup</h3>
+<ul><li>A Node host (Render, Railway and Fly.io all work similarly) running one service: Express serving both <code>/api</code> and the built UI.</li><li>A managed Postgres database, separate from the future production one.</li><li>Environment variables set in the host's dashboard: <code>DATABASE_URL</code>, <code>SESSION_SECRET</code>, <code>APP_ORIGIN</code>.</li><li>Release command: <code>npx prisma migrate deploy</code>, which applies committed migrations and never generates new ones.</li></ul>
+<pre><code>// api/src/config.ts (crash at startup, not at 2 AM)
+const Env = z.object({
+  DATABASE_URL: z.string().url(),
+  SESSION_SECRET: z.string().min(32),
+  APP_ORIGIN: z.string().url(),
+  NODE_ENV: z.enum(["development", "test", "production"]),
+});
+export const config = Env.parse(process.env);</code></pre>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#dep-env">Environments</a><a href="../Backend/Backend_Handbook.html#dep-hosting">Hosting</a><a href="../Backend/Backend_Handbook.html#arch-config">Config</a></p>
+</article>
+<article class="topic" id="staging-cookie" data-node data-label="Login worked, then didn't"><p class="when">Thursday, 3:00 PM</p><h3>Login worked, then didn't</h3>
+<p>On staging, login returned 200, then every next request returned 401. In the Network tab, the login response had <b>no <code>Set-Cookie</code> header</b> at all.</p>
+<div class="note mistake"><b>Bug</b><p>In production the cookie is <code>secure: true</code>, sent only over HTTPS. The host's proxy handles HTTPS and forwards plain HTTP to Express. Express saw HTTP, decided the connection wasn't secure, and silently didn't set the cookie.</p></div>
+<pre><code>// tell Express it sits behind one trusted proxy
+if (config.NODE_ENV === "production") app.set("trust proxy", 1);</code></pre>
+<p>With this, Express reads the proxy's <code>X-Forwarded-Proto</code> header and knows the original request was HTTPS. One line, but it took an hour to find, because nothing printed an error.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#dep-proxy">Reverse proxies</a><a href="../Backend/Backend_Handbook.html#http-https">HTTPS</a></p>
+</article>
+<article class="topic wide" id="staging-tz" data-node data-label="Every slot was 5½ hours off"><p class="when">Friday, 10:00 AM</p><h3>Every slot was 5½ hours off</h3>
+<p>Meera tried staging and messaged: “Why does the first slot say 11:30 AM?” On my laptop it said 6:00 AM.</p>
+<pre><code>// the buggy helper
+const d = new Date("2026-12-05");   // midnight UTC
+d.setHours(6 + i);                   // 6 o'clock in the SERVER's time zone</code></pre>
+<p>My laptop is set to India time, so <code>setHours(6)</code> meant 6 AM India. The server runs in UTC, so it meant 6 AM UTC, which is 11:30 AM in India. Same code, different machine, different answer.</p>
+<pre><code>// fixed: always compute slots in the club's time zone, explicitly
+import { DateTime } from "luxon";
+const CLUB_ZONE = "Asia/Kolkata";
+
+export function slotsForDay(dateISO: string): Date[] {
+  const day = DateTime.fromISO(dateISO, { zone: CLUB_ZONE }).startOf("day");
+  return Array.from({ length: 16 }, (_, i) =&gt; day.set({ hour: 6 + i }).toUTC().toJSDate());
+}</code></pre>
+<div class="note decision"><b>Rule I follow now</b><p>Store and send instants in UTC. Convert to a human time zone only at the edges: when computing “6 AM at the club” and when displaying. Never rely on the machine's own time zone.</p></div>
+<p>I also added a test that runs with <code>TZ=UTC</code> set, so this bug can't come back silently.</p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read Express's <a href="https://expressjs.com/en/guide/behind-proxies.html" target="_blank" rel="noopener">behind proxies</a> guide and Luxon's <a href="https://moment.github.io/luxon/#/zones" target="_blank" rel="noopener">time zones</a> page.</p>
+</section>
+
+<!-- ============ 11 FRIDAY ============ -->
+<section class="stage" id="friday" data-title="Friday, 7 PM">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 4 · Friday · soft launch</div><h2>Friday, 7 PM <small>the race condition</small></h2><p class="lead">Meera invited 30 members to try the app. New days open at 7 PM. At 7:00:01, thirty people clicked Saturday morning at the same time.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic wide" id="friday-race" data-node data-label="Two bookings, one court"><p class="when">Friday, 7:04 PM</p><h3>Two bookings, one court</h3>
+<p>Message from Meera: “Court 2, Saturday 7 AM has two bookings.” The skipped TODO from chapter 4 had arrived. Here's what happened, step by step:</p>
+<div class="tw"><table><thead><tr><th>Time</th><th>Request A (Ravi)</th><th>Request B (Sana)</th></tr></thead><tbody>
+<tr><td>7:00:01.010</td><td><code>findFirst</code>: no booking</td><td></td></tr>
+<tr><td>7:00:01.012</td><td></td><td><code>findFirst</code>: no booking</td></tr>
+<tr><td>7:00:01.020</td><td><code>create</code>: booked ✓</td><td></td></tr>
+<tr><td>7:00:01.023</td><td></td><td><code>create</code>: booked ✓</td></tr>
+</tbody></table></div>
+<p>Both checks ran before either insert. My “check, then insert” code was correct for one user at a time and wrong for two at once. Local testing never showed it, because I was always the only user.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#db-tx">Transactions</a><a href="../Backend/Backend_Handbook.html#node-loop">The event loop</a></p>
+</article>
+<article class="topic" id="friday-constraint" data-node data-label="Let the database decide"><p class="when">Friday, 9:00 PM</p><h3>Let the database decide</h3>
+<p>Code can't reliably enforce “only one” across parallel requests. The database can, with a unique index. Cancelled bookings must not block a slot, so it's a <b>partial</b> unique index: unique only among confirmed bookings.</p>
+<pre><code>npx prisma migrate dev --create-only --name one_booking_per_slot</code></pre>
+<pre><code>-- prisma/migrations/..._one_booking_per_slot/migration.sql (edited by hand)
+CREATE UNIQUE INDEX "booking_one_confirmed_per_slot"
+  ON "Booking" ("courtId", "startsAt")
+  WHERE status = 'CONFIRMED';</code></pre>
+<p>Our Prisma schema couldn't describe a partial index, so I wrote this migration by hand. Check whether your Prisma version supports it in the schema.</p>
+<div class="note mistake"><b>Watch out</b><p>Prisma compares the database with <code>schema.prisma</code>, so an index it can't see may show up as a <code>DROP INDEX</code> in a later generated migration. I now read every generated migration before applying it.</p></div>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#db-index">Indexes</a><a href="../Backend/Backend_Handbook.html#orm-migrations">Migrations</a></p>
+</article>
+<article class="topic wide" id="friday-catch" data-node data-label="Turning the error into a 409"><p class="when">Friday, 10:00 PM</p><h3>Turning the error into a 409</h3>
+<pre><code>// api/src/bookings/service.ts (second version)
+import { Prisma } from "@prisma/client";
+
+try {
+  return await prisma.booking.create({ data: { userId, courtId, startsAt } });
+} catch (err) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError &amp;&amp; err.code === "P2002") {
+    const mine = await prisma.booking.findFirst({
+      where: { userId, courtId, startsAt, status: "CONFIRMED" },
+    });
+    if (mine) return mine;                         // the same member clicked twice
+    throw new HttpError(409, "SLOT_TAKEN", "Someone booked this slot a moment ago.");
+  }
+  throw err;
+}</code></pre>
+<p>I kept the friendly <code>findFirst</code> check before the insert, because it gives a fast answer in the common case. But the index is the real guard, and the <code>catch</code> handles the rare case where two requests pass the check together.</p>
+<p>I didn't trust my memory of the error code. I forced a conflict in a test and logged <code>err.code</code> to confirm it was <code>P2002</code> before writing this.</p>
+</article>
+<article class="topic" id="friday-double" data-node data-label="The double click"><p class="when">Friday, 10:30 PM</p><h3>The double click</h3>
+<p>One member got “Someone just took that slot”, and the slot was theirs. They had double-clicked. The first click booked it, and the second hit the unique index.</p>
+<p>Two fixes, one on each side:</p>
+<ul><li><b>UI:</b> the button is disabled while its request is pending (already done in chapter 8, but this member was on an old cached version).</li><li><b>API:</b> if the conflict is with the same member's own booking, return that booking instead of an error, as in the code above. Repeating the same request now gives the same result.</li></ul>
+<p>That property is called idempotency. For payments, teams use an explicit idempotency key per request. For a booking, “same member, court and time” was a natural key already.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#rest-idem">Idempotency</a></p>
+</article>
+<article class="topic" id="friday-limit" data-node data-label="The limit has the same race"><p class="when">Saturday, 11:00 AM</p><h3>The limit has the same race, and I kept it</h3>
+<p>The “max 2 upcoming bookings” check has the same problem: two parallel requests could both count 1 and both insert, giving 3. I could fix it with a row lock on the user or a serializable transaction.</p>
+<div class="note tradeoff"><b>Tradeoff</b><p>The worst case is one member with 3 bookings, rarely, and an admin can cancel one. The fix adds locking complexity to every booking. I wrote the risk in the README and left it. A double-booked court is a real problem; a third booking isn't.</p></div>
+<p>Seniors don't fix every theoretical issue. They decide which ones matter and write down the ones they accept.</p>
+</article>
+<article class="topic" id="friday-test" data-node data-label="A test that races"><p class="when">Saturday, 2:00 PM</p><h3>A test that races</h3>
+<pre><code>// Vitest + Supertest, against a separate test database
+test("two members race for one slot: exactly one wins", async () =&gt; {
+  const slot = { courtId: 2, startsAt: nextSaturdayAt(7) };
+  const [a, b] = await Promise.all([
+    ravi.post("/api/bookings").send(slot),
+    sana.post("/api/bookings").send(slot),
+  ]);
+  expect([a.status, b.status].sort()).toEqual([201, 409]);
+  expect(await confirmedCount(slot)).toBe(1);
+});</code></pre>
+<p>I ran it against the old code first and watched it fail. A test that has never failed might not be testing anything.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#test-supertest">Supertest</a><a href="../Backend/Backend_Handbook.html#test-what">What to test</a></p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read PostgreSQL's <a href="https://www.postgresql.org/docs/current/indexes-partial.html" target="_blank" rel="noopener">partial indexes</a> page and Prisma's <a href="https://www.prisma.io/docs/orm/reference/error-reference" target="_blank" rel="noopener">error reference</a>.</p>
+</section>
+
+<!-- ============ 12 EMAIL ============ -->
+<section class="stage" id="email" data-title="The slow email">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 5 · Tuesday</div><h2>The slow email <small>when to move work out of the request</small></h2><p class="lead">Meera asked for a confirmation email after each booking. The first version took twenty minutes to write and caused a problem on its first busy evening.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="email-naive" data-node data-label="Sending inside the request"><p class="when">Tuesday, 10:00 AM</p><h3>Sending inside the request</h3>
+<pre><code>const booking = await createBooking(req.user.id, input);
+await sendConfirmationEmail(booking);   // calls the email provider's API
+res.status(201).json({ data: booking });</code></pre>
+<p>On Friday evening the email provider was slow: about 4 seconds per call. Every booking took 4 seconds, so people clicked again. Once the provider timed out and the member got a 500 error, <b>even though the booking was already saved.</b></p>
+<div class="note mistake"><b>Bug</b><p>A side effect (email) decided whether the main action (booking) looked successful. The booking succeeded; the response said it failed.</p></div>
+</article>
+<article class="topic" id="email-fireforget" data-node data-label="Why not just skip await?"><p class="when">Tuesday, 11:00 AM</p><h3>Why not just skip <code>await</code>?</h3>
+<p>The tempting fix is to call <code>sendConfirmationEmail(booking)</code> without <code>await</code>. The response returns fast. But if the server restarts during a deploy, or the provider is down for 10 minutes, those emails are lost forever and nobody knows.</p>
+<p>I needed the email to be <b>recorded</b> as owed in the same moment as the booking, then sent separately, with retries.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#scale-queue">Queues</a><a href="../Backend/Backend_Handbook.html#rt-email">Sending email</a></p>
+</article>
+<article class="topic wide" id="email-outbox" data-node data-label="An outbox table and a worker"><p class="when">Tuesday, 2:00 PM</p><h3>An outbox table and a worker</h3>
+<pre><code>// in the booking service: both rows commit together, or neither does
+const booking = await prisma.$transaction(async tx =&gt; {
+  const b = await tx.booking.create({ data: { userId, courtId, startsAt } });
+  await tx.outbox.create({ data: { type: "booking.confirmed", payload: { bookingId: b.id } } });
+  return b;
+});
+
+// api/src/worker.ts (a separate process on the same host)
+async function tick() {
+  const jobs = await prisma.outbox.findMany({
+    where: { sentAt: null, attempts: { lt: 5 } }, orderBy: { createdAt: "asc" }, take: 10,
+  });
+  for (const job of jobs) {
+    try {
+      await sendEmailFor(job);
+      await prisma.outbox.update({ where: { id: job.id }, data: { sentAt: new Date() } });
+    } catch (err) {
+      await prisma.outbox.update({ where: { id: job.id }, data: { attempts: { increment: 1 } } });
+      log.warn({ jobId: job.id, err }, "email failed, will retry");
+    }
+  }
+}
+while (true) { await tick(); await new Promise(r =&gt; setTimeout(r, 10_000)); }</code></pre>
+<p>Bookings are fast again, emails survive restarts, and a failed email retries up to 5 times. This pattern is called a transactional outbox.</p>
+<div class="note tradeoff"><b>What I accepted</b><p>If the email sends but saving <code>sentAt</code> fails, the member gets the email twice. For a booking confirmation that's fine. With one worker, I didn't need row locking; two workers would need <code>FOR UPDATE SKIP LOCKED</code> so they don't take the same job.</p></div>
+<div class="note decision"><b>Why not Redis or a queue service?</b><p>The outbox uses the database we already have. A dedicated queue becomes worth it when there are many job types or high volume. Here, there's one job type and a few hundred emails a week.</p></div>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read the <a href="https://microservices.io/patterns/data/transactional-outbox.html" target="_blank" rel="noopener">transactional outbox</a> pattern, then Prisma's <a href="https://www.prisma.io/docs/orm/prisma-client/queries/transactions" target="_blank" rel="noopener">transactions</a> page.</p>
+</section>
+
+<!-- ============ 13 LAUNCH ============ -->
+<section class="stage" id="launch" data-title="Going live">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 5 · Saturday · launch</div><h2>Going live <small>a release you can recover from</small></h2><p class="lead">“Deployed” and “launched” aren't the same. Launched means that if something breaks at 9 PM, I can see it, roll back, and lose no bookings.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic" id="launch-checklist" data-node data-label="The launch checklist"><p class="when">Friday night</p><h3>The launch checklist</h3>
+<ul><li>Production has its own database, secrets and <code>SESSION_SECRET</code>, never copied from staging.</li><li><code>.env</code> is in <code>.gitignore</code>; secrets live only in the host dashboard.</li><li>Login is rate-limited: 10 attempts per 15 minutes per IP, with <code>express-rate-limit</code>.</li><li>Security headers via <code>helmet</code>.</li><li><code>/api/health</code> runs <code>SELECT 1</code>, so the host knows when the app is really ready.</li><li>A smoke test after each deploy: log in, book, cancel, check a member can't open <code>/admin</code>.</li></ul>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#sec-rate">Rate limiting</a><a href="../Backend/Backend_Handbook.html#sec-headers">Security headers</a><a href="../Backend/Backend_Handbook.html#sec-secrets">Secrets</a><a href="../Backend/Backend_Handbook.html#dep-ops">Operations</a></p>
+</article>
+<article class="topic" id="launch-backup" data-node data-label="A backup I actually restored"><p class="when">Friday night</p><h3>A backup I actually restored</h3>
+<p>The managed database takes daily backups. That's not enough to trust. The night before launch I restored last night's backup into a scratch database and counted the bookings.</p>
+<p>A backup you have never restored is a hope, not a plan. The drill took 20 minutes and showed me where the restore button was, which I'd rather learn on a calm evening.</p>
+</article>
+<article class="topic" id="launch-logs" data-node data-label="Logs with a request id"><p class="when">Saturday, 8:00 AM</p><h3>Logs with a request id</h3>
+<p>Every request gets an id, which goes into every log line and into the response header <code>X-Request-Id</code>. When Meera sends a screenshot of an error, I search the logs for that id and see the whole story of that one request.</p>
+<p>I log the booking id and user id, never passwords, session cookies or full request bodies.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#arch-logging">Logging</a><a href="../Backend/Backend_Handbook.html#dep-shutdown">Graceful shutdown</a></p>
+</article>
+<article class="topic" id="launch-migrate" data-node data-label="Changing a live database safely"><p class="when">Week 6</p><h3>Changing a live database safely</h3>
+<p>A week after launch, Meera wanted bookings to show a “partner name”. Adding a nullable column is safe. Renaming one isn't: the old code still running during the deploy would crash on the missing name.</p>
+<p>So database changes go in steps, called expand and contract: add the new column, deploy code that writes both, backfill old rows, switch reads, and only later remove the old column. Rolling back the code never needs the database rolled back.</p>
+<div class="note habit"><b>Senior habit</b><p>A code rollback doesn't undo a migration. Before each release, ask: “if I roll back the code, does it still work with the new database?”</p></div>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Read <a href="https://martinfowler.com/bliki/ParallelChange.html" target="_blank" rel="noopener">Parallel change</a> (expand and contract) and PostgreSQL's <a href="https://www.postgresql.org/docs/current/backup.html" target="_blank" rel="noopener">backup and restore</a> chapter.</p>
+</section>
+
+<!-- ============ 14 AFTER ============ -->
+<section class="stage" id="after" data-title="Two weeks later">
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Week 7</div><h2>Two weeks later <small>measure, then decide</small></h2><p class="lead">Real users bring two things: performance problems you didn't see locally, and a long list of new ideas. Both need the same answer: evidence first.</p></div><button class="btn learned" type="button" aria-pressed="false">Mark learned</button></header>
+<div class="grid">
+<article class="topic wide" id="after-n1" data-node data-label="The grid took a second"><p class="when">Monday</p><h3>The grid took almost a second</h3>
+<p>Members said the grid felt slow. Locally it loaded in 30 ms. The request-id logs showed 880 ms in production, and the query log showed why: <b>65 queries</b> for one grid.</p>
+<pre><code>// what I had written in week 2, in a hurry
+for (const court of courts)
+  for (const slot of slots)
+    taken[key(court, slot)] = await prisma.booking.findFirst({ where: { courtId: court.id, startsAt: slot, status: "CONFIRMED" } });
+
+// fixed: one query for the whole day, then build the grid in memory
+const bookings = await prisma.booking.findMany({
+  where: { status: "CONFIRMED", startsAt: { gte: slots[0], lte: slots.at(-1) } },
+  select: { courtId: true, startsAt: true, userId: true },
+});</code></pre>
+<p>Locally each query took under 1 ms, so 65 of them didn't matter. The hosted database was about 12 ms away, and 65 round trips added up to most of a second. After the fix: 2 queries, 45 ms.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#orm-n1">The N+1 problem</a><a href="../Backend/Backend_Handbook.html#scale-measure">Measure first</a></p>
+</article>
+<article class="topic" id="after-requests" data-node data-label="Saying no, and not yet"><p class="when">Wednesday</p><h3>Saying no, and “not yet”</h3>
+<div class="tw"><table><thead><tr><th>Request</th><th>Answer</th></tr></thead><tbody>
+<tr><td>Waitlist for full slots</td><td>Yes, next. It was already on the “later” list.</td></tr>
+<tr><td>See new bookings live</td><td>Refetch the grid when the tab regains focus and every 30 seconds. No WebSockets.</td></tr>
+<tr><td>Upload payment screenshots</td><td>No. Private financial images need storage, access rules and deletion policy. Admins mark “paid at desk” instead.</td></tr>
+<tr><td>A mobile app</td><td>Not yet. The site works on phones; an installable web app later if needed.</td></tr>
+</tbody></table></div>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#rt-options">Real-time options</a><a href="../Backend/Backend_Handbook.html#rt-uploads">Uploads</a></p>
+</article>
+<article class="topic" id="after-cache" data-node data-label="The cache I didn't add"><p class="when">Thursday</p><h3>The cache I didn't add</h3>
+<p>Someone suggested Redis to make the grid faster. After the N+1 fix the grid took 45 ms, so a cache would save almost nothing, and it would add a new failure: showing a slot as free after it was booked.</p>
+<p>A cache is worth it when the same expensive read repeats often and you have a clear plan for when to clear it. Neither was true here.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Backend/Backend_Handbook.html#scale-cache">Caching</a><a href="../Backend/Backend_Handbook.html#scale-redis">Redis</a></p>
+</article>
+<article class="topic" id="after-next" data-node data-label="The same app in Next.js"><p class="when">Friday</p><h3>The same app in Next.js</h3>
+<div class="tw"><table><thead><tr><th>This build</th><th>Next.js App Router</th></tr></thead><tbody>
+<tr><td>Vite React pages</td><td>Pages in the <code>app/</code> folder</td></tr>
+<tr><td>Express routes</td><td>Route Handlers or Server Actions</td></tr>
+<tr><td>Vite proxy for one origin</td><td>Not needed: UI and API are one app</td></tr>
+<tr><td>Services, Prisma, the unique index, the outbox</td><td><b>Exactly the same</b></td></tr>
+</tbody></table></div>
+<p>The framework changes where code sits. The rules, the schema and the race-condition fix don't change at all. That's the part worth understanding deeply.</p>
+<p class="from-hb"><span>From the handbooks</span><a href="../Frontend/Frontend_Handbook.html#next-why">Why Next.js</a><a href="../Backend/Backend_Handbook.html#next-actions">Server Actions</a><a href="../Backend/Backend_Handbook.html#next-compare">Express vs Next.js</a></p>
+</article>
+<article class="topic" id="after-retro" data-node data-label="What I'd do differently"><p class="when">Friday evening</p><h3>What I'd do differently</h3>
+<ul><li>Put the unique index in the very first migration. The database was the right place from day one, and I knew it.</li><li>Write the race test and the “someone else's id” test before building the features.</li><li>Deploy to staging on day 3, not week 3. The cookie and time-zone bugs would have shown up sooner.</li><li>Set the test machine to UTC from the start.</li></ul>
+<p>None of these were knowledge problems. I knew each idea. They were discipline problems, which is most of what experience really is.</p>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Turn on query logging in any project you've built and count the queries per page. Then read Prisma's <a href="https://www.prisma.io/docs/orm/prisma-client/queries/query-optimization-performance" target="_blank" rel="noopener">query optimization</a> guide.</p>
+</section>
+
+<!-- ============ FINISH ============ -->
+<section class="stage" id="finish" data-title="Your turn" data-plain>
+<header class="stage-head"><span class="stage-num"></span><div><div class="story-beat">Wrap-up</div><h2>Your turn <small>build one yourself, without AI writing it</small></h2><p class="lead">You have now watched a full build. The way to own this is to do it once yourself, slowly, with your own hands on every line.</p></div></header>
+<div class="grid">
+<article class="topic wide" id="finish-order"><h3>The order, in one table</h3>
+<div class="tw"><table><thead><tr><th>Step</th><th>Question</th><th>Output</th></tr></thead><tbody>
+<tr><td>1. Problem</td><td>Whose problem, in one sentence?</td><td>A brief with must, later and not doing</td></tr>
+<tr><td>2. Paper</td><td>Which screens and flows? Which failures?</td><td>Sketches and the walking skeleton</td></tr>
+<tr><td>3. Tools</td><td>Which boring tools, and why?</td><td>A decision table and a README</td></tr>
+<tr><td>4. Data</td><td>Which facts must be stored? Which rules can the database enforce?</td><td>Schema, constraints, seed</td></tr>
+<tr><td>5. Contract</td><td>What crosses the boundary, including failures?</td><td>Endpoint list, shapes, error codes</td></tr>
+<tr><td>6. API</td><td>Does every endpoint work from the terminal?</td><td>Routes, services, a requests file</td></tr>
+<tr><td>7. Auth</td><td>Who are you, and may you touch this exact thing?</td><td>Sessions, guards, owner checks</td></tr>
+<tr><td>8. UI</td><td>Does every screen handle loading, error and empty?</td><td>Components and one fetch wrapper</td></tr>
+<tr><td>9. Connect</td><td>What crosses the wire, as seen in the Network tab?</td><td>One origin, a first real end-to-end action</td></tr>
+<tr><td>10. Deploy early</td><td>What differs between my laptop and a server?</td><td>Staging, validated config</td></tr>
+<tr><td>11. Break it</td><td>What happens with two users at once, or a double click?</td><td>Constraints and race tests</td></tr>
+<tr><td>12. Launch</td><td>Can I see problems and recover?</td><td>Checklist, restored backup, logs</td></tr>
+</tbody></table></div>
+</article>
+<article class="topic" id="finish-practice"><h3>How to practice without AI writing code</h3>
+<ul><li>Pick a small app with one “only one” rule: a library loan, a seat booking, a hostel room request.</li><li>Do steps 1 to 5 on paper before opening the editor.</li><li>When stuck, try for 20 minutes, read the error and the docs, then ask a person or AI to <b>explain</b> the concept, not to write the code.</li><li>Keep a diary like this one. Each bug: what you saw, how you found the layer, the fix, the lesson.</li><li>Explain one chapter to each other on a call before marking it learned.</li></ul>
+</article>
+<article class="topic" id="finish-check"><h3>Teach-back checklist</h3>
+<label class="check"><input type="checkbox" data-k="p1"><span>Why bookings store timestamps instead of a table of free slots.</span></label>
+<label class="check"><input type="checkbox" data-k="p2"><span>Why the contract lists failures, and what each status code means here.</span></label>
+<label class="check"><input type="checkbox" data-k="p3"><span>Shape validation in the route versus rules in the service.</span></label>
+<label class="check"><input type="checkbox" data-k="p4"><span>How the cancel bug worked, and why hiding the button didn't help.</span></label>
+<label class="check"><input type="checkbox" data-k="p5"><span>Why the browser blocked the request (CORS) and how one origin fixes it.</span></label>
+<label class="check"><input type="checkbox" data-k="p6"><span>Why the cookie vanished behind the proxy.</span></label>
+<label class="check"><input type="checkbox" data-k="p7"><span>Why the slots were 5½ hours off, and the UTC rule.</span></label>
+<label class="check"><input type="checkbox" data-k="p8"><span>Why check-then-insert double-booked, and how the partial unique index fixes it.</span></label>
+<label class="check"><input type="checkbox" data-k="p9"><span>Why the email moved to an outbox instead of skipping <code>await</code>.</span></label>
+<label class="check"><input type="checkbox" data-k="p10"><span>How 65 fast queries became a slow page.</span></label>
+</article>
+</div>
+<p class="deeper"><span class="label">Go deeper</span>Revisit the <a href="../Frontend/Frontend_Handbook.html#finish-order">Frontend order</a> and the <a href="../Backend/Backend_Handbook.html#finish-order">Backend order</a>, then start your own diary for <code>01_Quiz_Room</code> or your next project.</p>
+</section>
+
+<p class="foot">Made for the DineshXEswar learning repo. Read after the Frontend and Backend handbooks. Courtside, the club, and everyone in it are fictional; the bugs are the kind every web developer meets. Code blocks are focused excerpts, not a complete app. Story controls run locally, and progress is saved only in your browser.</p>
+</main></div>
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+/* theme */
+const root=document.documentElement, tbtn=$("#theme");
+function setTheme(t){root.dataset.theme=t;tbtn.textContent=t==="dark"?"Light mode":"Dark mode";store.set("hb-codex-theme",t)}
+setTheme(root.dataset.theme==="light"?"light":"dark");
+tbtn.addEventListener("click",()=>setTheme(root.dataset.theme==="dark"?"light":"dark"));
+
+/* stages: numbers, counts */
+const stages=$$(".stage");
+stages.forEach((s,i)=>{s.dataset.n=String(i+1).padStart(2,"0");$(".stage-num",s).textContent=s.dataset.n});
+const learnable=stages.filter(s=>!("plain" in s.dataset));
+$("#n-stages").textContent=learnable.length;
+$("#n-topics").textContent=$$(".topic",$("main")).filter(t=>!t.closest("[data-plain]")).length;
+
+/* learned state */
+const LKEY="hb-codex-project-learned";
+let learned=new Set(store.get(LKEY,[]));
+function paintLearned(){
+  stages.forEach(s=>{
+    const on=learned.has(s.id), b=$(".learned",s);
+    if(b){b.setAttribute("aria-pressed",on);b.textContent=on?"Learned":"Mark learned"}
+    const n=$('.node.stage[data-stage="'+s.id+'"]'); if(n)n.classList.toggle("done",on);
+    const t=$('#toc a[href="#'+s.id+'"]'); if(t)t.classList.toggle("done",on);
+  });
+}
+$$(".learned").forEach(b=>b.addEventListener("click",()=>{
+  const id=b.closest(".stage").id;
+  learned.has(id)?learned.delete(id):learned.add(id);
+  store.set(LKEY,[...learned]);paintLearned();
+}));
+
+/* toc */
+$("#toc").innerHTML='<p class="label" style="padding-left:12px">Stages</p>'+stages.map(s=>`<a href="#${s.id}" data-id="${s.id}">${s.dataset.n} ${s.dataset.title}</a>`).join("");
+
+/* roadmap */
+const rows=$("#rows");
+learnable.forEach(s=>{
+  const li=document.createElement("li");li.className="row";
+  const left=document.createElement("div");left.className="branches left";
+  const mid=document.createElement("div");
+  const right=document.createElement("div");right.className="branches right";
+  const a=document.createElement("a");a.className="node stage";a.href="#"+s.id;a.dataset.stage=s.id;
+  a.innerHTML=`<small>${s.dataset.n}</small>`;a.append(s.dataset.title);
+  mid.append(a);
+  $$(".topic[data-node]",s).forEach((t,i)=>{
+    const side=i%2===0?"l":"r";
+    const n=document.createElement("a");n.className="node branch";n.href="#"+t.id;
+    n.dataset.stage=s.id;n.dataset.side=side;n.textContent=t.dataset.label||$("h3",t).textContent;
+    (side==="l"?left:right).append(n);
+  });
+  li.append(left,mid,right);rows.append(li);
+});
+
+const box=$("#roadmap"), svg=$("svg",box), mq=matchMedia("(max-width:760px)");
+function draw(){
+  const c=box.getBoundingClientRect();
+  if(!c.width)return;
+  svg.setAttribute("width",c.width);svg.setAttribute("height",c.height);
+  const P=el=>{const r=el.getBoundingClientRect();return{l:r.left-c.left,r:r.right-c.left,t:r.top-c.top,b:r.bottom-c.top,cx:(r.left+r.right)/2-c.left,cy:(r.top+r.bottom)/2-c.top}};
+  const nodes=$$(".node.stage",box);
+  let paths="";
+  nodes.forEach((n,i)=>{
+    const a=P(n);
+    if(i<nodes.length-1){const b=P(nodes[i+1]);paths+=`<path class="spine" marker-end="url(#arr)" d="M${a.cx} ${a.b}L${b.cx} ${b.t-3}"/>`}
+    if(!mq.matches)$$('.node.branch[data-stage="'+n.dataset.stage+'"]',box).forEach(bn=>{
+      const b=P(bn),isL=bn.dataset.side==="l",x1=isL?a.l:a.r,x2=isL?b.r:b.l,dx=(x2-x1)/2;
+      paths+=`<path class="branch" d="M${x1} ${a.cy}C${x1+dx} ${a.cy} ${x2-dx} ${b.cy} ${x2} ${b.cy}"/>`;
+    });
+  });
+  svg.innerHTML='<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M0 0L10 5L0 10z"/></marker></defs>'+paths;
+}
+new ResizeObserver(draw).observe(box);
+addEventListener("load",draw);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+draw();paintLearned();
+
+/* pagers */
+stages.forEach((s,i)=>{
+  const p=stages[i-1],n=stages[i+1];
+  const nav=document.createElement("nav");nav.className="pager";nav.setAttribute("aria-label","Stage navigation");
+  nav.innerHTML=(p?`<a href="#${p.id}">&larr; ${p.dataset.title}</a>`:"<span></span>")+(n?`<a href="#${n.id}">${n.dataset.title} &rarr;</a>`:"<span></span>");
+  s.append(nav);
+});
+
+/* search */
+const q=$("#q");
+q.addEventListener("input",()=>{
+  const t=q.value.trim().toLowerCase();
+  $$(".topic").forEach(a=>{a.hidden=!!t&&!a.textContent.toLowerCase().includes(t)});
+  stages.forEach(s=>s.classList.toggle("empty",!$$(".topic",s).some(a=>!a.hidden)));
+  $("#map").hidden=!!t;
+  if(!t)draw();
+});
+addEventListener("keydown",e=>{
+  if(e.key==="/"&&!/input|textarea|select/i.test(document.activeElement.tagName)){e.preventDefault();q.focus()}
+  if(e.key==="Escape"&&document.activeElement===q){q.value="";q.dispatchEvent(new Event("input"));q.blur()}
+});
+
+/* checklist */
+const CKEY="hb-codex-project-check";
+const checked=new Set(store.get(CKEY,[]));
+$$("input[data-k]").forEach(i=>{
+  i.checked=checked.has(i.dataset.k);
+  i.addEventListener("change",()=>{i.checked?checked.add(i.dataset.k):checked.delete(i.dataset.k);store.set(CKEY,[...checked])});
+});
+
+
+})();
+</script>
+<script id="codex-interface">
+/* Interface enhancements. Lesson markup and the original demos are retained. */
+(() => {
+  'use strict';
+  const $ = (s, parent = document) => parent.querySelector(s);
+  const $$ = (s, parent = document) => [...parent.querySelectorAll(s)];
+  const root = document.documentElement;
+  const track = root.dataset.handbook;
+  const project = track === 'project';
+  const backend = track === 'backend';
+  const name = project ? 'Project' : backend ? 'Backend' : 'Frontend';
+  const main = $('main');
+  const hero = $('.hero');
+  const toc = $('#toc');
+  const stages = $$('section.stage');
+  const learnable = stages.filter(s => !s.hasAttribute('data-plain'));
+  const topicText = new Map($$('.topic').map(t => [t, t.textContent.toLowerCase()]));
+  const mobile = matchMedia('(max-width:1079px)');
+  const reduced = matchMedia('(prefers-reduced-motion:reduce)');
+  const svg = (paths, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${paths}</svg>`;
+  const icons = {
+    frontend: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/>'),
+    backend: svg('<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 7h5M12 18h5"/>'),
+    map: svg('<rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="15" width="6" height="6" rx="1.5"/><path d="M9 6h7a2 2 0 0 1 2 2v7M6 9v9h9"/>'),
+    book: svg('<path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15"/>'),
+    menu: svg('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+    database: svg('<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/>')
+  };
+
+  // Give the top bar a compact identity and a consistently placed search field.
+  $('.brand').innerHTML = `<div class="brand-copy">DineshXEswar<span>Developer handbooks</span></div>`;
+  const context = document.createElement('div');
+  context.className = 'header-context';
+  context.innerHTML = '<i></i> A little progress, every day';
+  const divider = document.createElement('span');
+  divider.className = 'header-divider';
+  $('.brand').after(divider, context);
+  $('#q').placeholder = 'Search this handbook…';
+  $('.search').insertAdjacentHTML('beforeend', '<kbd aria-hidden="true">/</kbd>');
+  $('#theme').setAttribute('aria-label', 'Switch color theme');
+  const menu = document.createElement('button');
+  menu.className = 'menu-toggle';
+  menu.type = 'button';
+  menu.setAttribute('aria-label', 'Open chapter navigation');
+  menu.setAttribute('aria-expanded', 'false');
+  menu.setAttribute('aria-controls', 'toc');
+  menu.innerHTML = icons.menu;
+  $('.brand').before(menu);
+  $('.top').insertAdjacentHTML('beforeend', '<div class="reading-progress" aria-hidden="true"><span></span></div>');
+
+  const workspace = document.createElement('div');
+  workspace.className = 'workspace-bar';
+  workspace.innerHTML = `<span>${icons.book} Learning library <span aria-hidden="true">/</span> <strong>${name}</strong></span><span class="edition">CODEX EDITION</span>`;
+  main.prepend(workspace);
+
+  const copy = document.createElement('div');
+  copy.className = 'hero-copy';
+  [...hero.children].filter(el => !el.classList.contains('stats')).forEach(el => copy.append(el));
+  hero.prepend(copy);
+  const h1 = $('h1', copy);
+  h1.innerHTML = project ? '<span>Courtside</span>a build diary' : `<span>${name}</span>handbook`;
+  const actions = document.createElement('div');
+  actions.className = 'hero-actions';
+  actions.innerHTML = `<a class="btn btn-primary" id="continue-learning" href="#${learnable[0].id}">Start learning</a><a class="btn btn-secondary" id="explore-roadmap" href="#map">Explore roadmap ↗</a>`;
+  copy.append(actions);
+
+  const art = document.createElement('aside');
+  art.className = 'hero-art';
+  art.setAttribute('aria-hidden', 'true');
+  art.innerHTML = project
+    ? '<div class="art-label">ONE APP. EVERY DECISION.</div><div class="art-window"><div class="art-window-bar"><i></i><i></i><i></i><span>courtside / saturday</span></div><div class="art-ticket"><small>COURT 2 · 7:00 AM · 60 MIN</small><strong>Booked by you</strong><span>CONFIRMED</span></div></div><div class="art-tags"><span>Schema</span><span>API</span><span>UI</span><span>Deploy</span></div><div class="art-caption"><b>Follow the decisions, then the code.</b><span>↗</span></div>'
+    : backend
+    ? `<div class="art-label">BEHIND EVERY INTERACTION</div><div class="art-server"><span>${icons.frontend}Client</span><i>→</i><span>${icons.backend}Server</span><i>→</i><span>${icons.database}Data</span></div><div class="art-response"><span>200 OK</span> &nbsp; application/json<br>{ "ready": true }</div><div class="art-tags"><span>Node.js</span><span>Express</span><span>Next.js</span></div><div class="art-caption"><b>One request. A whole world.</b><span>↗</span></div>`
+    : '<div class="art-label">FROM IDEA TO INTERFACE</div><div class="art-window"><div class="art-window-bar"><i></i><i></i><i></i><span>hello-world.jsx</span></div><div class="art-code"><em>function</em> HelloWorld() {\n  <em>return</em> (\n    &lt;<b>h1</b>&gt;Hello, world.&lt;/<b>h1</b>&gt;\n  );\n}</div></div><div class="art-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>React</span></div><div class="art-caption"><b>Small pieces. Endless possibilities.</b><span>↗</span></div>';
+  copy.after(art);
+
+  const journey = document.createElement('div');
+  journey.className = 'journey';
+  journey.innerHTML = '<div class="journey-copy"><strong>Your learning journey</strong><small id="journey-count"></small></div><progress id="journey-progress" value="0" aria-label="Stages learned"></progress><span class="journey-pct" aria-hidden="true">0%</span>';
+  hero.after(journey);
+
+  // The full original roadmap remains available on demand.
+  const details = document.createElement('details');
+  details.className = 'roadmap-panel';
+  const summary = document.createElement('summary');
+  summary.innerHTML = `<span class="roadmap-icon">${icons.map}</span><span><strong>View the complete learning roadmap</strong><small>${learnable.length} stages · connected topics · follow your own pace</small></span>`;
+  details.append(summary);
+  $('#roadmap').before(details);
+  details.append($('#roadmap'));
+  details.addEventListener('toggle', () => {
+    if (details.open) window.dispatchEvent(new Event('resize'));
+  });
+  $('#explore-roadmap').addEventListener('click', () => { details.open = true; });
+  const kicker = document.createElement('div');
+  kicker.className = 'section-kicker';
+  kicker.textContent = 'THE CURRICULUM';
+  stages[0].before(kicker);
+
+  // Numbered chapter navigation, with a persistent route to both editions.
+  $$('#toc a[data-id]').forEach(a => {
+    const stage = stages.find(s => s.id === a.dataset.id);
+    a.replaceChildren();
+    const n = document.createElement('span');
+    n.className = 'toc-number';
+    n.textContent = stage.dataset.n;
+    n.setAttribute('aria-hidden', 'true');
+    const label = document.createElement('span');
+    label.textContent = stage.dataset.title;
+    a.append(n, label);
+  });
+  const switcher = document.createElement('div');
+  switcher.className = 'track-switcher';
+  switcher.setAttribute('aria-label', 'Choose handbook');
+  switcher.innerHTML = [
+    ['frontend', 'Frontend', '../Frontend/Frontend_Handbook.html', icons.frontend],
+    ['backend', 'Backend', '../Backend/Backend_Handbook.html', icons.backend],
+    ['project', 'Build', '../Projects/Project_Handbook.html', icons.map]
+  ].map(([id, label, href, icon]) => `<a href="${href}" ${track === id ? 'aria-current="page"' : ''} ${id === 'project' ? 'aria-label="Build diary: a court booking app"' : ''}>${icon}${label}</a>`).join('');
+  toc.prepend(switcher);
+  switcher.insertAdjacentHTML('afterend', `<a href="#top" class="toc-overview active">${icons.book}Handbook overview</a>`);
+  const sidebarProgress = document.createElement('div');
+  sidebarProgress.className = 'sidebar-progress';
+  sidebarProgress.innerHTML = '<p>Your progress <span id="sidebar-count"></span></p><progress id="sidebar-meter" value="0" aria-label="Stages learned"></progress><small>Saved in this browser. Keep going.</small>';
+  toc.append(sidebarProgress);
+  const closeMenu = document.createElement('button');
+  closeMenu.type = 'button';
+  closeMenu.className = 'menu-close';
+  closeMenu.textContent = 'Chapter navigation';
+  closeMenu.setAttribute('aria-label', 'Close chapter navigation');
+  toc.prepend(closeMenu);
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.hidden = true;
+  document.body.append(toast);
+  let toastTimer;
+  function announce(message) {
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.hidden = false;
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 2400);
+  }
+  function updateProgress() {
+    const done = learnable.filter(s => $('.learned', s)?.getAttribute('aria-pressed') === 'true').length;
+    const total = learnable.length;
+    const pct = Math.round(done / total * 100);
+    $('#journey-count').textContent = `${done} of ${total} stages learned`;
+    $('#sidebar-count').textContent = `${done} / ${total}`;
+    $('.journey-pct').textContent = pct + '%';
+    [$('#journey-progress'), $('#sidebar-meter')].forEach(p => { p.max = total; p.value = done; });
+    const next = learnable.find(s => $('.learned', s)?.getAttribute('aria-pressed') !== 'true') || learnable[0];
+    $('#continue-learning').href = '#' + next.id;
+    $('#continue-learning').textContent = done === total ? 'Review handbook' : done ? 'Continue learning' : 'Start learning';
+  }
+  $$('.learned').forEach(b => b.addEventListener('click', () => {
+    updateProgress();
+    announce(b.getAttribute('aria-pressed') === 'true' ? 'Stage marked as learned. Nice progress.' : 'Stage marked for another look.');
+  }));
+  updateProgress();
+
+  // Keep output text separate from controls, so copy never changes a lesson or demo.
+  $$('pre').forEach((pre, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    const toolbar = document.createElement('div');
+    toolbar.className = 'code-toolbar';
+    const label = document.createElement('span');
+    label.textContent = pre.closest('.demo, .story-player') ? 'Live output' : 'Code example';
+    const button = document.createElement('button');
+    button.className = 'copy-code';
+    button.type = 'button';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-label', `Copy ${label.textContent.toLowerCase()} ${index + 1}`);
+    toolbar.append(label, button);
+    pre.before(wrapper);
+    wrapper.append(toolbar, pre);
+    button.addEventListener('click', async () => {
+      const text = pre.textContent;
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch (_) { /* Local-file and browser clipboard permissions vary. */ }
+      if (!copied) {
+        const field = document.createElement('textarea');
+        field.value = text;
+        field.style.cssText = 'position:fixed;left:-9999px;top:0';
+        document.body.append(field);
+        field.select();
+        try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+        field.remove();
+        button.focus({preventScroll:true});
+      }
+      if (copied) {
+        button.textContent = 'Copied ✓';
+        announce('Copied to clipboard.');
+        setTimeout(() => { button.textContent = 'Copy'; }, 1800);
+      } else announce('Select the code and use your browser’s copy command.');
+    });
+  });
+
+  // Add useful result and empty states to the original topic filtering.
+  const feedback = document.createElement('section');
+  feedback.className = 'search-feedback';
+  feedback.hidden = true;
+  feedback.setAttribute('aria-label', 'Search results');
+  feedback.innerHTML = '<h2>Search results</h2><p role="status" aria-live="polite" id="search-count"></p><button class="btn" id="clear-search" type="button">Clear search</button>';
+  journey.after(feedback);
+  const q = $('#q');
+  let wasSearching = false;
+  q.addEventListener('input', () => {
+    const term = q.value.trim().toLowerCase();
+    const searching = !!term;
+    let matches = 0;
+    stages.forEach(stage => {
+      const stageMatch = stage.dataset.title.toLowerCase().includes(term);
+      $$('.topic', stage).forEach(topic => {
+        topic.hidden = searching && !stageMatch && !topicText.get(topic).includes(term);
+        if (!topic.hidden) matches++;
+      });
+      stage.classList.toggle('empty', !$$('.topic', stage).some(t => !t.hidden));
+    });
+    document.body.classList.toggle('searching', searching);
+    feedback.hidden = !searching;
+    $('#search-count').textContent = matches
+      ? `${matches} ${matches === 1 ? 'topic' : 'topics'} matching “${q.value.trim()}”`
+      : `No topics found for “${q.value.trim()}”. Try a shorter phrase, a technology, or a stage name.`;
+    $('h2', feedback).textContent = matches ? 'Search results' : 'A different search might help';
+    if (searching && !wasSearching) window.scrollTo({top:0, behavior:'instant'});
+    wasSearching = searching;
+  });
+  $('#clear-search').addEventListener('click', () => {
+    q.value = '';
+    q.dispatchEvent(new Event('input'));
+    q.focus();
+  });
+  // Anchors from the navigation should remain useful while a search is active.
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (link && q.value && !link.closest('.topic')) {
+      q.value = '';
+      q.dispatchEvent(new Event('input'));
+    }
+  });
+
+  // Mobile chapter drawer: focus stays inside; Escape and the backdrop close it.
+  const backdrop = document.createElement('button');
+  backdrop.className = 'nav-backdrop';
+  backdrop.hidden = true;
+  backdrop.type = 'button';
+  backdrop.tabIndex = -1;
+  backdrop.setAttribute('aria-label', 'Close chapter navigation');
+  document.body.append(backdrop);
+  let returnFocus = null;
+  function setMenu(open, restore = true) {
+    open = open && mobile.matches;
+    if (open) returnFocus = document.activeElement;
+    document.body.classList.toggle('nav-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    backdrop.hidden = !open;
+    menu.setAttribute('aria-expanded', String(open));
+    main.inert = open;
+    $('.top').inert = open;
+    if (open) {
+      toc.setAttribute('role', 'dialog');
+      toc.setAttribute('aria-modal', 'true');
+      closeMenu.focus({preventScroll:true});
+    } else {
+      toc.removeAttribute('role');
+      toc.removeAttribute('aria-modal');
+      if (restore && returnFocus) returnFocus.focus({preventScroll:true});
+      returnFocus = null;
+    }
+  }
+  menu.addEventListener('click', () => setMenu(true));
+  closeMenu.addEventListener('click', () => setMenu(false));
+  backdrop.addEventListener('click', () => setMenu(false));
+  toc.addEventListener('click', e => {
+    if (e.target.closest('a') && mobile.matches) setMenu(false);
+  });
+  mobile.addEventListener('change', () => setMenu(false, false));
+  document.addEventListener('keydown', e => {
+    if (document.body.classList.contains('nav-open')) {
+      if (e.key === 'Escape') { e.preventDefault(); setMenu(false); }
+      if (e.key === 'Tab') {
+        const focusable = $$('button,a[href]', toc).filter(el => el.getClientRects().length);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault(); q.focus();
+    }
+  });
+
+  const backTop = document.createElement('button');
+  backTop.className = 'back-top';
+  backTop.type = 'button';
+  backTop.textContent = '↑';
+  backTop.hidden = true;
+  backTop.setAttribute('aria-label', 'Back to top');
+  document.body.append(backTop);
+  backTop.addEventListener('click', () => {
+    window.scrollTo({top:0, behavior:reduced.matches ? 'instant' : 'smooth'});
+    $('.brand').focus({preventScroll:true});
+  });
+  let frame = false;
+  function paintScroll() {
+    const available = root.scrollHeight - root.clientHeight;
+    $('.reading-progress span').style.width = (available > 0 ? window.scrollY / available * 100 : 0) + '%';
+    backTop.hidden = window.scrollY < 800;
+    const line = $('.top').getBoundingClientRect().height + 65;
+    const current = stages.filter(s => !s.classList.contains('empty') && s.getBoundingClientRect().top <= line).at(-1);
+    $$('#toc a[data-id]').forEach(a => {
+      const active = a.dataset.id === current?.id;
+      a.classList.toggle('active', active);
+      if (active) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+    $('.toc-overview').classList.toggle('active', !current);
+    $$('.node.stage').forEach(a => a.classList.toggle('active', a.dataset.stage === current?.id));
+    frame = false;
+  }
+  addEventListener('scroll', () => {
+    if (!frame) { frame = true; requestAnimationFrame(paintScroll); }
+  }, {passive:true});
+  addEventListener('resize', paintScroll);
+  paintScroll();
+
+  let printOpen;
+  addEventListener('beforeprint', () => { printOpen = details.open; details.open = true; });
+  addEventListener('afterprint', () => { details.open = printOpen; });
+})();
+
+</script>
+<script id="project-story">
+(() => {
+  const $ = s => document.querySelector(s);
+  const scenes = [
+    ['DayGrid.tsx → SlotButton', 'A member taps a free slot', 'Court 2, Saturday 7:00 AM. The button disables itself so a double tap can\'t send two requests.', 'ui-book'],
+    ['api.ts → POST /api/bookings', 'Cross the HTTP boundary', 'The page calls /api on its own origin. In development the Vite proxy forwards it to Express; the session cookie travels with it.', 'merge-proxy'],
+    ['auth/requireAuth.ts', 'Who is asking?', 'The session id in the cookie maps to a user id stored in Postgres. The body can\'t choose a different user.', 'auth-guards'],
+    ['bookings/schema.ts + time helpers', 'Is the input sensible?', 'Zod checks the shape. The service checks the meaning in club time: on the hour, 6 AM to 10 PM, in the future, at most 7 days ahead.', 'api-validate'],
+    ['bookings/service.ts', 'Does a rule say no?', 'Count this member\'s upcoming confirmed bookings. Two or more means no third booking.', 'friday-limit'],
+    ['Postgres → Booking + Outbox', 'Save it, atomically', 'One transaction inserts the booking and its email job. The partial unique index rejects a second confirmed booking for the same court and hour.', 'friday-constraint'],
+    ['bookings/routes.ts → HTTP 201', 'Send the confirmed result', 'The response carries the saved booking in the agreed { data } envelope. The email is sent later by the worker.', 'contract-shapes'],
+    ['DayPage.tsx → refetch grid', 'Show the server\'s truth', 'A toast says "Booked". The grid refetches, and the slot now shows as yours.', 'ui-grid']
+  ];
+  const failures = {
+    'signed-out': [2, 401, 'UNAUTHENTICATED', 'No session cookie, or it maps to no user. The request stops before any booking logic runs. The UI sends the member to the login page.'],
+    'invalid': [3, 400, 'VALIDATION', '11:00 PM is outside opening hours. Nothing is read from or written to the bookings table.'],
+    'limit': [4, 422, 'BOOKING_LIMIT', 'This member already has 2 upcoming bookings. No row is inserted; the toast links to My bookings.'],
+    'taken': [5, 409, 'SLOT_TAKEN', 'Another member\'s booking committed a few milliseconds earlier. The unique index rejected this insert (Prisma error P2002), so the transaction rolled back with no booking and no email job.']
+  };
+  const bodies = {
+    success: { courtId: 2, startsAt: '2026-12-05T01:30:00.000Z' },
+    taken: { courtId: 2, startsAt: '2026-12-05T01:30:00.000Z' },
+    limit: { courtId: 3, startsAt: '2026-12-06T02:30:00.000Z' },
+    invalid: { courtId: 2, startsAt: '2026-12-05T17:30:00.000Z' },
+    'signed-out': { courtId: 2, startsAt: '2026-12-05T01:30:00.000Z' }
+  };
+  let step = 0, timer = null;
+  const scenario = $('#story-scenario');
+  const next = $('#story-next'), previous = $('#story-prev'), play = $('#story-play');
+  const stop = () => { if (timer !== null) clearTimeout(timer); timer = null; play.textContent = 'Play flow'; };
+  function limit() { return failures[scenario.value]?.[0] ?? 7; }
+  function render() {
+    const [file, title, description, chapter] = scenes[step];
+    const failed = failures[scenario.value];
+    const blocked = failed && step === failed[0];
+    $('#story-file').textContent = `STEP ${step + 1} / 8 · ${file}`;
+    $('#story-title').textContent = blocked ? `Request stopped · HTTP ${failed[1]}` : title;
+    $('#story-description').textContent = blocked ? failed[3] : description;
+    $('#story-chapter').href = '#' + chapter;
+    $('#story-progress').value = step + 1;
+    const header = `POST /api/bookings\n${JSON.stringify(bodies[scenario.value], null, 2)}`;
+    const result = blocked
+      ? `HTTP ${failed[1]}\n${JSON.stringify({ error: { code: failed[2] } }, null, 2)}\n\nBookings inserted: 0 · Email jobs: 0`
+      : step >= 6
+      ? `HTTP 201 Created\n{ "data": { "id": 381, "courtId": 2, "status": "CONFIRMED" } }\n\nBookings inserted: 1 · Email jobs queued: 1`
+      : `${file}\n${step < 5 ? 'Nothing written yet.' : 'Booking and email job committed together.'}`;
+    $('#story-output').textContent = header + '\n\n' + result;
+    [...$('#story-track').children].forEach((li, index) => {
+      li.dataset.state = index < step ? 'done' : index === step && blocked ? 'blocked' : 'pending';
+      if (index === step) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+    });
+    previous.disabled = step === 0;
+    next.disabled = step >= limit();
+  }
+  function advance() { if (step < limit()) { step++; render(); } }
+  next.addEventListener('click', () => { stop(); advance(); });
+  previous.addEventListener('click', () => { stop(); if (step) { step--; render(); } });
+  $('#story-reset').addEventListener('click', () => { stop(); step = 0; render(); });
+  scenario.addEventListener('change', () => { stop(); step = 0; render(); });
+  play.addEventListener('click', () => {
+    if (timer !== null) { stop(); return; }
+    if (step >= limit()) step = 0;
+    render(); play.textContent = 'Pause';
+    const delay = () => matchMedia('(prefers-reduced-motion:reduce)').matches ? 80 : 900;
+    const tick = () => {
+      advance();
+      if (step >= limit()) stop();
+      else timer = setTimeout(tick, delay());
+    };
+    timer = setTimeout(tick, delay());
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+  render();
+})();
+</script>
+<script id="codex-refresh-js">
+/* Refresh: logo, favicon, collapsible sidebar and per-stage topic lists. Runs after codex-interface. */
+(() => {
+  'use strict';
+  const $ = (s, p = document) => p.querySelector(s);
+  const $$ = (s, p = document) => [...p.querySelectorAll(s)];
+  const root = document.documentElement;
+  const body = document.body;
+  const toc = $('#toc');
+  const menu = $('.menu-toggle');
+  const desktop = matchMedia('(min-width:1080px)');
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  // Logo: a ">" and a "<" meeting in the middle make the X in DineshXEswar.
+  // Two learners, two code brackets, and a spark where they meet.
+  const logo = a => `<svg class="brand-logo" viewBox="0 0 48 48" aria-hidden="true">
+    <rect width="48" height="48" rx="13" style="fill:${a}"/>
+    <path d="M11 14.5 19.5 24 11 33.5" fill="none" stroke="#111113" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M37 14.5 28.5 24 37 33.5" fill="none" stroke="#111113" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+    <path class="spark" d="M24 19.2c.45 2.9 1.9 4.35 4.8 4.8-2.9.45-4.35 1.9-4.8 4.8-.45-2.9-1.9-4.35-4.8-4.8 2.9-.45 4.35-1.9 4.8-4.8Z" fill="#111113"/>
+  </svg>`;
+  const brand = $('.brand');
+  brand.setAttribute('aria-label', 'DineshXEswar developer handbooks, back to top');
+  brand.insertAdjacentHTML('afterbegin', logo('var(--pastel)'));
+  $('.brand-copy', brand).innerHTML = 'Dinesh<em>X</em>Eswar<span>Developer handbooks</span>';
+
+  // Favicon with the same mark, fixed colors per track.
+  const favColors = { frontend: '#c9b8ff', backend: '#97e6f2', project: '#e3f58a' };
+  const fa = favColors[root.dataset.handbook] || favColors.frontend;
+  const fav = document.createElement('link');
+  fav.rel = 'icon';
+  fav.type = 'image/svg+xml';
+  fav.href = 'data:image/svg+xml,' + encodeURIComponent(logo(fa).replace('class="brand-logo" ', 'xmlns="http://www.w3.org/2000/svg" '));
+  document.head.append(fav);
+
+  // Make every sidebar label hideable for the collapsed rail.
+  const wrapText = a => [...a.childNodes].forEach(n => {
+    if (n.nodeType === 3 && n.textContent.trim()) {
+      const s = document.createElement('span');
+      s.className = 'nav-text';
+      s.textContent = n.textContent;
+      n.replaceWith(s);
+    }
+  });
+  $$('.track-switcher a, .toc-overview', toc).forEach(a => { wrapText(a); a.dataset.tip = a.textContent.trim(); });
+
+  // Each stage link gets a caret that reveals its topics. The current stage opens on its own.
+  const stageLinks = $$('#toc a[data-id]');
+  const pinned = new Set();
+  const closedByUser = new Set();
+  const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+  const groups = stageLinks.map(a => {
+    const stage = document.getElementById(a.dataset.id);
+    const label = a.querySelector('span:not(.toc-number)');
+    if (label) label.classList.add('nav-text');
+    a.dataset.tip = (stage.dataset.n ? stage.dataset.n + ' ' : '') + stage.dataset.title;
+    const item = document.createElement('div');
+    item.className = 'toc-item';
+    a.before(item);
+    item.append(a);
+    const topics = $$('.topic[id]', stage);
+    if (!topics.length) return { a, stage, topics, list: null, caret: null };
+    const list = document.createElement('div');
+    list.className = 'toc-topics';
+    list.id = 'toc-topics-' + stage.id;
+    list.hidden = true;
+    list.innerHTML = topics.map(t => `<a href="#${t.id}" data-topic="${t.id}"></a>`).join('');
+    $$('a', list).forEach((link, i) => { link.textContent = $('h3', topics[i])?.textContent.trim() || topics[i].dataset.label || topics[i].id; });
+    const caret = document.createElement('button');
+    caret.type = 'button';
+    caret.className = 'toc-caret';
+    caret.innerHTML = chevron;
+    caret.setAttribute('aria-controls', list.id);
+    caret.setAttribute('aria-expanded', 'false');
+    caret.setAttribute('aria-label', 'Show topics in ' + stage.dataset.title);
+    item.append(caret, list);
+    caret.addEventListener('click', () => {
+      const open = list.hidden;
+      if (open) { pinned.add(stage.id); closedByUser.delete(stage.id); }
+      else { pinned.delete(stage.id); closedByUser.add(stage.id); }
+      paintTopics();
+    });
+    return { a, stage, topics, list, caret };
+  });
+
+  function paintTopics() {
+    const line = $('.top').getBoundingClientRect().height + 65;
+    groups.forEach(g => {
+      if (!g.list) return;
+      const active = g.a.classList.contains('active');
+      if (!active) closedByUser.delete(g.stage.id);
+      const open = pinned.has(g.stage.id) || (active && !closedByUser.has(g.stage.id));
+      g.list.hidden = !open;
+      g.caret.setAttribute('aria-expanded', String(open));
+      if (open) {
+        const here = g.topics.filter(t => !t.hidden && t.getBoundingClientRect().top <= line).at(-1);
+        $$('a', g.list).forEach(l => l.classList.toggle('here', active && here && l.dataset.topic === here.id));
+      }
+    });
+  }
+  // Re-read active state after the original scroll handler has painted it.
+  let frame = false;
+  addEventListener('scroll', () => {
+    if (!frame) { frame = true; requestAnimationFrame(() => requestAnimationFrame(() => { paintTopics(); frame = false; })); }
+  }, { passive: true });
+  const mo = new MutationObserver(paintTopics);
+  stageLinks.forEach(a => mo.observe(a, { attributes: true, attributeFilter: ['class'] }));
+
+  // Desktop collapse into a slim numbered rail. Remembered across all three handbooks.
+  const KEY = 'hb-codex-sidebar-collapsed';
+  const icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16M15 10l-2 2 2 2"/></svg>';
+  const collapseBtn = document.createElement('button');
+  collapseBtn.type = 'button';
+  collapseBtn.className = 'toc-collapse';
+  collapseBtn.setAttribute('aria-controls', 'toc');
+  toc.append(collapseBtn);
+  menu.setAttribute('title', 'Toggle sidebar  [');
+
+  function setCollapsed(on, save = true) {
+    body.classList.toggle('sidebar-collapsed', on);
+    if (save) store.set(KEY, on);
+    collapseBtn.innerHTML = icon + `<span class="nav-text">${on ? 'Expand' : 'Collapse'} sidebar</span>`;
+    collapseBtn.setAttribute('aria-label', (on ? 'Expand' : 'Collapse') + ' sidebar');
+    collapseBtn.setAttribute('aria-expanded', String(!on));
+    $$('[data-tip]', toc).forEach(a => { if (on) a.title = a.dataset.tip; else a.removeAttribute('title'); });
+    $$('.toc-collapse', toc).forEach(b => { if (on) b.title = 'Expand sidebar  ['; else b.removeAttribute('title'); });
+    syncMenu();
+    // The roadmap SVG measures its box, so let it redraw once the column settles.
+    setTimeout(() => dispatchEvent(new Event('resize')), 280);
+  }
+  function syncMenu() {
+    if (!desktop.matches) {
+      menu.setAttribute('aria-label', 'Open chapter navigation');
+      return;
+    }
+    const collapsed = body.classList.contains('sidebar-collapsed');
+    menu.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+    menu.setAttribute('aria-expanded', String(!collapsed));
+  }
+  // The original handler opens the drawer on small screens; on desktop this one collapses instead.
+  menu.addEventListener('click', () => {
+    if (desktop.matches) setCollapsed(!body.classList.contains('sidebar-collapsed'));
+  });
+  collapseBtn.addEventListener('click', () => setCollapsed(!body.classList.contains('sidebar-collapsed')));
+  desktop.addEventListener('change', syncMenu);
+  addEventListener('keydown', e => {
+    if (e.key === '[' && !e.ctrlKey && !e.metaKey && !e.altKey && !/input|textarea|select/i.test(document.activeElement.tagName) && desktop.matches) {
+      e.preventDefault();
+      setCollapsed(!body.classList.contains('sidebar-collapsed'));
+    }
+  });
+  setCollapsed(!!store.get(KEY, false), false);
+  paintTopics();
+})();
+</script>
+</body>
+</html>
