@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="A map of frontend development in order, from HTML and CSS to React, TSX and Next.js. Made for Dinesh and Eswar."
+      content="A guided, hands-on path through frontend development, from HTML and CSS to React, TSX and Next.js, with demos, practice tasks and quick checks. Made for Dinesh and Eswar."
     />
     <title>Frontend Handbook</title>
     <script>
@@ -2982,7 +2982,100 @@ progress::-moz-progress-bar { background:var(--pastel); }
 @media(max-width:760px) { .brand-logo { width:34px; height:34px; } }
 @media print { .brand-logo { filter:none; } .hero h1 span { color:var(--primary); background:none; } }
 </style>
-  </head>
+  
+<style id="fe-learn">
+/* Frontend only: learning layer (start guide, stage briefs, practice, quizzes, extra labs, glossary). Flat colors, no gradients. */
+.fe-small { font-size:12.5px; color:var(--muted); line-height:1.7; }
+.fe-start { margin:28px 0 8px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:28px; }
+.fe-start h2 { margin:6px 0 8px; font-size:24px; letter-spacing:-.4px; color:var(--text); }
+.fe-start h3 { font-size:15px; margin:0 0 8px; color:var(--text); }
+.fe-start .lead { margin:0 0 18px; }
+.fe-loop { list-style:none; padding:0; margin:0 0 22px; display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); }
+.fe-loop li { background:var(--surface-2); border-radius:18px; padding:16px 16px 18px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--body); }
+.fe-loop strong { color:var(--text); font-size:14px; }
+.fe-loop .n { display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:var(--pastel); color:var(--ink); font:700 13px/1 var(--mono); }
+.fe-start-grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); }
+.fe-start-grid > div { border:1px solid var(--line); border-radius:18px; padding:18px; font-size:13px; color:var(--body); min-width:0; }
+.fe-start-grid ol { padding-left:20px; margin:0 0 8px; }
+.fe-start-grid li { margin:3px 0; }
+.fe-chip { display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.3px; padding:3px 10px; border-radius:999px; margin:3px 4px 3px 0; background:var(--surface-2); color:var(--text); border:1px solid var(--line); }
+.fe-chip.lab { background:var(--sky); border-color:var(--sky); color:var(--ink); }
+.fe-chip.mistake { background:var(--peach); border-color:var(--peach); color:var(--ink); }
+.fe-chip.turn { background:var(--lime); border-color:var(--lime); color:var(--ink); }
+
+.fe-brief { display:flex; flex-wrap:wrap; align-items:flex-start; gap:10px 22px; background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:14px 18px; margin:0 0 16px; font-size:13px; color:var(--body); }
+.fe-brief b { color:var(--text); font-size:12px; }
+.fe-brief ul { margin:4px 0 0; padding-left:18px; }
+.fe-brief li { margin:2px 0; }
+.fe-time { flex:none; background:var(--lime); color:var(--ink); border-radius:999px; padding:4px 12px; font-size:12px; font-weight:600; }
+
+.fe-mistakes h3::before, .fe-practice h3::before { display:block; width:max-content; font:700 9.5px/1.6 var(--mono); letter-spacing:1.2px; padding:2px 10px; border-radius:999px; color:var(--ink); margin-bottom:10px; }
+.fe-mistakes h3::before { content:"COMMON MISTAKES"; background:var(--peach); }
+.fe-practice h3::before { content:"YOUR TURN"; background:var(--lime); }
+.fe-mistake-list { padding-left:18px; margin:0; }
+.fe-mistake-list li { margin:8px 0; }
+.topic.fe-practice { border:2px solid var(--pastel); }
+.fe-tasks { padding-left:22px; margin:6px 0 0; }
+.fe-tasks > li { margin:0 0 16px; padding-left:4px; }
+.fe-tasks > li::marker { font-weight:700; color:var(--primary); }
+.fe-tasks .code-block { margin:10px 0 4px; }
+details.hint { margin:8px 0 0; background:var(--surface-2); border-radius:12px; padding:8px 14px; }
+details.hint summary { cursor:pointer; font-size:12px; font-weight:600; color:var(--primary); }
+details.hint[open] summary { margin-bottom:6px; }
+details.hint > div { font-size:13px; }
+details.hint .code-block { margin:6px 0 2px; }
+.quiz { margin-top:22px; padding-top:18px; border-top:1px dashed var(--line-strong); }
+.quiz h4 { font-size:13px; margin:0 0 12px; color:var(--text); }
+.quiz .q { margin:0 0 18px; }
+.quiz .q-text { margin:0 0 8px; color:var(--text); font-size:13.5px; }
+.quiz .opts { display:grid; gap:7px; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); }
+.quiz .opt { text-align:left; border:1px solid var(--line-strong); background:var(--surface); color:var(--text); border-radius:14px; padding:10px 14px; font:inherit; font-size:13px; line-height:1.5; cursor:pointer; min-height:44px; }
+.quiz .opt:hover:not(:disabled), .quiz .opt:focus-visible { border-color:var(--primary); }
+.quiz .opt:disabled { cursor:default; }
+.quiz .q.answered .opt:not(.right):not(.wrong) { opacity:.55; }
+.quiz .opt.right { background:var(--lime); border-color:var(--lime); color:var(--ink); opacity:1; }
+.quiz .opt.wrong { background:var(--peach); border-color:var(--peach); color:var(--ink); }
+.quiz .opt.right code, .quiz .opt.wrong code { color:var(--ink); background:#ffffff80; }
+.quiz .opt.right::after { content:"  ✓"; font-weight:700; }
+.quiz .opt.wrong::after { content:"  ✕"; font-weight:700; }
+.quiz .why { margin:8px 0 0; font-size:13px; background:var(--surface-2); border-radius:12px; padding:10px 14px; color:var(--body); }
+.quiz-foot { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.quiz-score { margin:0; font-weight:600; color:var(--text); font-size:13px; }
+.quiz .why[hidden], .quiz-reset[hidden], .fe-gloss-empty[hidden], .g-item[hidden], [data-loop-note][hidden] { display:none !important; }
+
+/* labs */
+.pos-outer { position:relative; padding:30px 16px 16px; border:1px dashed var(--line-strong); border-radius:14px; background:var(--surface-2); }
+.pos-parent { height:190px; overflow:auto; border:2px solid var(--primary); border-radius:12px; padding:30px 14px 14px; background:var(--surface); font-size:13px; color:var(--body); }
+.pos-parent p { margin:0 0 10px; }
+.pos-tag { position:absolute; top:6px; left:12px; font:600 10px/1.4 var(--mono); color:var(--muted); }
+.pos-parent > .pos-tag { position:static; display:block; margin:-22px 0 8px; }
+.pos-box { width:max-content; max-width:80%; padding:8px 12px; border-radius:10px; background:var(--pastel); color:var(--ink); font:600 12px/1.4 var(--mono); z-index:1; }
+.gr { display:grid; gap:8px; margin:0 auto; }
+.gr div { background:var(--lavender); color:var(--ink); border-radius:10px; padding:16px 8px; text-align:center; font:700 13px/1 var(--mono); }
+.gr div:nth-child(3n+2) { background:var(--sky); }
+.gr div:nth-child(3n) { background:var(--lime); }
+.st-view { min-height:120px; font-size:13px; color:var(--body); }
+.st-view ul { margin:0; padding:0; list-style:none; display:grid; gap:6px; }
+.st-view li { background:var(--surface-2); border-radius:10px; padding:8px 12px; }
+.st-view .st-msg { display:flex; align-items:center; gap:10px; margin:0; padding:12px; border-radius:12px; background:var(--surface-2); }
+.st-view .st-msg.err { background:var(--peach); color:var(--ink); }
+.st-view .st-msg .btn { margin-left:auto; }
+.st-spin { width:18px; height:18px; border:3px solid var(--line-strong); border-top-color:var(--primary); border-radius:50%; animation:st-spin .8s linear infinite; flex:none; }
+@keyframes st-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce) { .st-spin { animation:none; } }
+#demo-states .controls, #demo-loop .controls { display:flex; flex-wrap:wrap; gap:8px; }
+
+/* glossary */
+.fe-gloss-filter { width:min(100%,320px); border-radius:999px; padding:8px 14px; margin:4px 0 14px; border:1px solid var(--line-strong); background:var(--surface); color:var(--text); font:inherit; font-size:13px; }
+.fe-gloss { margin:0; display:grid; gap:8px 20px; grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr)); }
+.g-item { background:var(--surface-2); border-radius:14px; padding:10px 14px; }
+.g-item dt { font-weight:600; font-size:13px; }
+.g-item dt a { color:var(--text); text-decoration:none; }
+.g-item dt a:hover { color:var(--primary); text-decoration:underline; }
+.g-item dd { margin:2px 0 0; font-size:12.5px; color:var(--body); }
+@media print { .quiz, details.hint { break-inside:avoid; } }
+</style>
+</head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="top">
@@ -3013,16 +3106,64 @@ progress::-moz-progress-bar { background:var(--pastel); }
           <p class="label">Dinesh and Eswar &middot; Learning handbook</p>
           <h1>Frontend handbook</h1>
           <p class="lead">
-            A map of frontend development in the order you would learn it, from
-            HTML to Next.js. Each stage says what a thing is, why it exists, and
-            what to look up next. The handbook is meant for explaining to each
-            other on a call, so it skips the deep code on purpose.
+            A guided path through frontend development, from how the web works
+            to Next.js. Every stage explains ideas in plain words, shows live
+            demos, and ends with small tasks and a quick check. Read a little,
+            build a little, then explain it to each other.
           </p>
           <div class="stats">
             <div><b id="n-stages">0</b><span>Stages in order</span></div>
             <div><b id="n-topics">0</b><span>Topics</span></div>
-            <div><b>4</b><span>Live demos</span></div>
-            <div><b>0</b><span>Libraries needed</span></div>
+            <div><b id="n-demos">9</b><span>Live demos</span></div>
+            <div><b id="n-tasks">0</b><span>Practice tasks</span></div>
+          </div>
+        </section>
+
+
+        <section class="fe-start" id="start-here" aria-labelledby="start-here-title">
+          <p class="label">Before you start</p>
+          <h2 id="start-here-title">How to learn from this handbook</h2>
+          <p class="lead">Reading about code feels like learning, but your hands have to do it too. Every stage follows the same loop.</p>
+          <ol class="fe-loop">
+            <li><b class="n">1</b><strong>Read one card</strong><span>Five to ten minutes. If a word is new, check the <a href="#finish-glossary">glossary</a>.</span></li>
+            <li><b class="n">2</b><strong>Type the example</strong><span>Type it into your own file instead of copying it. Change one thing and predict the result before you reload.</span></li>
+            <li><b class="n">3</b><strong>Do "Your turn"</strong><span>Each stage ends with small tasks and a quick check. Open a hint only after a real try.</span></li>
+            <li><b class="n">4</b><strong>Teach it back</strong><span>Explain the stage to each other on Meet without notes. Then press Mark learned.</span></li>
+          </ol>
+          <div class="fe-start-grid">
+            <div>
+              <h3>Your practice file</h3>
+              <p>Make a <code>playground</code> folder outside the repo with this file, plus an empty <code>style.css</code> and <code>script.js</code>. Open it in the browser and keep DevTools open with F12. Until the Tooling stage, you need nothing else.</p>
+<pre><code>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;Playground&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Playground&lt;/h1&gt;
+  &lt;script src="script.js" defer&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+            <div>
+              <h3>When you get stuck</h3>
+              <ol>
+                <li>Read the error message slowly. The <a href="#debug">Debugging stage</a> shows how.</li>
+                <li>Open the hint.</li>
+                <li>Search MDN for the exact property or method.</li>
+                <li>Ask each other, with a small example.</li>
+                <li>Ask AI to explain the idea, not to write the code.</li>
+              </ol>
+              <p>Give each step about 20 minutes of honest effort before moving to the next.</p>
+            </div>
+            <div>
+              <h3>How long it takes</h3>
+              <p>Each stage shows a time estimate for reading and practice. The whole handbook is roughly 75 to 95 hours. Projects like the <a href="Practice/Practice_Guide.html">four practice questions</a> come on top.</p>
+              <p>You'll see four kinds of cards: <span class="fe-chip">Concept</span> <span class="fe-chip lab">Interactive lab</span> <span class="fe-chip mistake">Common mistakes</span> <span class="fe-chip turn">Your turn</span></p>
+            </div>
           </div>
         </section>
 
@@ -3057,6 +3198,8 @@ progress::-moz-progress-bar { background:var(--pastel); }
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 1 to 2 hours</span><div><b>By the end you can</b><ul><li>Describe what happens between typing a URL and seeing the page.</li><li>Name each part of a URL.</li><li>Find any request in the DevTools Network tab and read its status code.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -3064,13 +3207,10 @@ progress::-moz-progress-bar { background:var(--pastel); }
               data-node
               data-label="Request and response"
             >
-              <h3>Request and response</h3>
-              <p>
-                The browser is the client. It asks a server for something over
-                HTTP, and the server answers. HTTPS is the same thing with
-                encryption. Every click that loads data is a request.
-              </p>
-            </article>
+<h3>Request and response</h3>
+<p>The browser is the <b>client</b>. It asks a <b>server</b> for something over HTTP, and the server answers. HTTPS is the same conversation, encrypted so nobody in between can read it.</p>
+<p>Think of a restaurant. You (the browser) give an order to the waiter, the kitchen (the server) prepares it, and the waiter brings back the dish (the response). Every page load, every image, and every button that loads data is one order.</p>
+</article>
             <article
               class="topic"
               id="web-journey"
@@ -3095,10 +3235,18 @@ progress::-moz-progress-bar { background:var(--pastel); }
               data-node
               data-label="Parts of a URL"
             >
-              <h3>Parts of a URL</h3>
-              <pre><code>https://example.com:443/blog/5?sort=asc#intro
+<h3>Parts of a URL</h3>
+<pre><code>https://example.com:443/blog/5?sort=asc#intro
 protocol  domain     port path  query    fragment</code></pre>
-            </article>
+<ul>
+<li><b>Protocol</b>: how to talk. Almost always <code>https</code>.</li>
+<li><b>Domain</b>: which server. DNS turns it into an IP address, like a phone book.</li>
+<li><b>Port</b>: which door on that server. Browsers hide it when it is the default (443 for https).</li>
+<li><b>Path</b>: which page or file.</li>
+<li><b>Query</b>: extra options as <code>key=value</code> pairs, joined with <code>&amp;</code>.</li>
+<li><b>Fragment</b>: a spot on the page. It never goes to the server. This handbook's links, like <code>#layout</code>, are fragments.</li>
+</ul>
+</article>
             <article
               class="topic"
               id="web-http"
@@ -3142,7 +3290,21 @@ protocol  domain     port path  query    fragment</code></pre>
                 full-stack developer.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="web-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Watch a page load.</b> Open any site, press F12, choose the Network tab, and reload. Find the first request, the HTML document. What is its status code? How many requests did the page make in total?<details class="hint"><summary>Hint</summary><div>The first row is usually the page itself, with the type <code>document</code>. The total count is in the bar at the bottom of the Network tab.</div></details></li>
+<li><b>Cause a 404.</b> Add a made-up path to a real site, like <code>/this-page-does-not-exist</code>. Find that request in Network and read its status.<details class="hint"><summary>Hint</summary><div>Many sites still show a friendly page. The status code tells the truth, not the page design.</div></details></li>
+<li><b>Take a URL apart.</b> Label every part of <code>https://shop.example.com/products/42?color=blue&amp;size=m#reviews</code>.<details class="hint answer"><summary>Show one answer</summary><div>Protocol <code>https</code>; domain <code>shop.example.com</code>; no port shown, so 443; path <code>/products/42</code>; query <code>color=blue</code> and <code>size=m</code>; fragment <code>reviews</code>.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> A request comes back with status 404. What happened?</p><div class="opts"><button type="button" class="opt">The server crashed</button><button type="button" class="opt" data-ok>The server could not find what you asked for</button><button type="button" class="opt">You are not logged in</button><button type="button" class="opt">The request worked</button></div><p class="why" hidden>Codes starting with 4 mean the request had a problem. 404 is "not found". A crash is a 5xx code, and "not logged in" is 401.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> Which part of a URL is never sent to the server?</p><div class="opts"><button type="button" class="opt">The path</button><button type="button" class="opt">The query</button><button type="button" class="opt" data-ok>The fragment</button><button type="button" class="opt">The domain</button></div><p class="why" hidden>The fragment, after <code>#</code>, is used only by the browser to jump to a spot on the page.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> After the HTML arrives, why does the browser make more requests?</p><div class="opts"><button type="button" class="opt">To check that the HTML is valid</button><button type="button" class="opt" data-ok>The HTML mentions CSS, JavaScript and images, and the browser fetches each one</button><button type="button" class="opt">Those are retries of the first request</button></div><p class="why" hidden>The HTML is only the starting point. Every stylesheet, script and image tag in it can trigger another request.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Open DevTools, go to the Network
             tab, reload any site, and watch the requests happen. Then read
@@ -3175,6 +3337,8 @@ protocol  domain     port path  query    fragment</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 3 to 4 hours</span><div><b>By the end you can</b><ul><li>Write a page skeleton from memory.</li><li>Choose semantic tags instead of <code>div</code> for headers, navigation, articles and footers.</li><li>Build a form where every input has a label and a name.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -3216,25 +3380,35 @@ protocol  domain     port path  query    fragment</code></pre>
               </p>
             </article>
             <article class="topic" id="html-text">
-              <h3>Text, links and media</h3>
-              <p>
-                <code>h1</code> to <code>h6</code> for headings (one
-                <code>h1</code> per page), <code>p</code> for paragraphs,
-                <code>strong</code> and <code>em</code> for emphasis,
-                <code>a</code> for links, <code>img</code>,
-                <code>video</code> and <code>audio</code> for media.
-              </p>
-            </article>
+<h3>Text, links and media</h3>
+<p>Headings go from <code>h1</code> to <code>h6</code>, like chapter and section titles in a book. Use one <code>h1</code> per page and don't skip levels to get a smaller font. Size is CSS's job.</p>
+<pre><code>&lt;h1&gt;Recipes&lt;/h1&gt;
+&lt;h2&gt;Breakfast&lt;/h2&gt;
+&lt;p&gt;Quick ideas for &lt;strong&gt;busy&lt;/strong&gt; mornings.&lt;/p&gt;
+&lt;a href="/recipes/dosa"&gt;Dosa recipe&lt;/a&gt;
+&lt;a href="https://developer.mozilla.org" target="_blank" rel="noopener"&gt;MDN&lt;/a&gt;
+&lt;img src="dosa.jpg" alt="A crispy dosa with chutney" width="400" height="300"&gt;</code></pre>
+<p><code>href</code> is where a link goes. <code>alt</code> describes an image for screen readers, and shows if the image fails to load. <code>width</code> and <code>height</code> let the browser reserve space before the image arrives, so the page doesn't jump.</p>
+</article>
             <article class="topic" id="html-lists">
-              <h3>Lists and tables</h3>
-              <p>
-                <code>ul</code> is a bullet list, <code>ol</code> is numbered,
-                each item is an <code>li</code>. Tables use <code>table</code>,
-                <code>tr</code> for rows, <code>th</code> and
-                <code>td</code> for cells. Use tables for data, never for page
-                layout.
-              </p>
-            </article>
+<h3>Lists and tables</h3>
+<p><code>ul</code> is a bullet list, <code>ol</code> is numbered, and each item is an <code>li</code>. Navigation menus are usually a <code>ul</code> of links.</p>
+<pre><code>&lt;ul&gt;
+  &lt;li&gt;Milk&lt;/li&gt;
+  &lt;li&gt;Bread&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Score&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Dinesh&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Eswar&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+<p><code>tr</code> is a row, <code>th</code> a heading cell, <code>td</code> a data cell. Use tables for data with rows and columns, never for page layout.</p>
+</article>
             <article class="topic" id="html-forms" data-node data-label="Forms">
               <h3>Forms</h3>
               <p>
@@ -3299,7 +3473,39 @@ protocol  domain     port path  query    fragment</code></pre>
                 job.
               </p>
             </article>
-          </div>
+<article class="topic fe-mistakes" id="html-mistakes">
+<h3>Common HTML mistakes</h3>
+<ul class="fe-mistake-list"><li><b>A div that acts like a button.</b> Use <code>&lt;button&gt;</code>. It works with the keyboard and screen readers for free.</li><li><b>Headings picked by size.</b> Choose the level by meaning, then change the size with CSS.</li><li><b>Inputs without labels.</b> A placeholder is not a label. It disappears as soon as you type.</li><li><b>&lt;br&gt; for spacing.</b> Use CSS <code>margin</code> or <code>padding</code> instead.</li><li><b>A missing alt.</b> Describe the image, or write <code>alt=""</code> if it is only decoration.</li></ul>
+</article>
+
+          <article class="topic wide fe-practice" id="html-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>An About me page.</b> Build a page about yourself with <code>header</code>, <code>nav</code>, <code>main</code>, two <code>section</code>s and a <code>footer</code>, and no <code>div</code> at all. Include a heading, a list, a link and an image with alt text.<details class="hint"><summary>Hint</summary><div>Sketch the boxes on paper first. The header holds your name, the nav has three links, and main holds the sections.</div></details></li>
+<li><b>A signup form.</b> Name, email, a password of at least 8 characters, and a "Remember me" checkbox. Every input needs a label and a name. Try to submit it empty and watch the browser stop you.<details class="hint"><summary>Hint</summary><div><code>required</code>, <code>type="email"</code> and <code>minlength="8"</code> give you the browser checks. Click a label: if it focuses its input, the <code>for</code> and <code>id</code> match.</div></details><details class="hint answer"><summary>Show one answer</summary><div><pre><code>&lt;form&gt;
+  &lt;label for="name"&gt;Name&lt;/label&gt;
+  &lt;input id="name" name="name" required&gt;
+
+  &lt;label for="email"&gt;Email&lt;/label&gt;
+  &lt;input id="email" name="email" type="email" required&gt;
+
+  &lt;label for="password"&gt;Password&lt;/label&gt;
+  &lt;input id="password" name="password" type="password" minlength="8" required&gt;
+
+  &lt;label&gt;&lt;input type="checkbox" name="remember"&gt; Remember me&lt;/label&gt;
+
+  &lt;button type="submit"&gt;Sign up&lt;/button&gt;
+&lt;/form&gt;</code></pre></div></details></li>
+<li><b>Keyboard only.</b> Put the mouse away. Use Tab, Shift+Tab, Enter and Space to fill in and submit your form. Fix anything you can't reach.<details class="hint"><summary>Hint</summary><div>If you can't reach something, it is probably a <code>div</code> or <code>span</code> with a click handler. Swap it for a real button or link.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> Users click something to delete a task. Which element should it be?</p><div class="opts"><button type="button" class="opt">&lt;div onclick="..."&gt;</button><button type="button" class="opt" data-ok>&lt;button&gt;</button><button type="button" class="opt">&lt;span&gt;</button><button type="button" class="opt">&lt;a href="#"&gt;</button></div><p class="why" hidden>A button can be focused and pressed with the keyboard, and screen readers announce it as a button. A link is for going somewhere.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> The email input has <code>required</code>. Does the server still need to check the email?</p><div class="opts"><button type="button" class="opt">No, the browser already checked it</button><button type="button" class="opt" data-ok>Yes, because anyone can send a request without using your form</button></div><p class="why" hidden>Browser checks are a convenience. A user can edit the HTML in DevTools or send a request with no browser at all.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> Why use <code>main</code>, <code>nav</code> and <code>footer</code> instead of <code>div</code>?</p><div class="opts"><button type="button" class="opt">They load faster</button><button type="button" class="opt" data-ok>They describe meaning, which helps screen readers and search engines</button><button type="button" class="opt">They come with built-in styles</button></div><p class="why" hidden>They look like plain divs until you style them. Their value is meaning: a screen reader user can jump straight to the main content.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Keep
             <a
@@ -3328,6 +3534,8 @@ protocol  domain     port path  query    fragment</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 4 to 6 hours</span><div><b>By the end you can</b><ul><li>Explain which rule wins when two rules disagree.</li><li>Predict an element's real size from the box model.</li><li>Choose between <code>px</code>, <code>rem</code> and <code>%</code> for a value.</li></ul></div></div>
+
           <div class="grid">
             <article class="topic" id="css-add">
               <h3>Three ways to add CSS</h3>
@@ -3359,20 +3567,22 @@ p::first-line { }  /* pseudo-element: a part */</code></pre>
               data-node
               data-label="Cascade and specificity"
             >
-              <h3>Cascade and specificity</h3>
-              <p>
-                The cascade considers origin, importance and cascade layers
-                before selector specificity. Among ordinary rules in the same
-                origin and layer, IDs outrank classes, which outrank element
-                selectors; normal inline styles outrank normal stylesheet
-                declarations. Source order breaks otherwise equal ties.
-                <code>!important</code> changes precedence rather than making a
-                selector more specific, and is not an absolute winner:
-                transitions and other cascade rules still matter. Properties
-                such as <code>color</code> and <code>font-family</code> are
-                often inherited.
-              </p>
-            </article>
+<h3>Cascade and specificity</h3>
+<p>When two rules set the same property on the same element, the browser has to pick one. For everyday CSS, three questions decide:</p>
+<ol>
+<li><b>Which selector is more specific?</b> An id beats a class, and a class beats a tag name.</li>
+<li><b>Still a tie?</b> The rule written later wins.</li>
+<li><b>Is it inline?</b> A <code>style=""</code> attribute beats your stylesheet.</li>
+</ol>
+<pre><code>p      { color: gray; }  /* 1 tag   */
+.note  { color: blue; }  /* 1 class */
+#intro { color: red;  }  /* 1 id    */
+
+/* &lt;p id="intro" class="note"&gt; is red: the id wins. */</code></pre>
+<p>Count ids first, then classes (pseudo-classes like <code>:hover</code> count as classes), then tags. <code>!important</code> jumps over all of this, which is why it starts fights. Avoid it.</p>
+<p>Some properties, like <code>color</code> and <code>font-family</code>, are <b>inherited</b>: children take the parent's value unless a rule sets their own.</p>
+<p class="fe-small">Later you will meet the full rules, such as style origins and <code>@layer</code>. You won't need them for a long time.</p>
+</article>
             <article
               class="topic wide"
               id="css-box"
@@ -3417,38 +3627,42 @@ p::first-line { }  /* pseudo-element: a part */</code></pre>
               </div>
             </article>
             <article class="topic" id="css-units" data-node data-label="Units">
-              <h3>Units</h3>
-              <p>
-                <code>px</code> is a CSS pixel, not necessarily one device
-                pixel. Percentage reference sizes depend on the property; a
-                percentage width usually uses the containing block's width. For
-                <code>font-size</code>, <code>em</code> uses the parent's font
-                size; for most other properties it uses the element's own font
-                size. <code>rem</code> uses the root font size.
-                <code>vw</code> and <code>vh</code> refer to viewport
-                dimensions. On mobile, <code>dvh</code> tracks the changing
-                visible viewport height.
-              </p>
-            </article>
+<h3>Units</h3>
+<div class="tw"><table>
+<thead><tr><th>Unit</th><th>Means</th><th>Good for</th></tr></thead>
+<tbody>
+<tr><td><code>px</code></td><td>a fixed CSS pixel</td><td>borders, small details</td></tr>
+<tr><td><code>rem</code></td><td>times the root font size, usually 16px</td><td>font sizes, spacing</td></tr>
+<tr><td><code>em</code></td><td>times this element's font size</td><td>padding that grows with its text</td></tr>
+<tr><td><code>%</code></td><td>a share of the parent</td><td>widths inside a container</td></tr>
+<tr><td><code>vw</code>, <code>vh</code></td><td>1% of the window's width or height</td><td>full-screen sections</td></tr>
+<tr><td><code>dvh</code></td><td>like <code>vh</code>, but follows a phone's moving address bar</td><td>full-height phone layouts</td></tr>
+</tbody></table></div>
+<p>If someone raises their browser's default text size, <code>rem</code> sizes grow with it and <code>px</code> sizes don't. That makes <code>rem</code> the friendlier choice for text.</p>
+</article>
             <article class="topic" id="css-type">
-              <h3>Colors and typography</h3>
-              <p>
-                Colors come as hex (<code>#fffaf0</code>), <code>rgb()</code> or
-                <code>hsl()</code>. For text, learn <code>font-family</code>,
-                <code>font-size</code>, <code>font-weight</code>,
-                <code>line-height</code> and <code>letter-spacing</code>. A
-                <code>line-height</code> of 1.5 to 1.7 reads well.
-              </p>
-            </article>
+<h3>Colors and typography</h3>
+<p>Colors come as hex (<code>#fffaf0</code>), <code>rgb()</code> or <code>hsl()</code>. A good starting point for text:</p>
+<pre><code>body {
+  font-family: system-ui, sans-serif;  /* a fallback comes last */
+  font-size: 1rem;                     /* 16px by default */
+  line-height: 1.6;                    /* space between lines */
+  color: #222;
+}
+h1 { font-size: 2.25rem; font-weight: 700; }</code></pre>
+<p>A <code>line-height</code> of 1.5 to 1.7 reads well. Always end <code>font-family</code> with a generic fallback like <code>sans-serif</code>.</p>
+</article>
             <article class="topic" id="css-decor">
-              <h3>Backgrounds, borders and shadows</h3>
-              <p>
-                <code>background</code>, <code>border</code>,
-                <code>border-radius</code> for rounded corners,
-                <code>box-shadow</code> for depth, and <code>overflow</code> to
-                decide what happens when content spills out of its box.
-              </p>
-            </article>
+<h3>Backgrounds, borders and shadows</h3>
+<pre><code>.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;                     /* rounded corners */
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);  /* soft depth */
+  overflow: hidden;                        /* clip what spills out */
+}</code></pre>
+<p><code>overflow</code> decides what happens when content is bigger than its box: <code>visible</code> lets it spill out (the default), <code>hidden</code> clips it, and <code>auto</code> adds scroll bars when needed.</p>
+</article>
             <article
               class="topic"
               id="css-vars"
@@ -3463,7 +3677,31 @@ p::first-line { }  /* pseudo-element: a part */</code></pre>
                 between dark and light by redefining a handful of variables.
               </p>
             </article>
-          </div>
+<article class="topic fe-mistakes" id="css-mistakes">
+<h3>Common CSS mistakes</h3>
+<ul class="fe-mistake-list"><li><b>A typo fails silently.</b> CSS skips a misspelled property or value without an error. DevTools marks it with a warning icon or a strikethrough.</li><li><b>Forgetting the dot.</b> <code>card { }</code> looks for a <code>&lt;card&gt;</code> tag. A class needs <code>.card { }</code>.</li><li><b>The width surprise.</b> By default, <code>width: 300px</code> plus 20px of padding is 340px wide. Start every project with <code>*, *::before, *::after { box-sizing: border-box; }</code>.</li><li><b>Fighting with !important.</b> If a rule doesn't apply, find the rule that wins in DevTools and write a selector that matches or beats it.</li></ul>
+</article>
+
+          <article class="topic wide fe-practice" id="css-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>A profile card.</b> Style your About me page as a centered card: at most 400px wide, rounded corners, padding, a soft border, and a readable font. Put the main color and spacing in CSS variables.<details class="hint"><summary>Hint</summary><div><code>max-width: 400px</code> plus <code>margin: 0 auto</code> centers a block horizontally. Put the variables on <code>:root</code>.</div></details></li>
+<li><b>Predict the winner.</b> What color is the text? Predict first, then test it. Then delete the <code>#first</code> rule and predict again.<pre><code>&lt;p class="intro special" id="first"&gt;Hello&lt;/p&gt;
+
+p.intro  { color: green; }
+.special { color: orange; }
+#first   { color: purple; }
+p        { color: black; }</code></pre><details class="hint answer"><summary>Show one answer</summary><div>Purple, because an id beats everything else here. Without it, <code>p.intro</code> (1 class and 1 tag) beats <code>.special</code> (1 class), so the text is green.</div></details></li>
+<li><b>Box model by hand.</b> A box has <code>width: 200px</code>, <code>padding: 20px</code>, <code>border: 5px</code> and <code>margin: 10px</code>. How wide is it on screen by default? And with <code>border-box</code>? Check with the box model diagram in DevTools.<details class="hint answer"><summary>Show one answer</summary><div>By default: 200 + 2 &times; 20 + 2 &times; 5 = 250px, with 10px of margin outside it. With <code>border-box</code>: 200px, and the content area shrinks to 150px.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> <code>&lt;p class="a" id="b"&gt;</code> has two rules: <code>#b { color: blue }</code>, then <code>.a { color: red }</code>. What color is it?</p><div class="opts"><button type="button" class="opt">Red, because it comes last</button><button type="button" class="opt" data-ok>Blue</button><button type="button" class="opt">Purple, they mix</button></div><p class="why" hidden>An id is more specific than a class, so blue wins wherever the rules are written. Order only breaks ties.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> Which unit grows when a user raises their browser's default font size?</p><div class="opts"><button type="button" class="opt">px</button><button type="button" class="opt" data-ok>rem</button><button type="button" class="opt">vw</button></div><p class="why" hidden><code>rem</code> is relative to the root font size, which follows the browser setting.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> Your CSS rule has no effect. Where do you look first?</p><div class="opts"><button type="button" class="opt">Add !important</button><button type="button" class="opt" data-ok>The Styles panel in DevTools, to see whether it is crossed out or missing</button><button type="button" class="opt">Restart the browser</button></div><p class="why" hidden>The Styles panel lists every rule that matched the element. Crossed out means another rule won. Missing means the selector didn't match.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Work through
             <a
@@ -3491,6 +3729,8 @@ p::first-line { }  /* pseudo-element: a part */</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 6 to 8 hours</span><div><b>By the end you can</b><ul><li>Pick flexbox or grid for a layout and say why.</li><li>Center anything in both directions.</li><li>Make a page that works from phone width to desktop.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -3508,35 +3748,52 @@ p::first-line { }  /* pseudo-element: a part */</code></pre>
               </p>
             </article>
             <article
-              class="topic"
+              class="topic wide"
               id="layout-position"
               data-node
               data-label="position and z-index"
             >
-              <h3>position and z-index</h3>
-              <pre><code>position: static;    /* default, normal flow */
-position: relative;  /* offset from its own spot */
-position: absolute;  /* placed inside nearest positioned parent */
+<h3>position and z-index</h3>
+<p>Normally boxes sit in the <b>flow</b>, one after another like words in a paragraph. <code>position</code> lets you nudge a box or lift it out of that flow.</p>
+<pre><code>position: static;    /* default, normal flow */
+position: relative;  /* nudged from its own spot */
+position: absolute;  /* placed inside the nearest positioned ancestor */
 position: fixed;     /* stuck to the screen */
 position: sticky;    /* normal, then sticks while scrolling */</code></pre>
-              <p>
-                <code>z-index</code> decides which overlapping element sits on
-                top.
-              </p>
-            </article>
+<p>The one that confuses everyone: <code>absolute</code> is measured from the nearest ancestor whose position isn't <code>static</code>. That's why you often see <code>position: relative</code> on a parent with no offsets. It's there to be the anchor. Try each value:</p>
+<div class="demo" id="demo-pos">
+  <div class="controls">
+    <label>position<select data-p="pos"><option>static</option><option selected>relative</option><option>absolute</option><option>sticky</option></select></label>
+    <label class="inline"><input type="checkbox" data-p="anchor" checked> parent has position: relative</label>
+  </div>
+  <div class="stagebox">
+    <div class="pos-outer"><span class="pos-tag">outer box, position: relative</span>
+      <div class="pos-parent"><span class="pos-tag">parent</span>
+        <p>Text before the box.</p>
+        <div class="pos-box">box: top 20px, left 40px</div>
+        <p>Text after the box.</p><p>Scroll down inside this parent.</p><p>More text.</p><p>Even more text.</p><p>The end.</p>
+      </div>
+    </div>
+  </div>
+  <pre><code class="out"></code></pre>
+  <p class="fe-small" data-pos-note></p>
+</div>
+<p><code>z-index</code> decides which overlapping positioned element sits on top. A bigger number sits higher.</p>
+</article>
             <article
               class="topic wide"
               id="layout-flex"
               data-node
               data-label="Flexbox"
             >
-              <h3>Flexbox</h3>
-              <p>
-                Flexbox lays items out along one direction, a row or a column.
-                It handles alignment, spacing and centering with very little
-                code. Use it for navbars, button groups and card rows.
-              </p>
-              <div class="demo" id="demo-flex">
+<h3>Flexbox</h3>
+<p>Flexbox lays items out along one line, a row or a column. That line is the <b>main axis</b>. The other direction is the <b>cross axis</b>.</p>
+<ul>
+<li><code>justify-content</code> spreads items along the main axis.</li>
+<li><code>align-items</code> lines them up on the cross axis.</li>
+<li>Switch to <code>column</code> and the two swap directions. Try it below.</li>
+</ul>
+<div class="demo" id="demo-flex">
                 <div class="controls">
                   <label
                     >flex-direction<select data-p="flexDirection">
@@ -3580,20 +3837,34 @@ position: sticky;    /* normal, then sticks while scrolling */</code></pre>
                 </div>
                 <pre><code class="out"></code></pre>
               </div>
-            </article>
-            <article class="topic" id="layout-grid" data-node data-label="Grid">
-              <h3>Grid</h3>
-              <p>
-                Grid arranges items in rows and columns at once. Use it for page
-                layouts and galleries.
-              </p>
-              <pre><code>.gallery {
+<p>Three more you will use all the time:</p>
+<pre><code>.item { flex: 1; }          /* items share the free space equally */
+.logo { flex: none; }       /* keep its own size, never shrink */
+.row  { flex-wrap: wrap; }  /* move to a new line when out of room */</code></pre>
+<p>Use it for navbars, button groups, and anything in a single row or column.</p>
+</article>
+            <article class="topic wide" id="layout-grid" data-node data-label="Grid">
+<h3>Grid</h3>
+<p>Grid places items in rows and columns at the same time. You describe the columns on the parent, and the children fill the cells in order.</p>
+<pre><code>.gallery {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);  /* 3 equal columns */
   gap: 16px;
-}</code></pre>
-              <p>Rule of thumb: flexbox for one direction, grid for two.</p>
-            </article>
+}
+.featured { grid-column: span 2; }        /* this item takes 2 columns */</code></pre>
+<p><code>fr</code> means "a share of the free space". The most useful line in grid is <code>repeat(auto-fit, minmax(200px, 1fr))</code>: as many columns as fit, each at least 200px wide. It's responsive without a single media query. Shrink the container and watch:</p>
+<div class="demo" id="demo-grid">
+  <div class="controls">
+    <label>columns<select data-p="mode"><option value="fit" selected>auto-fit with minmax</option><option value="fixed">repeat(3, 1fr)</option></select></label>
+    <label>min width <output></output><input type="range" min="60" max="220" value="120" data-p="min"></label>
+    <label>container width <output></output><input type="range" min="35" max="100" value="100" data-p="w"></label>
+    <label class="inline"><input type="checkbox" data-p="span"> item 1 spans 2 columns</label>
+  </div>
+  <div class="stagebox"><div class="gr"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div></div></div>
+  <pre><code class="out"></code></pre>
+</div>
+<p>Rule of thumb: flexbox for one direction, grid for two.</p>
+</article>
             <article
               class="topic"
               id="layout-responsive"
@@ -3626,7 +3897,38 @@ position: sticky;    /* normal, then sticks while scrolling */</code></pre>
   min-height: 100vh;
 }</code></pre>
             </article>
-          </div>
+<article class="topic" id="layout-debug" data-node data-label="Debugging layout">
+<h3>When layout goes wrong</h3>
+<p>Three tricks solve most layout puzzles:</p>
+<ol>
+<li><b>Outline everything for a minute.</b> <code>* { outline: 1px solid red; }</code> shows every box. Unlike a border, an outline takes no space, so it doesn't change the layout.</li>
+<li><b>Use the DevTools badges.</b> In Elements, click the <code>flex</code> or <code>grid</code> badge next to an element to draw its lines and gaps on the page.</li>
+<li><b>Hunt the sideways scroll.</b> A page that scrolls sideways on a phone has one element wider than the screen: a fixed <code>width</code>, a long URL, an image without a max width, or <code>100vw</code> plus a scroll bar.</li>
+</ol>
+<pre><code>img { max-width: 100%; height: auto; }  /* images never overflow */</code></pre>
+</article>
+
+          <article class="topic wide fe-practice" id="layout-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>A navbar.</b> Logo on the left, three links on the right, everything vertically centered. On a phone, the links drop below the logo.<details class="hint"><summary>Hint</summary><div>One flex container with <code>justify-content: space-between</code> and <code>align-items: center</code>. For the phone, add <code>flex-wrap: wrap</code>, or switch to a column in a media query.</div></details></li>
+<li><b>A card gallery with no media queries.</b> Six cards: 1 column on a phone, 2 on a tablet, 3 or more on a laptop.<details class="hint"><summary>Hint</summary><div>The auto-fit line from the Grid card does all of it.</div></details><details class="hint answer"><summary>Show one answer</summary><div><pre><code>.gallery {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}</code></pre></div></details></li>
+<li><b>A sticky header and a centered hero.</b> A header that stays at the top while you scroll, and a first section that fills the screen with its text centered both ways.<details class="hint"><summary>Hint</summary><div><code>position: sticky; top: 0</code> on the header, plus a background so the text underneath doesn't show through. For the hero, <code>min-height: 100dvh</code> and the centering recipe.</div></details></li>
+<li><b>Finish the games.</b> Play <a href="https://flexboxfroggy.com" target="_blank" rel="noopener">Flexbox Froggy</a> and <a href="https://cssgridgarden.com" target="_blank" rel="noopener">Grid Garden</a> to the last level.</li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> A row of buttons should spread out with equal space between them. What do you reach for?</p><div class="opts"><button type="button" class="opt">Grid with grid-template-areas</button><button type="button" class="opt" data-ok>Flexbox with justify-content: space-between</button><button type="button" class="opt">position: absolute on each button</button></div><p class="why" hidden>It's one direction, a row, which is flexbox's job. Absolute positioning breaks as soon as the text or screen size changes.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> A badge has <code>position: absolute; top: 0; right: 0</code> but jumps to the corner of the whole page. Why?</p><div class="opts"><button type="button" class="opt">absolute always uses the page</button><button type="button" class="opt" data-ok>No ancestor has a position set, so it falls back to the page</button><button type="button" class="opt">z-index is missing</button></div><p class="why" hidden>Add <code>position: relative</code> to the card that should hold the badge. The badge is then placed from the card's corner.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> In a flex container with <code>flex-direction: column</code>, which property centers items left to right?</p><div class="opts"><button type="button" class="opt">justify-content</button><button type="button" class="opt" data-ok>align-items</button></div><p class="why" hidden>In a column the main axis runs top to bottom, so <code>justify-content</code> works vertically and <code>align-items</code> works horizontally.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> A page scrolls sideways on a phone. What is the most likely cause?</p><div class="opts"><button type="button" class="opt">Too many media queries</button><button type="button" class="opt" data-ok>Something is wider than the screen, like a fixed width or a large image</button><button type="button" class="opt">The font is too big</button></div><p class="why" hidden>Outline everything, or scroll right and inspect whatever sticks out.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span
             ><a href="https://flexboxfroggy.com" target="_blank" rel="noopener"
@@ -3656,6 +3958,8 @@ position: sticky;    /* normal, then sticks while scrolling */</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 2 to 3 hours</span><div><b>By the end you can</b><ul><li>Add smooth hover effects with transitions.</li><li>Build a looping animation with keyframes.</li><li>Keep animations smooth and respect reduced motion.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic wide"
@@ -3763,23 +4067,43 @@ position: sticky;    /* normal, then sticks while scrolling */</code></pre>
               </p>
             </article>
             <article class="topic" id="motion-3d">
-              <h3>3D basics</h3>
-              <p>
-                Add <code>perspective</code> to a parent and use
-                <code>rotateX</code> or <code>rotateY</code> on the child for
-                card flips and tilt effects.
-              </p>
-            </article>
+<h3>3D basics</h3>
+<p>Add <code>perspective</code> to a parent and rotate the child on <code>rotateX</code> or <code>rotateY</code> for card flips and tilt effects.</p>
+<pre><code>.scene { perspective: 800px; }
+.card  { transition: transform 0.6s; }
+.scene:hover .card { transform: rotateY(180deg); }</code></pre>
+</article>
             <article class="topic" id="motion-a11y">
-              <h3>Reduced motion</h3>
-              <p>
-                Some people get dizzy from animation. Wrap big motion in
-                <code>@media (prefers-reduced-motion: no-preference)</code>, or
-                switch it off inside
-                <code>prefers-reduced-motion: reduce</code>.
-              </p>
-            </article>
-          </div>
+<h3>Reduced motion</h3>
+<p>Some people get dizzy or sick from motion on screen. Operating systems have a "reduce motion" setting, and CSS can read it:</p>
+<pre><code>@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}</code></pre>
+<p>This is one of the rare good uses of <code>!important</code>: it has to win over every other rule.</p>
+</article>
+          <article class="topic wide fe-practice" id="motion-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>A button that lifts.</b> On hover the button moves up 2px and its shadow grows, over 200ms. While pressed (<code>:active</code>), it sinks back down.<details class="hint"><summary>Hint</summary><div>Put <code>transition</code> on the button's normal rule, not on <code>:hover</code>, so it animates both ways. Move it with <code>transform</code>, not <code>top</code>.</div></details></li>
+<li><b>A loading spinner.</b> A circle with one colored edge that spins forever, in pure CSS.<details class="hint"><summary>Hint</summary><div>A square with <code>border-radius: 50%</code>, a gray border and a different <code>border-top-color</code>. Then keyframes that rotate it to 360deg, <code>linear</code> and <code>infinite</code>.</div></details><details class="hint answer"><summary>Show one answer</summary><div><pre><code>.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ddd;
+  border-top-color: #6c4cf1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }</code></pre></div></details></li>
+<li><b>Turn it off.</b> Make the spinner and the hover effect stop under reduced motion. To test it, open DevTools, press Ctrl+Shift+P, type "reduced motion" and pick the "emulate" option.</li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> Which is smoother to animate?</p><div class="opts"><button type="button" class="opt">left: 0 to left: 100px</button><button type="button" class="opt" data-ok>transform: translateX(0) to translateX(100px)</button></div><p class="why" hidden>Changing <code>left</code> makes the browser redo layout on every frame. <code>transform</code> usually skips layout and paint.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> A hover effect animates when the mouse enters but snaps back instantly when it leaves. Why?</p><div class="opts"><button type="button" class="opt" data-ok>The transition is written inside :hover only</button><button type="button" class="opt">The duration is too short</button><button type="button" class="opt">Browsers never animate leaving</button></div><p class="why" hidden>When the mouse leaves, the <code>:hover</code> rule stops applying, and its transition goes with it. Put the transition on the base rule.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> When do you need <code>@keyframes</code> instead of a transition?</p><div class="opts"><button type="button" class="opt">For every hover effect</button><button type="button" class="opt" data-ok>For more than two steps, or motion that loops or starts on its own</button></div><p class="why" hidden>A transition only animates between two states when something changes. Keyframes describe a whole sequence.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Read
             <a
@@ -3808,6 +4132,8 @@ position: sticky;    /* normal, then sticks while scrolling */</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 12 to 15 hours</span><div><b>By the end you can</b><ul><li>Use <code>const</code>, <code>let</code>, functions and the main array methods without looking them up.</li><li>Explain the difference between copying a value and sharing a reference.</li><li>Read and write JSON, and catch errors with <code>try</code> and <code>catch</code>.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -3815,63 +4141,96 @@ position: sticky;    /* normal, then sticks while scrolling */</code></pre>
               data-node
               data-label="Variables and types"
             >
-              <h3>Variables and types</h3>
-              <p>
-                Use <code>const</code> by default and <code>let</code> when a
-                binding must be reassigned. A <code>const</code> object or array
-                can still be mutated; the binding itself cannot point to a
-                different value. The primitive types are string, number, bigint,
-                boolean, symbol, <code>null</code> and <code>undefined</code>.
-                Other values are objects, including arrays and functions. Use
-                <code>Array.isArray(value)</code> to identify an array. Prefer
-                <code>===</code> when you do not intend type coercion.
-              </p>
-            </article>
+<h3>Variables and types</h3>
+<p>A variable is a name for a value. Use <code>const</code> by default and <code>let</code> only when you will reassign it. Skip <code>var</code>, the old way with confusing scope rules.</p>
+<pre><code>const name = "Eswar";   // string
+let score = 0;          // number: whole and decimal alike
+score = score + 10;     // fine, it's let
+const done = false;     // boolean
+let picked = null;      // "nothing, on purpose"
+let city;               // undefined: "not set yet"
+
+const tasks = [];       // an array is an object
+tasks.push("learn JS"); // allowed: the array changes, the name doesn't</code></pre>
+<p>The simple types are string, number, boolean, <code>null</code> and <code>undefined</code> (plus bigint and symbol, which you'll rarely meet). Everything else, including arrays and functions, is an object.</p>
+<p>Compare with <code>===</code>, which never converts types: <code>"5" == 5</code> is true, but <code>"5" === 5</code> is false.</p>
+</article>
+<article class="topic" id="js-strings">
+<h3>Strings and numbers</h3>
+<pre><code>const msg = "  Hello, World  ";
+msg.trim();               // "Hello, World"
+msg.toLowerCase();        // "  hello, world  "
+msg.includes("World");    // true
+"a,b,c".split(",");       // ["a", "b", "c"]
+`Total: ${2 + 3}`;        // "Total: 5"
+
+Number("42");             // 42
+Number("42px");           // NaN, "not a number"
+parseInt("42px", 10);     // 42
+(19.999).toFixed(2);      // "20.00", a string</code></pre>
+<p>Two surprises to know early. <code>"5" + 1</code> is <code>"51"</code>, because <code>+</code> joins text when either side is a string. And <code>0.1 + 0.2</code> is <code>0.30000000000000004</code>, because computers store decimals in binary. For money, count whole paise or cents.</p>
+</article>
+
             <article
               class="topic"
               id="js-functions"
               data-node
               data-label="Functions"
             >
-              <h3>Functions</h3>
-              <p>
-                Functions are values: you can store them, pass them in, and
-                return them. Arrow functions offer concise syntax and capture
-                <code>this</code> from the surrounding scope; they are not
-                interchangeable with normal functions in every situation.
-              </p>
-              <pre><code>function add(a, b) { return a + b; }
-const add2 = (a, b) =&gt; a + b;</code></pre>
-            </article>
+<h3>Functions</h3>
+<p>A function is a reusable recipe: inputs (parameters) go in, and a result comes out with <code>return</code>. Functions are values too, so you can store them and pass them to other functions.</p>
+<pre><code>function add(a, b) { return a + b; }
+const add2 = (a, b) =&gt; a + b;                    // arrow function
+const greet = (name = "friend") =&gt; `Hi ${name}`; // default value
+
+greet();                          // "Hi friend"
+[1, 2, 3].map(n =&gt; add(n, 10));   // pass a function in: [11, 12, 13]</code></pre>
+<p>Arrow functions are shorter and don't have their own <code>this</code> (see <a href="#js-this">the this keyword</a>). A function without <code>return</code> gives back <code>undefined</code>, the cause of many "why is it undefined?" moments.</p>
+</article>
             <article
-              class="topic"
+              class="topic wide"
               id="js-collections"
               data-node
               data-label="Arrays and objects"
             >
-              <h3>Arrays and objects</h3>
-              <p>
-                Your two main data structures. The array methods below show up
-                in nearly every project.
-              </p>
-              <pre><code>const nums = [1, 2, 3, 4];
-nums.map(n =&gt; n * 2);               // [2, 4, 6, 8]
-nums.filter(n =&gt; n % 2 === 0);      // [2, 4]
-nums.reduce((sum, n) =&gt; sum + n, 0); // 10
-nums.find(n =&gt; n &gt; 2);              // 3</code></pre>
-            </article>
+<h3>Arrays and objects</h3>
+<p>Your two main data structures. An array is an ordered list. An object is a set of named values. Real data is usually an array of objects:</p>
+<pre><code>const tasks = [
+  { id: 1, title: "HTML page",    done: true,  mins: 40 },
+  { id: 2, title: "Flexbox game", done: false, mins: 25 },
+  { id: 3, title: "Array drills", done: false, mins: 30 },
+];
+tasks[0].title;          // "HTML page"
+tasks.length;            // 3
+Object.keys(tasks[0]);   // ["id", "title", "done", "mins"]</code></pre>
+<p>Pick a method to see what it returns on that array. These six cover most real code.</p>
+<div class="demo" id="demo-arr">
+  <div class="controls">
+    <label>method<select data-p="m">
+      <option value="map">map: change each item</option>
+      <option value="filter">filter: keep some</option>
+      <option value="find">find: the first match</option>
+      <option value="reduce">reduce: combine into one</option>
+      <option value="some">some: any match?</option>
+      <option value="sort">sort: reorder</option>
+    </select></label>
+  </div>
+  <pre><code class="out"></code></pre>
+  <p class="fe-small" data-arr-note></p>
+</div>
+</article>
             <article class="topic" id="js-flow">
-              <h3>Control flow</h3>
-              <p>
-                <code>if / else</code>, <code>switch</code>, and loops such as
-                <code>for</code>, <code>while</code> and
-                <code>for...of</code> control which code runs. Common falsy
-                values are <code>false</code>, <code>0</code>, <code>-0</code>,
-                <code>0n</code>, <code>""</code>, <code>null</code>,
-                <code>undefined</code> and <code>NaN</code>. Empty arrays and
-                objects are truthy.
-              </p>
-            </article>
+<h3>Control flow</h3>
+<pre><code>if (score &gt;= 90) grade = "A";
+else if (score &gt;= 75) grade = "B";
+else grade = "C";
+
+for (const task of tasks) console.log(task.title);    // arrays
+for (const [key, value] of Object.entries(user)) {}   // objects
+
+const label = done ? "Done" : "To do";                // a short if/else</code></pre>
+<p>Conditions treat some values as false: <code>false</code>, <code>0</code>, <code>""</code>, <code>null</code>, <code>undefined</code> and <code>NaN</code> (plus the rare <code>-0</code> and <code>0n</code>). Everything else counts as true, including empty arrays and objects.</p>
+</article>
             <article
               class="topic"
               id="js-scope"
@@ -3900,6 +4259,24 @@ next(); // 2</code></pre>
                 printing an old count, this is why.
               </p>
             </article>
+<article class="topic" id="js-refs" data-node data-label="Values and references">
+<h3>Copying: values and references</h3>
+<p>Simple values are copied. Objects and arrays are <b>shared</b>: the variable holds a reference, like a home address, not the house itself.</p>
+<pre><code>let a = 5;
+let b = a;
+b = 10;
+a;                      // 5, numbers are copied
+
+const user = { name: "Dinesh" };
+const same = user;      // the same address
+same.name = "Eswar";
+user.name;              // "Eswar", one object, two names
+
+const copy = { ...user, name: "Priya" };  // a new object
+const more = [...list, newItem];          // a new array</code></pre>
+<p>This explains two things you'll meet soon: why <code>{} === {}</code> is false (two different objects), and why React wants a <b>new</b> array or object when state changes. Spread copies one level deep; <code>structuredClone(obj)</code> copies everything.</p>
+</article>
+
             <article
               class="topic"
               id="js-modern"
@@ -3957,31 +4334,54 @@ user.later();                 // "Eswar", the arrow keeps this</code></pre>
               </p>
             </article>
             <article class="topic" id="js-classes">
-              <h3>Classes</h3>
-              <p>
-                <code>class</code> is a cleaner way to write object blueprints
-                with a <code>constructor</code>, methods and
-                <code>extends</code>, built on prototypes underneath. You will
-                see classes in older React code, in Node libraries and in custom
-                error types. Modern React uses functions instead.
-              </p>
-            </article>
+<h3>Classes</h3>
+<p>A <code>class</code> is a blueprint for objects, with a <code>constructor</code> that sets them up and methods they share. You'll see classes in older React code, in Node libraries, and in custom error types. Modern React uses functions instead.</p>
+<pre><code>class Timer {
+  constructor(label) { this.label = label; this.seconds = 0; }
+  tick() { this.seconds++; }
+}
+const t = new Timer("focus");
+t.tick();   // t.seconds is now 1</code></pre>
+</article>
             <article
               class="topic"
               id="js-json"
               data-node
               data-label="Errors and JSON"
             >
-              <h3>Errors and JSON</h3>
-              <p>
-                <code>try</code> / <code>catch</code> handles errors without
-                crashing. JSON is the text format for sending data between
-                frontend and backend.
-              </p>
-              <pre><code>const text = JSON.stringify({ name: "Dinesh" });
-const obj = JSON.parse(text);</code></pre>
-            </article>
-          </div>
+<h3>Errors and JSON</h3>
+<p>JSON is text that looks like a JavaScript object. It's how the frontend and backend send data to each other. Keys need double quotes, and it can't hold functions or <code>undefined</code>.</p>
+<pre><code>const text = JSON.stringify({ name: "Dinesh", done: true });
+// '{"name":"Dinesh","done":true}'
+const obj = JSON.parse(text);          // back to an object
+
+try {
+  JSON.parse("{ name: 'oops' }");      // not valid JSON
+} catch (error) {
+  console.error("Could not read it:", error.message);
+}</code></pre>
+<p><code>try</code> runs code that might fail, and <code>catch</code> receives the error so the page keeps working. Raise your own with <code>throw new Error("message")</code>.</p>
+</article>
+          <article class="topic wide fe-practice" id="js-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Cart total.</b> Given <code>const cart = [{ name: "Pen", price: 20, qty: 3 }, { name: "Book", price: 250, qty: 1 }]</code>, compute the total with <code>reduce</code>. It should be 310.<details class="hint"><summary>Hint</summary><div>Start from 0. Each step adds <code>item.price * item.qty</code> to the running sum.</div></details><details class="hint answer"><summary>Show one answer</summary><div><pre><code>const total = cart.reduce((sum, item) =&gt; sum + item.price * item.qty, 0);</code></pre></div></details></li>
+<li><b>Only what's left.</b> From the <code>tasks</code> array in the Arrays card, make an array with the titles of tasks that are not done: <code>["Flexbox game", "Array drills"]</code>.<details class="hint"><summary>Hint</summary><div><code>filter</code> first, then <code>map</code>. You can chain them because each returns a new array.</div></details><details class="hint answer"><summary>Show one answer</summary><div><pre><code>const left = tasks.filter(t =&gt; !t.done).map(t =&gt; t.title);</code></pre></div></details></li>
+<li><b>Count words.</b> Write <code>countWords(text)</code> that ignores extra spaces. <code>countWords("  hi   there you ")</code> is 3, and <code>countWords("")</code> is 0.<details class="hint"><summary>Hint</summary><div>Trim, split on runs of spaces, then drop empty strings.</div></details><details class="hint answer"><summary>Show one answer</summary><div><pre><code>const countWords = text =&gt; text.trim().split(/\s+/).filter(Boolean).length;</code></pre></div></details></li>
+<li><b>Spot the shared object.</b> Predict what this prints, run it, then change one line so <code>a.score</code> stays 1.<pre><code>const a = { score: 1 };
+const b = a;
+b.score = 99;
+console.log(a.score);</code></pre><details class="hint answer"><summary>Show one answer</summary><div>It prints 99, because <code>b</code> points to the same object. Make a copy instead: <code>const b = { ...a };</code></div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> <code>const list = []; list.push(1);</code> What happens?</p><div class="opts"><button type="button" class="opt">A TypeError, because list is const</button><button type="button" class="opt" data-ok>It works: const stops reassigning the name, not changing the array</button></div><p class="why" hidden><code>list = [2]</code> would fail. Changing what's inside the array is allowed.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> What does <code>[1, 2, 3].find(n =&gt; n &gt; 5)</code> return?</p><div class="opts"><button type="button" class="opt">[]</button><button type="button" class="opt" data-ok>undefined</button><button type="button" class="opt">null</button><button type="button" class="opt">false</button></div><p class="why" hidden><code>find</code> returns the first match, or <code>undefined</code> when nothing matches. <code>filter</code> would return <code>[]</code>.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> What is <code>"5" + 1</code>?</p><div class="opts"><button type="button" class="opt">6</button><button type="button" class="opt" data-ok>"51"</button><button type="button" class="opt">NaN</button></div><p class="why" hidden>If either side of <code>+</code> is a string, JavaScript joins them as text. Convert first with <code>Number("5")</code>.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> A function logs the right value inside, but the caller gets <code>undefined</code>. The most likely cause?</p><div class="opts"><button type="button" class="opt" data-ok>It forgot to return the value</button><button type="button" class="opt">The variable is const</button><button type="button" class="opt">It should be an arrow function</button></div><p class="why" hidden>Without <code>return</code>, a function gives back <code>undefined</code>. With an arrow function and curly braces, you also need <code>return</code>.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Part 1 of
             <a href="https://javascript.info" target="_blank" rel="noopener"
@@ -4009,6 +4409,8 @@ const obj = JSON.parse(text);</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 6 to 8 hours</span><div><b>By the end you can</b><ul><li>Select, change, create and remove elements.</li><li>Handle clicks, typing and form submits, including whole lists with one listener.</li><li>Save small settings in <code>localStorage</code>.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -4049,6 +4451,14 @@ document.querySelectorAll("li");        // all matches</code></pre>
                 one to learn first.
               </p>
             </article>
+<article class="topic" id="dom-script" data-node data-label="Loading scripts">
+<h3>When your script runs</h3>
+<p>The most common first DOM error is <code>Cannot read properties of null</code>. Usually the script ran before the HTML it looks for existed, so <code>querySelector</code> found nothing and returned <code>null</code>.</p>
+<pre><code>&lt;!-- in &lt;head&gt;: download now, run after the HTML is parsed --&gt;
+&lt;script src="script.js" defer&gt;&lt;/script&gt;</code></pre>
+<p>Use <code>defer</code>, or put the script tag at the end of <code>body</code>. Scripts with <code>type="module"</code> are deferred automatically.</p>
+</article>
+
             <article
               class="topic"
               id="dom-change"
@@ -4098,6 +4508,21 @@ form.addEventListener("submit", (e) =&gt; {
   e.preventDefault();   // stop the page reload
 });</code></pre>
             </article>
+<article class="topic" id="dom-forms" data-node data-label="Forms in JS">
+<h3>Forms in JavaScript</h3>
+<pre><code>const form = document.querySelector("#task-form");
+
+form.addEventListener("submit", (e) =&gt; {
+  e.preventDefault();                       // no page reload
+  const data = new FormData(form);
+  const title = data.get("title").trim();   // uses the input's name
+  if (!title) return showError("Title is required");
+  addTask(title);
+  form.reset();                             // clear the inputs
+});</code></pre>
+<p>Listen for <code>submit</code> on the form, not <code>click</code> on the button, so pressing Enter works too. An input's value is always a string, so convert numbers with <code>Number()</code>.</p>
+</article>
+
             <article
               class="topic wide"
               id="dom-bubbling"
@@ -4174,13 +4599,14 @@ input.addEventListener("input", debounce(search, 300));</code></pre>
               </p>
             </article>
             <article class="topic" id="dom-walk">
-              <h3>Moving around the tree</h3>
-              <p>
-                <code>parentElement</code>, <code>children</code>,
-                <code>nextElementSibling</code> and <code>closest()</code> let
-                you go from one element to its relatives.
-              </p>
-            </article>
+<h3>Moving around the tree</h3>
+<pre><code>const item = document.querySelector("li.active");
+item.parentElement;        // the &lt;ul&gt;
+item.children;             // its child elements
+item.nextElementSibling;   // the next &lt;li&gt;
+item.closest(".card");     // nearest ancestor that matches, or null</code></pre>
+<p><code>closest()</code> is the one you'll use most, especially with <a href="#dom-bubbling">event delegation</a>.</p>
+</article>
             <article
               class="topic"
               id="dom-storage"
@@ -4203,7 +4629,23 @@ localStorage.getItem("theme");   // "dark"</code></pre>
                 before reaching for <code>localStorage</code>.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="dom-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Counter.</b> A number with +, &minus; and Reset buttons. It can't go below 0, and it turns red at 10 or more.<details class="hint"><summary>Hint</summary><div>Keep the count in a variable. Each handler changes it and calls one <code>render()</code> function that sets <code>textContent</code> and toggles a class.</div></details></li>
+<li><b>To-do list with delegation.</b> A form adds tasks to a <code>ul</code>. Clicking a task toggles it done, and a small &times; button deletes it. Use one listener on the <code>ul</code>, not one per item.<details class="hint"><summary>Hint</summary><div>In the list's click handler, <code>e.target.closest("button")</code> tells you whether the delete button was clicked, and <code>e.target.closest("li")</code> gives you the item.</div></details></li>
+<li><b>Remember the theme.</b> A button switches light and dark by toggling a class on <code>body</code>. Reload the page: the theme should stay.<details class="hint"><summary>Hint</summary><div>Save <code>"dark"</code> or <code>"light"</code> in <code>localStorage</code> when it changes, and read it once when the script starts.</div></details></li>
+<li><b>Then the repo practice.</b> Work through <code>DEV/Frontend/DOM/Practice_1</code> to <code>Practice_8</code>, then <a href="Practice/Practice_Guide.html">01_Quiz_Room in the practice guide</a>.</li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> <code>querySelector("#menu")</code> returns <code>null</code>, but the element is in the HTML. Most likely?</p><div class="opts"><button type="button" class="opt">ids are case-insensitive</button><button type="button" class="opt" data-ok>The script ran before that element was parsed</button><button type="button" class="opt">querySelector can't find ids</button></div><p class="why" hidden>Add <code>defer</code> to the script tag, or move it to the end of the body.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> Which is safe for showing a user's comment?</p><div class="opts"><button type="button" class="opt">el.innerHTML = comment</button><button type="button" class="opt" data-ok>el.textContent = comment</button></div><p class="why" hidden><code>textContent</code> treats everything as plain text. <code>innerHTML</code> parses HTML, so a comment containing an <code>onerror</code> attribute could run code.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> A list has 100 items. How many click listeners do you need to handle all of them?</p><div class="opts"><button type="button" class="opt">100</button><button type="button" class="opt" data-ok>1, on the list</button></div><p class="why" hidden>Clicks bubble up to the list. One listener plus <code>e.target.closest("li")</code> handles every item, even ones added later.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> <code>localStorage.setItem("user", { name: "D" })</code>, then <code>getItem("user")</code>. What comes back?</p><div class="opts"><button type="button" class="opt">The object</button><button type="button" class="opt" data-ok>The string "[object Object]"</button></div><p class="why" hidden><code>localStorage</code> stores only strings. Save with <code>JSON.stringify</code> and read with <code>JSON.parse</code>.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>The repo has
             <code>DEV/Frontend/DOM/Practice_1</code> to
@@ -4234,14 +4676,16 @@ localStorage.getItem("theme");   // "dark"</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 6 to 8 hours</span><div><b>By the end you can</b><ul><li>Predict the order of normal code, promises and timers.</li><li>Fetch JSON with <code>async</code>/<code>await</code> and handle errors properly.</li><li>Show loading, empty, error and success states.</li></ul></div></div>
+
           <div class="grid">
             <article
-              class="topic"
+              class="topic wide"
               id="async-loop"
               data-node
               data-label="Event loop"
             >
-              <h3>The event loop</h3>
+<h3>The event loop</h3>
               <p>
                 JavaScript does one thing at a time. When it starts something
                 slow, like a request or a timer, it hands the job to the browser
@@ -4259,7 +4703,17 @@ localStorage.getItem("theme");   // "dark"</code></pre>
                 >
                 that callbacks run in.
               </p>
-            </article>
+<p>Predict what this prints, then run it:</p>
+<pre><code>console.log("1. start");
+setTimeout(() =&gt; console.log("timeout"), 0);
+Promise.resolve().then(() =&gt; console.log("promise"));
+console.log("2. end");</code></pre>
+<div class="demo" id="demo-loop">
+  <div class="controls"><button class="btn" type="button" data-p="run">Run it for real</button></div>
+  <pre><code class="out">Press the button. The page runs the code above and logs each line here.</code></pre>
+  <p class="fe-small" data-loop-note hidden>All normal code runs first. Then promise callbacks (microtasks). Then timers, even with a 0ms delay.</p>
+</div>
+</article>
             <article
               class="topic wide"
               id="async-styles"
@@ -4367,6 +4821,33 @@ const [u, p] = await Promise.all([getUser(), getPosts()]);</code></pre>
                 covers API design.
               </p>
             </article>
+<article class="topic wide" id="async-states" data-node data-label="Four UI states">
+<h3>Loading, empty, error, success</h3>
+<p>Every screen that fetches data is always in one of four states. Beginners build only "success", so the page looks broken while it loads or when the network fails. Pick a scenario:</p>
+<div class="demo" id="demo-states">
+  <div class="controls">
+    <button class="btn" type="button" data-s="success">Success</button>
+    <button class="btn" type="button" data-s="empty">Empty</button>
+    <button class="btn" type="button" data-s="error">Error</button>
+    <button class="btn" type="button" data-s="slow">Slow network</button>
+  </div>
+  <div class="stagebox"><div class="st-view" aria-live="polite"></div></div>
+  <pre><code class="out"></code></pre>
+</div>
+<p>The code shape that handles all four:</p>
+<pre><code>async function loadTasks() {
+  render({ status: "loading" });
+  try {
+    const res = await fetch("/api/tasks");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const tasks = await res.json();
+    render(tasks.length ? { status: "success", tasks } : { status: "empty" });
+  } catch (error) {
+    render({ status: "error", message: "Couldn't load tasks. Try again." });
+  }
+}</code></pre>
+</article>
+
             <article class="topic" id="async-timers">
               <h3>Timers</h3>
               <p>
@@ -4387,7 +4868,27 @@ const [u, p] = await Promise.all([getUser(), getPosts()]);</code></pre>
                 <li>No error handling, so the UI hangs on "loading".</li>
               </ul>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="async-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Predict, then run.</b> Write down the order first.<pre><code>console.log("A");
+setTimeout(() =&gt; console.log("B"), 100);
+setTimeout(() =&gt; console.log("C"), 0);
+Promise.resolve().then(() =&gt; console.log("D"));
+console.log("E");</code></pre><details class="hint answer"><summary>Show one answer</summary><div>A, E, D, C, B. Normal code first (A, E), then the promise (D), then the timers in the order they become due (C at 0ms, B at 100ms).</div></details></li>
+<li><b>Your first fetch.</b> Fetch <code>https://jsonplaceholder.typicode.com/users</code> (a free practice API) and list each user's name. Show "Loading..." first and a friendly message if it fails. Test the failure by choosing Offline in the Network tab.<details class="hint"><summary>Hint</summary><div>Use the four-state shape from the card above. The throttling dropdown in the Network tab has Offline and Slow 4G.</div></details></li>
+<li><b>Weather now.</b> Show the current temperature for your city from <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, which needs no key.<details class="hint"><summary>Hint</summary><div>Their docs build the URL for you from a latitude and longitude. Open that URL in the browser first to see the shape of the JSON.</div></details></li>
+<li><b>Two at once.</b> Fetch <code>/users</code> and <code>/posts</code> from jsonplaceholder in parallel with <code>Promise.all</code>, then show how many posts each user wrote.<details class="hint"><summary>Hint</summary><div>When both arrive, for each user, count the posts where <code>post.userId === user.id</code>.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> <code>const data = fetch(url); console.log(data);</code> What does it print?</p><div class="opts"><button type="button" class="opt">The JSON</button><button type="button" class="opt" data-ok>A Promise</button><button type="button" class="opt">undefined</button></div><p class="why" hidden><code>fetch</code> returns a promise right away. You need <code>await fetch(url)</code>, then <code>await res.json()</code>.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> The server answers 404. Does <code>fetch</code> throw an error?</p><div class="opts"><button type="button" class="opt">Yes</button><button type="button" class="opt" data-ok>No, you must check res.ok yourself</button></div><p class="why" hidden><code>fetch</code> rejects only when the request can't happen at all, like no network. Any HTTP answer, even 404 or 500, counts as a response.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> Two requests don't depend on each other. Which is faster?</p><div class="opts"><button type="button" class="opt">await one, then await the other</button><button type="button" class="opt" data-ok>await Promise.all([a(), b()])</button></div><p class="why" hidden>With <code>Promise.all</code> both run at the same time, so you wait for the slower one instead of both added together.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> <code>setTimeout(fn, 0)</code> runs <code>fn</code>...</p><div class="opts"><button type="button" class="opt">immediately</button><button type="button" class="opt" data-ok>after the current code and any pending promise callbacks finish</button></div><p class="why" hidden>A timer callback has to wait for the call stack to empty and for microtasks to run, even with a 0ms delay.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Read
             <a
@@ -4418,6 +4919,8 @@ const [u, p] = await Promise.all([getUser(), getPosts()]);</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 3 to 4 hours</span><div><b>By the end you can</b><ul><li>Find errors, requests and storage in DevTools.</li><li>Use Git every day: status, add, commit, pull, push.</li><li>Create and run a Vite project from the terminal.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -4438,22 +4941,24 @@ const [u, p] = await Promise.all([getUser(), getPosts()]);</code></pre>
               data-node
               data-label="Git and GitHub"
             >
-              <h3>Git and GitHub</h3>
-              <p>
-                Git keeps the history of your code. Learn: commit, branch,
-                merge, pull, push, pull request, merge conflict. GitHub hosts
-                the repo online. In this repo the habit is simple: pull before
-                you start, push when you finish.
-              </p>
-            </article>
+<h3>Git and GitHub</h3>
+<p>Git keeps the history of your code as snapshots called commits. GitHub hosts the repo online so two people can share it. In this repo the habit is simple: pull before you start, push when you finish.</p>
+<pre><code>git status                   # what changed?
+git add index.html           # choose what goes in the snapshot
+git commit -m "Add navbar"   # save the snapshot
+git pull                     # get your partner's work first
+git push                     # share yours</code></pre>
+<p>Learn branches, merges and merge conflicts next. They show up the first time you both edit the same file.</p>
+</article>
             <article class="topic" id="tool-terminal">
-              <h3>Terminal basics</h3>
-              <p>
-                <code>cd</code> to move, <code>ls</code> (or <code>dir</code>)
-                to list, <code>mkdir</code> to make a folder. Most tools below
-                are run from here.
-              </p>
-            </article>
+<h3>Terminal basics</h3>
+<pre><code>cd projects        # move into a folder
+cd ..              # go up one level
+ls                 # list files (dir in Windows cmd)
+mkdir playground   # make a folder
+code .             # open this folder in VS Code</code></pre>
+<p>Most tools below are run from here. Press Tab to finish a long folder name, and the up arrow to repeat the last command.</p>
+</article>
             <article class="topic" id="tool-npm" data-node data-label="npm">
               <h3>npm and package.json</h3>
               <p>
@@ -4502,7 +5007,21 @@ npm run dev</code></pre>
                 code.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="tooling-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>A DevTools tour.</b> On any site, find one console error, the largest request in Network, and whatever is stored under Application, then Local storage.<details class="hint"><summary>Hint</summary><div>Click the Size column header in Network to sort by size.</div></details></li>
+<li><b>A Vite project.</b> Create one with <code>npm create vite@latest</code>, choose vanilla or React, run it, then change some text and watch the page update without a reload.<details class="hint"><summary>Hint</summary><div>Follow the prompts, then <code>cd</code> into the folder, run <code>npm install</code> and <code>npm run dev</code>, and open the address it prints.</div></details></li>
+<li><b>A Git round trip.</b> Turn your playground into a repo, make three commits with clear messages, push it to GitHub, and check that <code>node_modules</code> isn't there.<details class="hint"><summary>Hint</summary><div>A <code>.gitignore</code> file with the line <code>node_modules/</code> keeps it out. Create it before your first commit.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> Where does <code>node_modules</code> belong?</p><div class="opts"><button type="button" class="opt">Commit it so nobody has to install</button><button type="button" class="opt" data-ok>In .gitignore; others run npm install</button></div><p class="why" hidden>It is large and can be rebuilt from <code>package.json</code> and the lockfile at any time.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> You put an API secret in a Vite <code>.env</code> file and use it in frontend code. Is it safe?</p><div class="opts"><button type="button" class="opt">Yes, .env is ignored by Git</button><button type="button" class="opt" data-ok>No, anything the frontend uses ships to the browser, where anyone can read it</button></div><p class="why" hidden>Git ignoring the file only keeps it out of the repo. Real secrets belong on a server.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> What does <code>package-lock.json</code> do?</p><div class="opts"><button type="button" class="opt">Stops others from editing the project</button><button type="button" class="opt" data-ok>Records the exact installed versions so everyone gets the same ones</button></div><p class="why" hidden>Without it, two people could install slightly different versions and see different bugs.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Follow the
             <a href="https://vite.dev/guide/" target="_blank" rel="noopener"
@@ -4510,6 +5029,114 @@ npm run dev</code></pre>
             >
             to create a project, push it to GitHub, and confirm
             <code>node_modules</code> is not in the repo.
+          </p>
+        </section>
+
+
+        <!-- ============ DEBUGGING ============ -->
+        <section class="stage" id="debug" data-title="Debugging">
+          <header class="stage-head">
+            <span class="stage-num"></span>
+            <div>
+              <h2>Debugging <small>when it doesn't work</small></h2>
+              <p class="lead">
+                Developers spend a large part of every day with code that doesn't work yet.
+                Debugging is a skill with steps, not luck, and it gets faster with practice.
+              </p>
+            </div>
+            <button class="btn learned" type="button" aria-pressed="false">
+              Mark learned
+            </button>
+          </header>
+<div class="fe-brief"><span class="fe-time">About 2 to 3 hours, then every day after</span><div><b>By the end you can</b><ul><li>Read an error message and jump to the line that caused it.</li><li>Narrow down a bug with <code>console.log</code> and breakpoints.</li><li>Ask for help with a small, clear example.</li></ul></div></div>
+          <div class="grid">
+<article class="topic" id="debug-routine" data-node data-label="A debugging routine">
+<h3>A debugging routine</h3>
+<ol>
+<li><b>Reproduce it.</b> Find the exact steps that make it happen every time.</li>
+<li><b>Read the error.</b> All of it, including the file name and line number.</li>
+<li><b>Check your assumptions.</b> Log the values you are "sure" about. One of them is usually wrong.</li>
+<li><b>Narrow it down.</b> Log at each step, or comment out half the code, until you find the first place where reality differs from what you expected.</li>
+<li><b>Change one thing at a time,</b> then test again.</li>
+<li><b>Explain the fix.</b> If you can't say why it works, you may have hidden the bug instead of fixing it.</li>
+</ol>
+</article><article class="topic wide" id="debug-errors" data-node data-label="Reading errors">
+<h3>Reading error messages</h3>
+<p>An error message tells you the type, the reason, and where it happened. Click the file link on the right of the Console message to jump to the line.</p>
+<pre><code>Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')
+    at script.js:4:8</code></pre>
+<p>Read it as: on line 4 of <code>script.js</code>, something was <code>null</code>, and the code tried to call <code>addEventListener</code> on it. Look at whatever comes before the dot.</p>
+<div class="tw"><table>
+<thead><tr><th>Error</th><th>What it usually means</th></tr></thead>
+<tbody>
+<tr><td><code>Cannot read properties of null</code> or <code>undefined</code></td><td>Something you expected doesn't exist: <code>querySelector</code> found nothing, or data hasn't loaded yet.</td></tr>
+<tr><td><code>ReferenceError: x is not defined</code></td><td>A typo in a name, or a variable used outside its scope.</td></tr>
+<tr><td><code>TypeError: x is not a function</code></td><td>A typo like <code>getElementByID</code>, or calling something that is data, not a function.</td></tr>
+<tr><td><code>SyntaxError: Unexpected token</code></td><td>A missing bracket, comma or quote, often on the line before the one reported.</td></tr>
+<tr><td><code>Unexpected token '&lt;'</code> while reading JSON</td><td>You called <code>res.json()</code> on an HTML page, often a 404 page from a wrong URL.</td></tr>
+<tr><td><code>Uncaught (in promise)</code></td><td>An async function threw and nothing caught it. Wrap the <code>await</code> in <code>try</code> and <code>catch</code>.</td></tr>
+<tr><td><code>Failed to fetch</code> or a CORS error</td><td>The request was blocked or never reached the server. Check the URL, the Network tab, and the <a href="../Backend/Backend_Handbook.html#sec-cors">Backend CORS card</a>.</td></tr>
+</tbody></table></div>
+</article><article class="topic" id="debug-console" data-node data-label="console and breakpoints">
+<h3>console and breakpoints</h3>
+<pre><code>console.log({ user, total });   // labels each value for free
+console.table(tasks);           // an array of objects as a table
+console.error("Save failed", error);
+debugger;                       // pauses here while DevTools is open</code></pre>
+<p>A <b>breakpoint</b> pauses the code so you can look around. In DevTools, open Sources and click a line number. When it pauses, hover any variable to see its value, then step forward one line at a time. It beats adding twenty <code>console.log</code> lines.</p>
+</article><article class="topic" id="debug-css">
+<h3>Debugging CSS</h3>
+<ul>
+<li>Right-click the element and choose Inspect. The Styles panel lists every rule that matched it.</li>
+<li>A crossed-out line lost to a stronger rule. A warning icon means an invalid value or a typo.</li>
+<li>The Computed tab shows the final value of each property, and which rule set it.</li>
+<li>The box model diagram shows the real margin, border and padding.</li>
+<li>Edit values live in DevTools to experiment, then copy the winner into your file. DevTools edits vanish on reload.</li>
+</ul>
+</article><article class="topic" id="debug-network">
+<h3>Debugging requests</h3>
+<p>When data doesn't show up, open the Network tab, choose the Fetch/XHR filter, and click the request.</p>
+<ul>
+<li><b>Not in the list?</b> Your code never sent it. Check that the function actually runs.</li>
+<li><b>Status 4xx or 5xx?</b> Read the Response tab for the server's error message.</li>
+<li><b>Payload</b> shows what you sent. Is it JSON, with the field names the server expects?</li>
+<li><b>Response</b> shows the raw answer. Does its shape match what your code reads?</li>
+</ul>
+</article><article class="topic" id="debug-ask">
+<h3>Asking for help well</h3>
+<p>Whether you ask each other on Meet, a forum, or an AI, a good question has four parts:</p>
+<ol>
+<li>What you are trying to do.</li>
+<li>What you expected, and what happened instead.</li>
+<li>The smallest piece of code that shows the problem, and the exact error text.</li>
+<li>What you already tried.</li>
+</ol>
+<p>Writing it down often solves the bug before you send it. When you ask an AI, ask it to explain the cause instead of rewriting your code, so the learning stays yours.</p>
+</article>
+<article class="topic wide fe-practice" id="debug-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Find each bug before you open the answer. Read the error message first.</p>
+<ol class="fe-tasks">
+<li><b>Bug 1.</b> The console says <code>TypeError: btn.addEventListner is not a function</code>.<pre><code>const btn = document.querySelector(".save-btn");
+btn.addEventListner("click", save);</code></pre><details class="hint answer"><summary>Show one answer</summary><div>A typo: <code>addEventListner</code> is missing an "e". It should be <code>addEventListener</code>.</div></details></li>
+<li><b>Bug 2.</b> The console says <code>TypeError: res.json is not a function</code>.<pre><code>async function load() {
+  const res = fetch("/api/tasks");
+  const tasks = await res.json();
+}</code></pre><details class="hint"><summary>Hint</summary><div>What does <code>fetch</code> return before you await it?</div></details><details class="hint answer"><summary>Show one answer</summary><div><code>fetch</code> isn't awaited, so <code>res</code> is a promise, not a response. Write <code>const res = await fetch("/api/tasks");</code></div></details></li>
+<li><b>Bug 3.</b> The total is always <code>undefined</code>.<pre><code>const total = prices.reduce((sum, p) =&gt; { sum + p }, 0);</code></pre><details class="hint answer"><summary>Show one answer</summary><div>With curly braces, an arrow function needs <code>return</code>. Write <code>(sum, p) =&gt; sum + p</code>, or <code>{ return sum + p; }</code>.</div></details></li>
+<li><b>Bug 4.</b> On a phone, the cards stick out past the right edge of the screen.<pre><code>.card { width: 100%; padding: 24px; }</code></pre><details class="hint answer"><summary>Show one answer</summary><div>Without <code>box-sizing: border-box</code>, the width is 100% plus 48px of padding. Add the border-box rule from the CSS mistakes card.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> The Console points to line 12, but line 12 looks fine. Where else do you look?</p><div class="opts"><button type="button" class="opt">Nowhere, the browser is wrong</button><button type="button" class="opt" data-ok>The line before it, and wherever line 12's values came from</button></div><p class="why" hidden>Syntax errors are often reported one line late. For other errors, the bad value was usually created earlier.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> <code>res.json()</code> fails with <code>Unexpected token '&lt;'</code>. What did the server send?</p><div class="opts"><button type="button" class="opt">JSON with a typo</button><button type="button" class="opt" data-ok>An HTML page, such as a 404 page</button></div><p class="why" hidden>HTML starts with <code>&lt;</code>. Check the URL and the status code in the Network tab.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> A bug seems to happen "randomly". What do you do first?</p><div class="opts"><button type="button" class="opt">Rewrite the feature</button><button type="button" class="opt" data-ok>Find the exact steps that reproduce it</button></div><p class="why" hidden>A bug you can trigger on demand is half fixed. A bug you can't trigger can't be tested.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+          </div>
+          <p class="deeper">
+            <span class="label">Go deeper</span>Work through
+            <a href="https://developer.chrome.com/docs/devtools/javascript" target="_blank" rel="noopener">Chrome DevTools: Debug JavaScript</a>,
+            which walks through breakpoints on a small broken page. The same tools are in Edge.
           </p>
         </section>
 
@@ -4529,6 +5156,8 @@ npm run dev</code></pre>
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 8 to 10 hours</span><div><b>By the end you can</b><ul><li>Split a screen into components and pass data down with props.</li><li>Keep changing data in state and update it without mutating it.</li><li>Render lists with keys, and show different UI for different states.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -4548,20 +5177,45 @@ npm run dev</code></pre>
                 write what the screen should show, and update the data.
               </p>
             </article>
+<article class="topic wide" id="react-thinking" data-node data-label="Thinking in React">
+<h3>Thinking in React</h3>
+<p>Before writing code, plan on paper. React's own docs suggest these steps:</p>
+<ol>
+<li><b>Draw boxes around the UI.</b> Each box with one job is a component.</li>
+<li><b>Build a static version</b> with props only and no state, so it just displays data.</li>
+<li><b>Find the smallest state.</b> For each piece of data ask: does it change over time? Can it be calculated from something else? If it can be calculated, it isn't state.</li>
+<li><b>Decide where state lives:</b> in the closest common parent of every component that needs it.</li>
+<li><b>Pass functions down</b> so children can ask that parent to change it.</li>
+</ol>
+<pre><code>TaskApp              state: tasks, filter
+├── AddTaskForm      gets onAdd
+├── FilterTabs       gets filter, onChange
+└── TaskList         gets the visible tasks
+    └── TaskItem     gets task, onToggle, onDelete</code></pre>
+<p>In this to-do app the visible list isn't state. It's calculated from <code>tasks</code> and <code>filter</code> on every render.</p>
+</article>
+
             <article
               class="topic"
               id="react-components"
               data-node
               data-label="Components"
             >
-              <h3>Components</h3>
-              <p>
-                A component is a function that returns markup. Names start with
-                a capital letter. A page is a tree of components, such as
-                <code>Navbar</code>, <code>ProductCard</code> and
-                <code>Footer</code>, each reusable.
-              </p>
-            </article>
+<h3>Components</h3>
+<p>A component is a function that returns markup. Its name starts with a capital letter. A page is a tree of components, such as <code>Navbar</code>, <code>ProductCard</code> and <code>Footer</code>, each reusable.</p>
+<pre><code>function Navbar() {
+  return &lt;nav&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/nav&gt;;
+}
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Navbar /&gt;
+      &lt;main&gt;...&lt;/main&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+</article>
             <article class="topic" id="react-jsx" data-node data-label="JSX">
               <h3>JSX</h3>
               <p>
@@ -4607,13 +5261,9 @@ npm run dev</code></pre>
               data-node
               data-label="State"
             >
-              <h3>State</h3>
-              <p>
-                State is data a component owns and can change. When you call the
-                setter, React re-renders. Never edit state directly, always make
-                a new value.
-              </p>
-              <pre><code>import { useState } from "react";
+<h3>State</h3>
+<p>State is data a component owns that changes over time. Why not a normal variable? A normal variable resets on every render, and changing it doesn't tell React to redraw. A state setter does both: it keeps the value and triggers a re-render.</p>
+<pre><code>import { useState } from "react";
 
 function Counter() {
   const [count, setCount] = useState(0);
@@ -4623,7 +5273,12 @@ function Counter() {
     &lt;/button&gt;
   );
 }</code></pre>
-            </article>
+<p>Two rules that trip up everyone:</p>
+<ul>
+<li><b>Never mutate state.</b> <code>tasks.push(t)</code> edits the old array, so React may not notice. Make a new one: <code>setTasks([...tasks, t])</code>. See <a href="#js-refs">values and references</a>.</li>
+<li><b>The new value isn't there yet.</b> Right after <code>setCount(count + 1)</code>, <code>count</code> still holds the old number. It changes on the next render.</li>
+</ul>
+</article>
             <article
               class="topic"
               id="react-events"
@@ -4672,14 +5327,13 @@ function Counter() {
               </p>
             </article>
             <article class="topic" id="react-routing">
-              <h3>Routing</h3>
-              <p>
-                React Router gives one page many URLs without reloading, which
-                makes it a single page app (SPA). Clicking a link swaps
-                components instead of downloading a new HTML page. Next.js
-                replaces this with file-based routing.
-              </p>
-            </article>
+<h3>Routing</h3>
+<p>React Router gives one page many URLs without reloading, which makes it a single page app (SPA). Clicking a link swaps components instead of downloading a new HTML page. Next.js replaces this with file-based routing.</p>
+<pre><code>&lt;Routes&gt;
+  &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+  &lt;Route path="/tasks/:id" element={&lt;TaskPage /&gt;} /&gt;
+&lt;/Routes&gt;</code></pre>
+</article>
             <article
               class="topic"
               id="react-tailwind"
@@ -4706,7 +5360,22 @@ function Counter() {
                 built on Tailwind.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="react-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Start a React playground with <code>npm create vite@latest</code> (React template), or use the sandboxes on react.dev.</p>
+<ol class="fe-tasks">
+<li><b>Counter, the React way.</b> Rebuild the DOM counter in React. Notice what disappears: no <code>querySelector</code>, no <code>textContent</code>.<details class="hint"><summary>Hint</summary><div>One <code>useState</code> for the count. The red color is a class chosen during render: <code>className={count &gt;= 10 ? "high" : ""}</code>.</div></details></li>
+<li><b>To-do list.</b> Add, toggle done, delete, and filter tabs for All, Active and Done. Plan the components on paper first, as in Thinking in React.<details class="hint"><summary>Hint</summary><div>State is only <code>tasks</code> and <code>filter</code>. Toggle with <code>tasks.map</code>, returning a new object for the clicked task: <code>{ ...t, done: !t.done }</code>. Delete with <code>filter</code>.</div></details></li>
+<li><b>Lift state up.</b> Two components side by side: an input in Celsius and a display in Fahrenheit. Typing in the input updates the display.<details class="hint"><summary>Hint</summary><div>Neither child owns the temperature. The parent does, and passes the value and an <code>onChange</code> function down.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> <code>tasks.push(newTask); setTasks(tasks);</code> The list doesn't update. Why?</p><div class="opts"><button type="button" class="opt">push is slow</button><button type="button" class="opt" data-ok>It is the same array, so React sees no change</button><button type="button" class="opt">setTasks needs await</button></div><p class="why" hidden>React compares the old and new value. The same array means "nothing changed". Use <code>setTasks([...tasks, newTask])</code>.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> Why does each list item need a <code>key</code>?</p><div class="opts"><button type="button" class="opt">For CSS</button><button type="button" class="opt" data-ok>So React can tell items apart when the list changes</button><button type="button" class="opt">HTML requires it</button></div><p class="why" hidden>Without stable keys, React can mix up items when you add, remove or reorder them, for example keeping the wrong checkbox ticked.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> Can a child component change its props?</p><div class="opts"><button type="button" class="opt">Yes</button><button type="button" class="opt" data-ok>No; it calls a function from the parent, and the parent changes its state</button></div><p class="why" hidden>Data flows down, requests to change it flow up.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> You have <code>tasks</code> and <code>filter</code> in state. Should the filtered list be state too?</p><div class="opts"><button type="button" class="opt">Yes</button><button type="button" class="opt" data-ok>No, calculate it during render from tasks and filter</button></div><p class="why" hidden>Copying calculated data into state creates two sources of truth that can drift apart.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Read
             <a href="https://react.dev/learn" target="_blank" rel="noopener"
@@ -4733,6 +5402,8 @@ function Counter() {
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 8 to 10 hours</span><div><b>By the end you can</b><ul><li>Tell when an effect is needed and when it isn't.</li><li>Fetch data in an effect, with cleanup.</li><li>Move repeated logic into a custom hook.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -4813,6 +5484,13 @@ function Counter() {
                   </tbody>
                 </table>
               </div>
+              <p>The first version you'll write looks like this:</p>
+<pre><code>useEffect(() =&gt; {
+  fetch("/api/users")
+    .then(res =&gt; res.json())
+    .then(data =&gt; setUsers(data));
+}, []);   // run once, after the first render</code></pre>
+              <p>It works, but it has two holes: no error handling, and a late response can still set state after the component is gone or the request was replaced. The safe version below fixes both. Read it once now, and again after you've written the simple one.</p>
               <div class="cols">
                 <pre><code>// setUsers and setError are component state setters.
 useEffect(() =&gt; {
@@ -4855,6 +5533,20 @@ useEffect(() =&gt; {
                 explains the lifecycle.
               </p>
             </article>
+<article class="topic wide" id="hooks-noeffect" data-node data-label="You might not need an effect">
+<h3>You might not need an effect</h3>
+<p>Effects are for talking to things outside React: the network, timers, the browser tab. A common beginner habit is using an effect to calculate data. That costs an extra render and leaves values out of sync for a moment.</p>
+<div class="cols">
+<pre><code>// avoid: an effect that copies state
+const [visible, setVisible] = useState([]);
+useEffect(() =&gt; {
+  setVisible(tasks.filter(t =&gt; !t.done));
+}, [tasks]);</code></pre><pre><code>// better: calculate during render
+const visible = tasks.filter(t =&gt; !t.done);</code></pre>
+</div>
+<p>The same goes for user actions: respond to a click inside the click handler, not in an effect that watches state. React's guide <a href="https://react.dev/learn/you-might-not-need-an-effect" target="_blank" rel="noopener">You Might Not Need an Effect</a> has many more examples.</p>
+</article>
+
             <article class="topic" id="hooks-ref" data-node data-label="useRef">
               <h3>useRef</h3>
               <p>
@@ -4871,16 +5563,25 @@ useEffect(() =&gt; {
               data-node
               data-label="useContext"
             >
-              <h3>useContext</h3>
-              <p>
-                Shares data with many components without passing props through
-                every level (prop drilling). Good for theme, current user,
-                language.
-              </p>
-              <pre><code>const ThemeContext = createContext("dark");
-// wrap the tree: &lt;ThemeContext.Provider value="light"&gt;
-// any child:     const theme = useContext(ThemeContext);</code></pre>
-            </article>
+<h3>useContext</h3>
+<p>Shares data with many components without passing props through every level (prop drilling). Good for the theme, the current user, or the language.</p>
+<pre><code>const ThemeContext = createContext("light");
+
+function App() {
+  const [theme, setTheme] = useState("dark");
+  return (
+    &lt;ThemeContext.Provider value={theme}&gt;
+      &lt;Page /&gt;
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+function SaveButton() {
+  const theme = useContext(ThemeContext);  // "dark", no props needed
+  return &lt;button className={theme}&gt;Save&lt;/button&gt;;
+}</code></pre>
+<p>React 19 also accepts <code>&lt;ThemeContext value={theme}&gt;</code> without <code>.Provider</code>.</p>
+</article>
             <article
               class="topic"
               id="hooks-memo"
@@ -4921,14 +5622,20 @@ const onSelect = useCallback(id =&gt; setSelected(id), []);</code></pre>
               </p>
             </article>
             <article class="topic" id="hooks-reducer">
-              <h3>useReducer</h3>
-              <p>
-                An alternative to <code>useState</code> when state has many
-                related pieces. You send actions like <code>"add"</code> or
-                <code>"remove"</code> to one function that decides the next
-                state.
-              </p>
-            </article>
+<h3>useReducer</h3>
+<p>An alternative to <code>useState</code> when one piece of state changes in many ways. You send actions like <code>"add"</code> or <code>"toggle"</code> to one function that decides the next state.</p>
+<pre><code>function reducer(tasks, action) {
+  switch (action.type) {
+    case "add":    return [...tasks, action.task];
+    case "toggle": return tasks.map(t =&gt;
+                     t.id === action.id ? { ...t, done: !t.done } : t);
+    case "remove": return tasks.filter(t =&gt; t.id !== action.id);
+    default:       return tasks;
+  }
+}
+const [tasks, dispatch] = useReducer(reducer, []);
+dispatch({ type: "toggle", id: 3 });</code></pre>
+</article>
             <article
               class="topic wide"
               id="hooks-custom"
@@ -4976,7 +5683,23 @@ function useFetch(url) {
                 built-in hooks first.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="hooks-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Stopwatch.</b> Start, Stop and Reset buttons. Stop must really stop the timer, and leaving the page must clear it.<details class="hint"><summary>Hint</summary><div>Run the interval inside an effect that depends on a <code>running</code> state, and clear it in the cleanup.</div></details></li>
+<li><b>Tab title.</b> Show the number of unfinished tasks in the browser tab, like "(3) My tasks".<details class="hint"><summary>Hint</summary><div>The tab title is outside React, so this is a real effect. Make it depend on the count.</div></details></li>
+<li><b>useLocalStorage.</b> Write a custom hook that works like <code>useState</code> but remembers its value in <code>localStorage</code>. Use it in your to-do list.<details class="hint"><summary>Hint</summary><div>Read the saved value inside a function passed to <code>useState</code>, so it runs only once. Save in an effect whenever the value changes.</div></details></li>
+<li><b>Debounced search.</b> Search jsonplaceholder users as you type, sending one request 300ms after typing stops.<details class="hint"><summary>Hint</summary><div>An effect that depends on the query sets a timeout, and its cleanup clears that timeout.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> <code>useEffect(() =&gt; { setCount(count + 1); });</code> has no dependency array. What happens?</p><div class="opts"><button type="button" class="opt">It runs once</button><button type="button" class="opt" data-ok>An endless loop: each render runs the effect, which sets state, which renders again</button></div><p class="why" hidden>With no array, the effect runs after every render. Setting state inside it causes another render.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> Which hook keeps a value between renders without causing a re-render when it changes?</p><div class="opts"><button type="button" class="opt">useState</button><button type="button" class="opt" data-ok>useRef</button><button type="button" class="opt">useMemo</button></div><p class="why" hidden>Changing <code>ref.current</code> doesn't re-render. Use it for timer ids and DOM elements.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> Where should a page's data fetch run in plain React?</p><div class="opts"><button type="button" class="opt">Directly in the component body</button><button type="button" class="opt" data-ok>In an effect, or with a library like TanStack Query</button><button type="button" class="opt">In useMemo</button></div><p class="why" hidden>A fetch in the component body would run on every render.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> Why can't you call a hook inside an <code>if</code>?</p><div class="opts"><button type="button" class="opt">It is slower</button><button type="button" class="opt" data-ok>React matches hooks by their call order, and an if can change that order</button></div><p class="why" hidden>If one render skips a hook, every hook after it gets the wrong stored value.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Read
             <a
@@ -5007,6 +5730,8 @@ function useFetch(url) {
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 4 to 5 hours</span><div><b>By the end you can</b><ul><li>Type the props, state and events of a component.</li><li>Read common TypeScript errors and fix them.</li><li>Explain what types catch, and what they can't.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -5132,7 +5857,21 @@ function first&lt;T&gt;(arr: T[]): T | undefined { // empty arrays return undefi
                 <code>.tsx</code>.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="tsx-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Type a card.</b> Convert a <code>ProductCard</code> with a name, a price, an optional discount and an <code>onBuy</code> function to TSX with an interface.<details class="hint"><summary>Hint</summary><div><code>onBuy: () =&gt; void</code> means "a function that takes nothing and returns nothing". Optional props get a <code>?</code>.</div></details></li>
+<li><b>Read the error.</b> <code>Type 'string' is not assignable to type 'number'</code> appears on <code>setAge(e.target.value)</code>. What does it mean, and how do you fix it?<details class="hint answer"><summary>Show one answer</summary><div>Input values are always strings, and <code>age</code> is a number. Convert it: <code>setAge(Number(e.target.value))</code>.</div></details></li>
+<li><b>Convert one project.</b> Rename your React to-do list files to <code>.tsx</code> and fix every error. Start with a <code>Task</code> type.<details class="hint"><summary>Hint</summary><div><code>type Task = { id: number; title: string; done: boolean };</code> then <code>useState&lt;Task[]&gt;([])</code>.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> Your types say an API returns a <code>User</code>, but the server sends something else. What happens?</p><div class="opts"><button type="button" class="opt">TypeScript throws an error at runtime</button><button type="button" class="opt" data-ok>Nothing at runtime; the types are gone before the code runs</button></div><p class="why" hidden>Types are checked while you code, then removed. Check data from outside with a runtime validator, such as the Zod library.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> Which file can hold a component with markup?</p><div class="opts"><button type="button" class="opt">.ts</button><button type="button" class="opt" data-ok>.tsx</button></div><p class="why" hidden>Only <code>.tsx</code> files allow JSX.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> What does <code>email?: string</code> mean?</p><div class="opts"><button type="button" class="opt">email must be a string</button><button type="button" class="opt" data-ok>email may be missing; if it is there, it is a string</button></div><p class="why" hidden>The <code>?</code> makes a property optional, so its type is really <code>string | undefined</code>.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>Keep the
             <a
@@ -5163,6 +5902,8 @@ function first&lt;T&gt;(arr: T[]): T | undefined { // empty arrays return undefi
               Mark learned
             </button>
           </header>
+<div class="fe-brief"><span class="fe-time">About 8 to 10 hours</span><div><b>By the end you can</b><ul><li>Create pages and dynamic routes in the <code>app</code> folder.</li><li>Decide which parts are Server Components and which are Client Components.</li><li>Explain SSR and SSG, and when each fits.</li></ul></div></div>
+
           <div class="grid">
             <article
               class="topic"
@@ -5170,7 +5911,7 @@ function first&lt;T&gt;(arr: T[]): T | undefined { // empty arrays return undefi
               data-node
               data-label="What and why"
             >
-              <h3>What it is and why it exists</h3>
+<h3>What it is and why it exists</h3>
               <p>
                 A client-rendered React SPA often starts with a small HTML shell
                 and builds its UI in the browser. That can delay meaningful
@@ -5183,7 +5924,8 @@ function first&lt;T&gt;(arr: T[]): T | undefined { // empty arrays return undefi
                 Next.js also makes many decisions for you: how to route, fetch,
                 optimize and deploy.
               </p>
-            </article>
+<p><b>When to start it:</b> once React components, state and effects feel comfortable. Next.js adds server ideas on top of React, so learning both at once makes it hard to tell which one is causing a problem.</p>
+</article>
             <article
               class="topic"
               id="next-routing"
@@ -5357,7 +6099,22 @@ export function LikeButton() {
                 value through a response or rendered props.
               </p>
             </article>
-          </div>
+          <article class="topic wide fe-practice" id="nextjs-practice">
+<h3>Practice and quick check</h3>
+<p class="fe-small">Do these in your playground before you mark the stage learned. Type the code yourself; the typing is part of the learning.</p>
+<ol class="fe-tasks">
+<li><b>Three pages.</b> With <code>npx create-next-app@latest</code>, build Home, About, and a blog list where each post opens at <code>/blog/[slug]</code>. Keep the posts in an array in a file.<details class="hint"><summary>Hint</summary><div><code>app/blog/[slug]/page.tsx</code> receives the slug through <code>params</code>.</div></details></li>
+<li><b>Server, then client.</b> Render the post list as a Server Component, and add a Like button that counts clicks. Only the button should be a Client Component.<details class="hint"><summary>Hint</summary><div>Put <code>"use client"</code> at the top of <code>LikeButton.tsx</code> only, and import it into the server page.</div></details></li>
+<li><b>Loading and not found.</b> Add <code>loading.tsx</code> and <code>not-found.tsx</code>, and call <code>notFound()</code> for an unknown slug.<details class="hint"><summary>Hint</summary><div><code>notFound</code> is imported from <code>next/navigation</code>.</div></details></li>
+</ol>
+<div class="quiz" data-quiz><h4>Quick check</h4>
+<div class="q"><p class="q-text"><b>1.</b> In the <code>app</code> folder, a page is by default...</p><div class="opts"><button type="button" class="opt">a Client Component</button><button type="button" class="opt" data-ok>a Server Component</button></div><p class="why" hidden>Pages and layouts run on the server unless a file opts into the client with <code>"use client"</code>.</p></div>
+<div class="q"><p class="q-text"><b>2.</b> A component needs <code>useState</code>. What do you add?</p><div class="opts"><button type="button" class="opt">"use server" at the top</button><button type="button" class="opt" data-ok>"use client" at the top of that file</button></div><p class="why" hidden>State, effects and event handlers need client JavaScript.</p></div>
+<div class="q"><p class="q-text"><b>3.</b> <code>NEXT_PUBLIC_API_KEY=secret</code>. Is the secret safe?</p><div class="opts"><button type="button" class="opt">Yes</button><button type="button" class="opt" data-ok>No, NEXT_PUBLIC_ variables are bundled into browser code</button></div><p class="why" hidden>The prefix exists precisely to expose a value to the browser.</p></div>
+<div class="q"><p class="q-text"><b>4.</b> A blog post changes once a month and must load fast. The best fit?</p><div class="opts"><button type="button" class="opt">Client-side rendering</button><button type="button" class="opt" data-ok>Static generation, perhaps with revalidation</button></div><p class="why" hidden>Build the HTML once and serve it from a cache. Revalidation refreshes it when the post changes.</p></div>
+<div class="quiz-foot"><p class="quiz-score" aria-live="polite"></p><button type="button" class="btn quiz-reset" hidden>Try again</button></div></div>
+</article>
+</div>
           <p class="deeper">
             <span class="label">Go deeper</span>The
             <a href="https://nextjs.org/learn" target="_blank" rel="noopener"
@@ -5388,58 +6145,20 @@ export function LikeButton() {
           </header>
           <div class="grid">
             <article class="topic wide" id="finish-order">
-              <h3>Suggested order</h3>
-              <div class="tw">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Stage</th>
-                      <th>Learn</th>
-                      <th>Build to practice</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>HTML, CSS, flexbox, grid, responsive</td>
-                      <td>Portfolio or landing page clone</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>JavaScript, DOM, fetch</td>
-                      <td>To-do app, weather app, quiz</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Git and GitHub</td>
-                      <td>Push every project</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>React and hooks</td>
-                      <td>Movie search, expense tracker</td>
-                    </tr>
-                    <tr>
-                      <td>5</td>
-                      <td>TypeScript and TSX</td>
-                      <td>Convert one React project</td>
-                    </tr>
-                    <tr>
-                      <td>6</td>
-                      <td>Next.js</td>
-                      <td>Blog or task manager</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p>
-                After this comes the backend: Node, Express, databases and
-                login. Continue in the
-                <a href="../Backend/Backend_Handbook.html"
-                  >Backend handbook</a
-                >.
-              </p>
-            </article>
+<h3>Suggested order</h3>
+<div class="tw"><table>
+<thead><tr><th>Step</th><th>Learn</th><th>Build to practice</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>HTML, CSS, layout</td><td>An About me page, then a landing page clone that works on a phone</td></tr>
+<tr><td>2</td><td>JavaScript and the DOM</td><td><code>DOM/Practice_1</code> to <code>Practice_8</code>, then <a href="Practice/Practice_Guide.html">01_Quiz_Room and 02_Task_Planner</a></td></tr>
+<tr><td>3</td><td>Async JS and fetch</td><td>A weather app, then <a href="Practice/Practice_Guide.html">03_Expense_Tracker and 04_Study_Shop</a></td></tr>
+<tr><td>4</td><td>Tooling and debugging</td><td>Push every project to GitHub; read every error message in full</td></tr>
+<tr><td>5</td><td>React and hooks</td><td>Rebuild the to-do list and the quiz room in React</td></tr>
+<tr><td>6</td><td>TypeScript and TSX</td><td>Convert one React project</td></tr>
+<tr><td>7</td><td>Next.js</td><td>A blog or task manager</td></tr>
+</tbody></table></div>
+<p>After this comes the backend: Node, Express, databases and login. Continue in the <a href="../Backend/Backend_Handbook.html">Backend handbook</a>. To watch frontend and backend come together in one real app, read the <a href="../Projects/Project_Handbook.html">Build diary</a>.</p>
+</article>
             <article class="topic wide" id="finish-flow">
               <h3>How frontend and backend meet</h3>
               <p>
@@ -5507,6 +6226,14 @@ export function LikeButton() {
                 >, but the same things still happen underneath.
               </p>
             </article>
+<article class="topic wide" id="finish-glossary">
+<h3>Glossary</h3>
+<p>New words, in plain English. Each one links to the card that explains it.</p>
+<input type="search" class="fe-gloss-filter field" placeholder="Filter words" aria-label="Filter the glossary">
+<dl class="fe-gloss"><div class="g-item"><dt><a href="#async-api">API</a></dt><dd>A set of URLs a server offers so other code can read or change data.</dd></div><div class="g-item"><dt><a href="#async-loop">Async</a></dt><dd>Code that starts now and finishes later, without freezing the page.</dd></div><div class="g-item"><dt><a href="#html-elements">Attribute</a></dt><dd>A setting in an opening HTML tag, like <code>href</code> or <code>alt</code>.</dd></div><div class="g-item"><dt><a href="#debug-console">Breakpoint</a></dt><dd>A spot where DevTools pauses your code so you can inspect it.</dd></div><div class="g-item"><dt><a href="#dom-bubbling">Bubbling</a></dt><dd>An event travelling up from the clicked element through its parents.</dd></div><div class="g-item"><dt><a href="#tool-vite">Bundler</a></dt><dd>A tool that combines many source files into a few for the browser.</dd></div><div class="g-item"><dt><a href="#css-cascade">Cascade</a></dt><dd>The rules that decide which CSS declaration wins.</dd></div><div class="g-item"><dt><a href="#js-scope">Closure</a></dt><dd>A function that remembers the variables around where it was created.</dd></div><div class="g-item"><dt><a href="#react-components">Component</a></dt><dd>A function that returns a piece of UI in React.</dd></div><div class="g-item"><dt><a href="#async-api">CORS</a></dt><dd>Browser rules about reading responses from another origin.</dd></div><div class="g-item"><dt><a href="#dom-debounce">Debounce</a></dt><dd>Waiting until events stop for a moment before running code once.</dd></div><div class="g-item"><dt><a href="#hooks-effect">Dependency array</a></dt><dd>The list that tells React when to run an effect again.</dd></div><div class="g-item"><dt><a href="#dom-what">DOM</a></dt><dd>The live tree of objects the browser builds from your HTML.</dd></div><div class="g-item"><dt><a href="#hooks-effect">Effect</a></dt><dd>Code that syncs a React component with something outside React.</dd></div><div class="g-item"><dt><a href="#dom-events">Event</a></dt><dd>Something that happens on the page, like a click or a key press.</dd></div><div class="g-item"><dt><a href="#async-fetch">fetch</a></dt><dd>The browser function for sending HTTP requests.</dd></div><div class="g-item"><dt><a href="#layout-flex">Flexbox</a></dt><dd>A CSS layout for items along one row or column.</dd></div><div class="g-item"><dt><a href="#layout-grid">Grid</a></dt><dd>A CSS layout for rows and columns at once.</dd></div><div class="g-item"><dt><a href="#hooks-rules">Hook</a></dt><dd>A React function starting with <code>use</code> that gives components abilities.</dd></div><div class="g-item"><dt><a href="#next-components">Hydration</a></dt><dd>React attaching event handlers to HTML that was rendered on the server.</dd></div><div class="g-item"><dt><a href="#js-json">JSON</a></dt><dd>A text format for data, shaped like JavaScript objects.</dd></div><div class="g-item"><dt><a href="#react-jsx">JSX</a></dt><dd>HTML-like syntax inside JavaScript, used by React.</dd></div><div class="g-item"><dt><a href="#layout-responsive">Media query</a></dt><dd>A CSS rule that applies only at certain screen sizes or settings.</dd></div><div class="g-item"><dt><a href="#js-refs">Mutate</a></dt><dd>To change an existing object or array in place.</dd></div><div class="g-item"><dt><a href="#tool-npm">npm</a></dt><dd>The tool that installs JavaScript packages and runs project scripts.</dd></div><div class="g-item"><dt><a href="#async-styles">Promise</a></dt><dd>An object standing for a value that will arrive later, or an error.</dd></div><div class="g-item"><dt><a href="#react-props">Props</a></dt><dd>Inputs a parent component passes to a child.</dd></div><div class="g-item"><dt><a href="#js-refs">Reference</a></dt><dd>What a variable holds for objects and arrays: the address, not a copy.</dd></div><div class="g-item"><dt><a href="#react-why">Render</a></dt><dd>React calling your component to work out what the screen should show.</dd></div><div class="g-item"><dt><a href="#layout-responsive">Responsive</a></dt><dd>A layout that adapts to the screen size.</dd></div><div class="g-item"><dt><a href="#html-semantic">Semantic HTML</a></dt><dd>Tags chosen for meaning, like <code>nav</code> and <code>main</code>.</dd></div><div class="g-item"><dt><a href="#next-components">Server Component</a></dt><dd>A Next.js component that runs only on the server.</dd></div><div class="g-item"><dt><a href="#css-cascade">Specificity</a></dt><dd>The score that decides which CSS selector is stronger.</dd></div><div class="g-item"><dt><a href="#react-routing">SPA</a></dt><dd>Single page app: one HTML page that swaps views with JavaScript.</dd></div><div class="g-item"><dt><a href="#react-state">State</a></dt><dd>Data a component owns that changes over time.</dd></div><div class="g-item"><dt><a href="#web-http">Status code</a></dt><dd>The number in a response that says how a request went, like 200 or 404.</dd></div><div class="g-item"><dt><a href="#tsx-ts">TypeScript</a></dt><dd>JavaScript with types that are checked while you code.</dd></div><div class="g-item"><dt><a href="#html-skeleton">Viewport</a></dt><dd>The visible area of the page in the browser window.</dd></div></dl>
+<p class="fe-small fe-gloss-empty" hidden>No word matches. Try the search at the top instead.</p>
+</article>
+
             <article class="topic wide" id="finish-check">
               <h3>Can you say these out loud?</h3>
               <label class="check"
@@ -5563,7 +6290,7 @@ export function LikeButton() {
                   >What Next.js adds over React, and the difference between SSR
                   and SSG.</span
                 ></label
-              >
+              ><label class="check"><input type="checkbox" data-k="c11" /><span>Why copying an object is different from copying a number.</span></label><label class="check"><input type="checkbox" data-k="c12" /><span>How to read an error message and find the line that caused it.</span></label><label class="check"><input type="checkbox" data-k="c13" /><span>Why React state must be a new array or object, not an edited one.</span></label><label class="check"><input type="checkbox" data-k="c14" /><span>When you need an effect, and when you can simply calculate.</span></label>
             </article>
           </div>
           <p class="foot">
@@ -6520,6 +7247,164 @@ export function LikeButton() {
   });
   setCollapsed(!!store.get(KEY, false), false);
   paintTopics();
+})();
+</script>
+
+<script id="fe-learn-js">
+/* Frontend only: quizzes, extra labs, glossary filter and hero counts. Runs after the shared scripts. */
+(() => {
+  'use strict';
+  const $ = (s, p = document) => p.querySelector(s);
+  const $$ = (s, p = document) => [...p.querySelectorAll(s)];
+
+  const demos = $('#n-demos'), tasks = $('#n-tasks');
+  if (demos) demos.textContent = $$('main .demo').length;
+  if (tasks) tasks.textContent = $$('.fe-tasks > li').length;
+
+  // Quick checks: one try per question, then the explanation. "Try again" resets the set.
+  $$('[data-quiz]').forEach(quiz => {
+    const qs = $$('.q', quiz), score = $('.quiz-score', quiz), reset = $('.quiz-reset', quiz);
+    const paint = () => {
+      const done = qs.filter(q => q.classList.contains('answered'));
+      const right = done.filter(q => $('.opt.right.picked', q)).length;
+      score.textContent = done.length === qs.length ? `${right} of ${qs.length} right.${right === qs.length ? ' Nice work.' : ' Read the explanations, then try again.'}` : '';
+      reset.hidden = !done.length;
+    };
+    qs.forEach(q => $$('.opt', q).forEach(b => b.addEventListener('click', () => {
+      if (q.classList.contains('answered')) return;
+      q.classList.add('answered');
+      b.classList.add('picked', b.hasAttribute('data-ok') ? 'right' : 'wrong');
+      $$('.opt', q).forEach(o => { o.disabled = true; if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      $('.why', q).hidden = false;
+      paint();
+    })));
+    reset.addEventListener('click', () => {
+      qs.forEach(q => {
+        q.classList.remove('answered');
+        $$('.opt', q).forEach(o => { o.disabled = false; o.classList.remove('right', 'wrong', 'picked'); });
+        $('.why', q).hidden = true;
+      });
+      paint();
+      $('.opt', qs[0])?.focus();
+    });
+  });
+
+  // Lab: position
+  (() => {
+    const d = $('#demo-pos'); if (!d) return;
+    const box = $('.pos-box', d), parent = $('.pos-parent', d), out = $('.out', d), note = $('[data-pos-note]', d);
+    const notes = {
+      static: 'Static ignores top and left. The box stays in the normal flow.',
+      relative: 'The box moves from its own spot, and its old space stays reserved, so the text below does not move up.',
+      absolute: 'The box leaves the flow, so the text closes the gap. It is placed from the corner of the parent.',
+      absoluteFree: 'The parent is static now, so the box is placed from the next positioned ancestor: the outer box.',
+      sticky: 'Scroll inside the parent. The box scrolls normally, then sticks 20px from the top of the scrolling box.'
+    };
+    const upd = () => {
+      const pos = $('[data-p="pos"]', d).value, anchor = $('[data-p="anchor"]', d).checked;
+      parent.style.position = anchor ? 'relative' : 'static';
+      box.style.position = pos; box.style.top = '20px'; box.style.left = '40px';
+      out.textContent = `.parent { position: ${anchor ? 'relative' : 'static'}; }\n.box    { position: ${pos}; top: 20px; left: 40px; }`;
+      note.textContent = notes[pos === 'absolute' && !anchor ? 'absoluteFree' : pos];
+    };
+    d.addEventListener('input', upd); d.addEventListener('change', upd); upd();
+  })();
+
+  // Lab: grid
+  (() => {
+    const d = $('#demo-grid'); if (!d) return;
+    const g = $('.gr', d), out = $('.out', d), q = k => $(`[data-p="${k}"]`, d);
+    const upd = () => {
+      const fit = q('mode').value === 'fit', min = q('min').value, w = q('w').value, span = q('span').checked;
+      q('min').previousElementSibling.textContent = min + 'px';
+      q('w').previousElementSibling.textContent = w + '%';
+      q('min').disabled = !fit;
+      const cols = fit ? `repeat(auto-fit, minmax(${min}px, 1fr))` : 'repeat(3, 1fr)';
+      g.style.gridTemplateColumns = cols; g.style.width = w + '%';
+      g.firstElementChild.style.gridColumn = span ? 'span 2' : '';
+      out.textContent = `.grid {\n  display: grid;\n  grid-template-columns: ${cols};\n  gap: 8px;\n}` + (span ? '\n.item-1 { grid-column: span 2; }' : '');
+    };
+    d.addEventListener('input', upd); d.addEventListener('change', upd); upd();
+  })();
+
+  // Lab: array methods, computed for real on the same data the card shows
+  (() => {
+    const d = $('#demo-arr'); if (!d) return;
+    const data = [
+      { id: 1, title: 'HTML page', done: true, mins: 40 },
+      { id: 2, title: 'Flexbox game', done: false, mins: 25 },
+      { id: 3, title: 'Array drills', done: false, mins: 30 }
+    ];
+    const m = {
+      map: ['tasks.map(t => t.title)', t => t.map(x => x.title), 'Same length as the original. Use it to turn data into something else, like a list of names, or a list of elements in React.'],
+      filter: ['tasks.filter(t => !t.done)', t => t.filter(x => !x.done), 'A new array with only the items that pass the test. The original is untouched.'],
+      find: ['tasks.find(t => t.id === 2)', t => t.find(x => x.id === 2), 'One item, not an array, or undefined when nothing matches.'],
+      reduce: ['tasks.reduce((sum, t) => sum + t.mins, 0)', t => t.reduce((s, x) => s + x.mins, 0), 'The 0 is the starting value. Each step adds one task’s minutes to the running total.'],
+      some: ['tasks.some(t => t.done)', t => t.some(x => x.done), 'true if at least one item passes. Its partner every() is true only if all of them pass.'],
+      sort: ['[...tasks].sort((a, b) => a.mins - b.mins).map(t => t.mins)', t => [...t].sort((a, b) => a.mins - b.mins).map(x => x.mins), 'sort() changes the original array, so copy it first with [...tasks]. a.mins - b.mins sorts from small to big.']
+    };
+    const sel = $('[data-p="m"]', d), out = $('.out', d), note = $('[data-arr-note]', d);
+    const upd = () => {
+      const [code, fn, why] = m[sel.value];
+      out.textContent = code + '\n\n// result\n' + JSON.stringify(fn(data), null, 2);
+      note.textContent = why;
+    };
+    sel.addEventListener('change', upd); upd();
+  })();
+
+  // Lab: event loop, runs the real code
+  (() => {
+    const d = $('#demo-loop'); if (!d) return;
+    const out = $('.out', d), note = $('[data-loop-note]', d);
+    $('[data-p="run"]', d).addEventListener('click', () => {
+      out.textContent = '';
+      const log = s => { out.textContent += s + '\n'; };
+      log('1. start');
+      setTimeout(() => { log('timeout'); note.hidden = false; }, 0);
+      Promise.resolve().then(() => log('promise'));
+      log('2. end');
+    });
+  })();
+
+  // Lab: four UI states
+  (() => {
+    const d = $('#demo-states'); if (!d) return;
+    const view = $('.st-view', d), out = $('.out', d);
+    const items = ['HTML page', 'Flexbox game', 'Array drills'];
+    let run = 0;
+    const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    function render(state) {
+      out.textContent = 'render(' + JSON.stringify(state, null, 2) + ')';
+      if (state.status === 'loading') view.innerHTML = '<p class="st-msg"><span class="st-spin" aria-hidden="true"></span> Loading tasks...</p>';
+      else if (state.status === 'empty') view.innerHTML = '<p class="st-msg">No tasks yet. Add your first one above.</p>';
+      else if (state.status === 'error') { view.innerHTML = `<p class="st-msg err">${esc(state.message)} <button class="btn" type="button">Try again</button></p>`; $('button', view).addEventListener('click', () => load('success')); }
+      else view.innerHTML = '<ul>' + state.tasks.map(t => `<li>${esc(t)}</li>`).join('') + '</ul>';
+    }
+    function load(kind) {
+      const mine = ++run;
+      render({ status: 'loading' });
+      setTimeout(() => {
+        if (mine !== run) return;   // a newer request started, so ignore this stale answer
+        if (kind === 'error') render({ status: 'error', message: 'Couldn’t load tasks. Check your connection.' });
+        else if (kind === 'empty') render({ status: 'empty' });
+        else render({ status: 'success', tasks: items });
+      }, kind === 'slow' ? 2600 : 700);
+    }
+    $$('[data-s]', d).forEach(b => b.addEventListener('click', () => load(b.dataset.s)));
+    render({ status: 'success', tasks: items });
+  })();
+
+  // Glossary filter
+  (() => {
+    const f = $('.fe-gloss-filter'); if (!f) return;
+    const items = $$('.g-item'), empty = $('.fe-gloss-empty');
+    f.addEventListener('input', () => {
+      const t = f.value.trim().toLowerCase();
+      let shown = 0;
+      items.forEach(i => { i.hidden = !!t && !i.textContent.toLowerCase().includes(t); if (!i.hidden) shown++; });
+      empty.hidden = shown > 0;
+    });
+  })();
 })();
 </script>
   <!-- KITSU PET (source: Chibi_Pet_Widget.html in the folder above this repo) -->
